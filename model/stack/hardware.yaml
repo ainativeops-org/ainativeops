@@ -1,0 +1,38 @@
+# 01 · Оборудование / 01 · Hardware
+# Ключ RM-… после версии 1.0 не меняется и не переиспользуется. / An RM-… key is frozen after 1.0 and never reused.
+RM-HW-01:
+  name:
+    ru: CPU-серверы
+    en: CPU servers
+  desc:
+    ru: Физические и виртуальные вычислительные ресурсы. Задания размещает планировщик; фактическая ёмкость и ограничения изоляции учитываются при допуске нагрузки.
+    en: Physical and virtual compute resources. The scheduler places jobs; actual capacity and isolation limits are considered at workload admission.
+RM-HW-02:
+  name:
+    ru: GPU-серверы и кластеры
+    en: GPU servers and clusters
+  desc:
+    ru: Серверы с GPU для обучения и инференса. Планировщик выделяет ускорители заданиям по квотам и изолирует задания разных владельцев.
+    en: GPU servers for training and inference. The scheduler allocates accelerators to jobs by quota and isolates jobs of different owners.
+RM-HW-03:
+  name:
+    ru: GPU и CPU с TEE
+    en: GPU and CPU with TEE
+  desc:
+    ru: CPU и GPU с аппаратной доверенной средой исполнения (TEE). Данные и веса остаются зашифрованными в памяти и на шине.
+    en: CPUs and GPUs with a hardware trusted execution environment (TEE). Data and weights stay encrypted in memory and on the bus.
+  optional: true
+RM-HW-04:
+  name:
+    ru: СХД · объектное хранилище
+    en: Storage · object store
+  desc:
+    ru: Предоставляют файловое, объектное или блочное хранение по требованиям нагрузки. Интерфейсы и гарантии этих классов различаются; состав выбирается для конкретных потребителей.
+    en: File, object or block storage by workload requirements. These classes differ in interfaces and guarantees; the set is chosen per consumer.
+RM-HW-05:
+  name:
+    ru: Сеть и балансировщики
+    en: Network and load balancers
+  desc:
+    ru: Связность сервисов, раздельные сегменты и управляемые входы и выходы. Политики исключают прямой путь в обход обязательных точек контроля.
+    en: Service connectivity, separate segments and controlled ingress and egress. Policies exclude a direct path that bypasses mandatory control points.

@@ -1,0 +1,76 @@
+# 04 · Модели и инференс / 04 · Models and inference
+# Ключ RM-… после версии 1.0 не меняется и не переиспользуется. / An RM-… key is frozen after 1.0 and never reused.
+RM-MOD-01:
+  name:
+    ru: Foundation-модели · LLM
+    en: Foundation models · LLM
+  desc:
+    ru: Предобученные модели поставщиков и открытые веса. Их принимают через входной контроль артефактов с проверкой происхождения и формата весов.
+    en: Providers' pretrained models and open weights. They are accepted through artifact intake with provenance and weight format checks.
+RM-MOD-02:
+  name:
+    ru: Fine-tuned модели и LoRA
+    en: Fine-tuned models and LoRA
+  desc:
+    ru: Модели, дообученные под продукт. Версия модели связана с набором данных, параметрами и заданием обучения.
+    en: Models fine-tuned for the product. The model version is linked to the dataset, parameters and the training job.
+RM-MOD-03:
+  name:
+    ru: Внешние LLM API
+    en: External LLM APIs
+  desc:
+    ru: Модели поставщиков по API за пределами контура. Поставщик может сменить модель без уведомления, поэтому LLM Gateway фиксирует фактическую версию ответа.
+    en: Providers' models behind an API outside the perimeter. The provider can change the model without notice, so the LLM Gateway records the actual version of each response.
+  optional: true
+RM-MOD-04:
+  name:
+    ru: Классические ML-модели
+    en: Classic ML models
+  desc:
+    ru: Модели классификации, прогноза и ранжирования без генерации текста. Они проходят те же рубежи выпуска, что и языковые модели.
+    en: Classification, forecasting and ranking models without text generation. They pass the same release gates as language models.
+  optional: true
+RM-MOD-05:
+  name:
+    ru: Model Registry
+    en: Model Registry
+  desc:
+    ru: Единый каталог моделей и реестр версий весов, адаптеров и метаданных. Фиксирует происхождение, условия использования и результаты испытаний. Статус допуска задаётся контроллером выпуска.
+    en: A single catalogue of models and a registry of weight, adapter and metadata versions. Records provenance, terms of use and test results. The release gate sets the admission status.
+RM-MOD-06:
+  name:
+    ru: LLM Gateway
+    en: LLM Gateway
+  desc:
+    ru: Маршрутизирует запросы к разрешённой внутренней модели или внешнему провайдеру через адаптеры API. При резервном выборе сохраняет ограничения раскрытия и фиксирует фактическую модель. Правила сети и бюджета проверяются для выбранного маршрута.
+    en: Routes requests to an allowed internal model or an external provider through API adapters. On fallback it keeps disclosure limits and records the actual model. Network and budget rules are checked for the chosen route.
+RM-MOD-07:
+  name:
+    ru: Inference-серверы
+    en: Inference servers
+  desc:
+    ru: Исполнение допущенных моделей с управлением загрузкой и версиями. EXP, EVAL и PROD используют раздельные доступы и конфигурации; внутренний ИИ-контролёр получает собственный сервис. Кеширование промежуточного KV-состояния относится к внутренней реализации сервиса; его области доверия и очистка определяются профилем.
+    en: Serve admitted models and manage loading and versions. EXP, EVAL and PROD use separate access and configurations; the internal AI controller gets its own service. KV cache is an internal detail of the service; its trust scopes and purging are defined by the profile.
+RM-MOD-08:
+  name:
+    ru: Очередь и батчинг запросов
+    en: Request queue and batching
+  desc:
+    ru: Ограничивает параллельность и размер модельных запросов, ведёт очередь и приоритеты. Использует выделенный задаче лимит; общий бюджет всей задачи учитывает Rate limits Harness.
+    en: Limits concurrency and size of model requests and manages the queue and priorities. Uses the limit allocated to the task; the Harness rate limits account for the budget of the whole task.
+RM-MOD-09:
+  name:
+    ru: Embedding-сервис
+    en: Embedding service
+  desc:
+    ru: Вычисляет векторные представления документов и запросов. Версия модели связана с индексом; повторное ранжирование выполняется в цепочке извлечения контекста по потребности.
+    en: Computes vector representations of documents and queries. The model version is linked to the index; reranking runs in the retrieval chain when needed.
+  optional: true
+RM-MOD-10:
+  name:
+    ru: Семантический кеш
+    en: Semantic cache
+  desc:
+    ru: Сохраняет готовые ответы для повторного использования. Ключ учитывает запрос, разрешённую область данных и версии конфигурации; определены срок хранения и инвалидирование.
+    en: Stores ready answers for reuse. The key covers the query, the permitted data scope and configuration versions; retention and invalidation are defined.
+  optional: true

@@ -1,0 +1,53 @@
+# Сценарий / Scenario: Создание дата-продукта / Data product creation
+# Шаг = [элемент, [участники]] / Step = [element, [participants]]
+order: 1
+name:
+  ru: Создание дата-продукта
+  en: Data product creation
+routes:
+  architecture:
+    - [b_reqprod, [b_goal]]
+    - [b_law, [b_poldisc]]
+    - [mt_profile, [mt_closure]]
+    - [s_risk, [g0, b_np]]
+    - [d1, [t_store, b_owndata]]
+    - [s_src, [g1]]
+    - [d2, [b_poldisc]]
+    - [s_prep, [g2]]
+    - [d3, [t_eng]]
+    - [d4, [t_ctl]]
+    - [s_scan, []]
+    - [d5, [t_vec]]
+    - [o_eval, [g4, t_ctl, mt_indep]]
+    - [o_pack, [g5, t_reg]]
+    - [o_release, [g6, b_regrelease, b_ownrisk]]
+    - [o_ops, [t_vec, t_prod]]
+    - [s_runtime, [g7, t_gw]]
+    - [s_detect, [t_siem]]
+  infrastructure:
+    - [external-datasets, []]
+    - [artifact-intake, []]
+    - [landing-zone, []]
+    - [data-discovery, []]
+    - [tokenization, [token-vault]]
+    - [notebooks, [data-access-proxy]]
+    - [dataset-versioning, [data-catalog, dataset-store]]
+    - [eval-red-teaming, [eval-datasets, rule-based-checks]]
+    - [artifact-registry, [provenance-registry]]
+    - [release-gate, [hsm-kms]]
+    - [cd-deployment, []]
+    - [business-apps, [role-based-detokenization]]
+    - [log-collectors, []]
+  stack:
+    - [RM-DAT-01, [RM-SEC-03]]
+    - [RM-DPR-01, []]
+    - [RM-DPR-02, [RM-TRS-02]]
+    - [RM-DEV-03, []]
+    - [RM-DAT-04, [RM-DAT-02, RM-DPR-05]]
+    - [RM-DEV-07, [RM-DAT-05]]
+    - [RM-DEV-08, [RM-TRS-05]]
+    - [RM-DEV-09, [RM-TRS-01]]
+    - [RM-DEV-10, []]
+    - [RM-INT-01, [RM-DPR-03]]
+    - [RM-APP-01, []]
+    - [RM-OPS-05, []]

@@ -1,0 +1,45 @@
+# Сценарий / Scenario: Дообучение по обратной связи / Retraining on feedback
+# Шаг = [элемент, [участники]] / Step = [element, [participants]]
+order: 4
+name:
+  ru: Дообучение по обратной связи
+  en: Retraining on feedback
+routes:
+  architecture:
+    - [o_ops, [t_target]]
+    - [s_detect, [t_siem]]
+    - [s_change, [g8, b_regchange]]
+    - [d1, [t_store]]
+    - [d4, [t_ctl]]
+    - [s_prep, [g2]]
+    - [m3, [t_eng, t_gpu]]
+    - [m4, [t_ctl]]
+    - [o_eval, [g4, mt_indep]]
+    - [o_release, [g6]]
+    - [mt_residual, [b_ownproc]]
+    - [mt_review, []]
+  infrastructure:
+    - [business-apps, [metrics-alerts]]
+    - [landing-zone, []]
+    - [data-discovery, []]
+    - [tokenization, [token-vault]]
+    - [dataset-versioning, [dataset-store]]
+    - [gpu-training-cluster, []]
+    - [experiment-tracking, []]
+    - [artifact-registry, [provenance-registry]]
+    - [eval-red-teaming, [eval-datasets, rule-based-checks]]
+    - [release-gate, [hsm-kms]]
+    - [cd-deployment, []]
+  stack:
+    - [RM-OPS-05, []]
+    - [RM-OPS-07, []]
+    - [RM-DAT-01, [RM-SEC-03]]
+    - [RM-DPR-02, [RM-TRS-02]]
+    - [RM-DAT-04, []]
+    - [RM-DEV-04, [RM-DEV-05]]
+    - [RM-MOD-05, []]
+    - [RM-DEV-07, [RM-DAT-05]]
+    - [RM-TRS-05, []]
+    - [RM-DEV-09, [RM-TRS-01]]
+    - [RM-GOV-04, [RM-GOV-03]]
+    - [RM-DEV-10, [RM-OPS-08]]

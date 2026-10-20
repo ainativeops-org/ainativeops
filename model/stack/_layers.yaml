@@ -1,0 +1,147 @@
+# Слои стека: порядок, размещение на схеме, категория цвета. Классы слоя лежат в файле <id слоя>.yaml.
+# Stack layers: order, placement, colour category. A layer's classes live in <layer id>.yaml.
+categories:
+  gov:
+    color: '#F5DEAA'
+    label:
+      ru: Управление ИИ
+      en: AI governance
+  app:
+    color: '#B5FFFF'
+    label:
+      ru: Продукты и интеграция
+      en: Products and integration
+  intel:
+    color: '#D6E4FF'
+    label:
+      ru: Агенты и модели
+      en: Agents and models
+  data:
+    color: '#FFFFB5'
+    label:
+      ru: Данные и знания
+      en: Data and knowledge
+  node:
+    color: '#C9E7B7'
+    label:
+      ru: Оборудование, платформа, CI/CD
+      en: Hardware, platform, CI/CD
+  cyber:
+    color: '#E6E6E6'
+    label:
+      ru: Observability и кибербезопасность
+      en: Observability and cybersecurity
+  asc:
+    color: '#CCCCFF'
+    label:
+      ru: AI Safety Core
+      en: AI Safety Core
+safetyCore:
+  ru: AI Safety Core
+  en: AI Safety Core
+layers:
+  - id: gov
+    title:
+      ru: AI Governance
+      en: AI Governance
+    category: gov
+    placement: top
+    cols: 4
+  - id: products
+    title:
+      ru: 07 · Продукты
+      en: 07 · Products
+    category: app
+    placement: left
+    cols: 4
+  - id: integration
+    title:
+      ru: 06 · Интеграция и инструменты
+      en: 06 · Integration and tools
+    category: app
+    placement: left
+    cols: 4
+  - id: agents
+    title:
+      ru: 05 · Агенты · Harness
+      en: 05 · Agents · Harness
+    category: intel
+    placement: left
+    cols: 4
+    accent: harness
+  - id: models
+    title:
+      ru: 04 · Модели и инференс
+      en: 04 · Models and inference
+    category: intel
+    placement: left
+    cols: 5
+  - id: data
+    title:
+      ru: 03 · Данные и знания
+      en: 03 · Data and knowledge
+    category: data
+    placement: left
+    cols: 5
+  - id: platform
+    title:
+      ru: 02 · Платформа
+      en: 02 · Platform
+    category: node
+    placement: left
+    cols: 5
+  - id: hardware
+    title:
+      ru: 01 · Оборудование
+      en: 01 · Hardware
+    category: node
+    placement: left
+    cols: 5
+  - id: cicd-mlops
+    title:
+      ru: CI/CD и MLOps
+      en: CI/CD and MLOps
+    category: node
+    placement: column
+  - id: observability
+    title:
+      ru: Observability
+      en: Observability
+    category: cyber
+    placement: column
+  - id: cybersecurity
+    title:
+      ru: Кибербезопасность
+      en: Cybersecurity
+    category: cyber
+    placement: column
+  - id: operation-admission
+    title:
+      ru: Допуск операций · PDP / PEP
+      en: Operation admission · PDP / PEP
+    category: asc
+    placement: core
+  - id: guardrails
+    title:
+      ru: Guardrails
+      en: Guardrails
+    category: asc
+    placement: core
+  - id: data-protection
+    title:
+      ru: Защита данных
+      en: Data protection
+    category: asc
+    placement: core
+  - id: confidential-computing
+    title:
+      ru: Confidential Computing
+      en: Confidential Computing
+    category: asc
+    placement: core
+  - id: trusted-services
+    title:
+      ru: Доверенные сервисы
+      en: Trusted services
+    category: asc
+    placement: core

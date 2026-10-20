@@ -1,0 +1,37 @@
+# Сценарий / Scenario: Реагирование на инцидент / Incident response
+# Шаг = [элемент, [участники]] / Step = [element, [participants]]
+order: 5
+name:
+  ru: Реагирование на инцидент
+  en: Incident response
+routes:
+  architecture:
+    - [s_detect, [t_siem]]
+    - [b_regincident, []]
+    - [s_resp, [b_ownrisk]]
+    - [t_gw, []]
+    - [t_iam, []]
+    - [mt_ev, [mt_assess]]
+    - [s_change, [g8, b_regchange]]
+    - [o_eval, [g4]]
+    - [o_release, [g6]]
+    - [mt_residual, [b_ownproc]]
+  infrastructure:
+    - [siem-soc, [log-metric-store]]
+    - [kill-switch, [agent-iam]]
+    - [audit-log, [archive-backup]]
+    - [provenance-registry, []]
+    - [eval-red-teaming, [rule-based-checks]]
+    - [release-gate, [hsm-kms]]
+    - [cd-deployment, []]
+    - [metrics-alerts, []]
+  stack:
+    - [RM-SEC-05, [RM-TRS-04, RM-SEC-07]]
+    - [RM-TRS-07, [RM-ACT-02]]
+    - [RM-SEC-01, [RM-TRS-03, RM-GOV-02]]
+    - [RM-SEC-02, [RM-ACT-03]]
+    - [RM-SEC-07, [RM-OPS-02]]
+    - [RM-OPS-07, []]
+    - [RM-DEV-07, []]
+    - [RM-DEV-09, [RM-TRS-05, RM-TRS-01]]
+    - [RM-DEV-10, [RM-OPS-08]]

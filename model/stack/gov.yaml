@@ -1,0 +1,30 @@
+# AI Governance / AI Governance
+# Ключ RM-… после версии 1.0 не меняется и не переиспользуется. / An RM-… key is frozen after 1.0 and never reused.
+RM-GOV-01:
+  name:
+    ru: AI-BOM · реестр ИИ-активов
+    en: AI-BOM · AI asset inventory
+  desc:
+    ru: 'Учитывает каждую модель, агента и набор данных вместе с версией и владельцем. По реестру применяют правило рекурсивного замыкания: в область анализа попадает каждый ИИ, который создаёт, изменяет или оценивает систему.'
+    en: 'Records every model, agent and dataset with its version and owner. The inventory is where the recursive closure rule applies: every AI that creates, changes or evaluates the system is in scope.'
+RM-GOV-02:
+  name:
+    ru: IAM агентов
+    en: Agent IAM
+  desc:
+    ru: Выдаёт каждому агенту и инструменту собственную идентичность со сроком полномочий. Агент не действует от общей учётной записи и не получает права пользователя без явного делегирования.
+    en: Gives every agent and tool its own identity with a limited authority period. An agent never acts under a shared account and gets no user rights without explicit delegation.
+RM-GOV-03:
+  name:
+    ru: Policy-as-Code
+    en: Policy-as-Code
+  desc:
+    ru: Владельцы рубежей ведут версии политик раскрытия, полномочий и бюджетов. Проверяемый агент не имеет права записи в политики, Policy Engine исполняет только опубликованную версию.
+    en: Gate owners keep versions of disclosure, authority and budget policies. The agent under review has no write access to policies; the Policy Engine executes only the published version.
+RM-GOV-04:
+  name:
+    ru: Реестр рисков и допусков
+    en: Risk and admission register
+  desc:
+    ru: Хранит профиль системы, оценку рисков и решения на рубежах G0–G9. Решение об остаточном риске имеет владельца, срок действия и условия пересмотра.
+    en: Holds the system profile, the risk assessment and the decisions taken at gates G0–G9. A residual risk decision has an owner, a validity period and review conditions.

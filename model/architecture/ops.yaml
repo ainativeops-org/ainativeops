@@ -1,0 +1,225 @@
+# Ops / Ops
+d1:
+  type: process
+  name:
+    ru: Приём в карантин
+    en: Quarantine intake
+  desc:
+    ru: Исходные данные попадают в карантин. Фиксируются источник и допустимая цель обработки.
+    en: Source data enters quarantine. The source and the permitted processing purpose are recorded.
+d2:
+  type: process
+  name:
+    ru: Классификация и доступ
+    en: Classification and access
+  desc:
+    ru: Определяются категории данных, права доступа и разрешённое раскрытие.
+    en: Data categories, access rights and permitted disclosure are defined.
+d3:
+  type: process
+  name:
+    ru: Очистка и разметка
+    en: Cleaning and labelling
+  desc:
+    ru: ИИ-инженер очищает и размечает данные, формирует выборки и синтетические записи. Каждое преобразование получает версию.
+    en: The AI engineer cleans and labels data and builds samples and synthetic records. Every transformation gets a version.
+d4:
+  type: process
+  name:
+    ru: Контроль качества
+    en: Quality control
+  desc:
+    ru: ИИ-контролёр проверяет качество, загрязнение и разделение выборок. Его оценка не заменяет приёмку на G4.
+    en: The AI controller checks quality, contamination and sample separation. Its assessment does not replace acceptance at G4.
+d5:
+  type: process
+  name:
+    ru: Сборка дата-продукта
+    en: Data product build
+  desc:
+    ru: Собран кандидат дата-продукта с составом, контрактом и версией.
+    en: A data product candidate is assembled with its composition, contract and version.
+m1:
+  type: process
+  name:
+    ru: Приём базовой модели
+    en: Foundation model intake
+  desc:
+    ru: Базовая модель принимается с проверкой происхождения и формата.
+    en: A foundation model is accepted after provenance and format checks.
+m2:
+  type: process
+  name:
+    ru: План эксперимента
+    en: Experiment plan
+  desc:
+    ru: Фиксируются план эксперимента, версии входов и бюджет вычислений.
+    en: The experiment plan, input versions and compute budget are recorded.
+m3:
+  type: process
+  name:
+    ru: Обучение и адаптация
+    en: Training and adaptation
+  desc:
+    ru: ИИ-инженер запускает обучение и подбирает адаптеры. В задание подключается допущенный дата-продукт.
+    en: The AI engineer runs training and selects adapters. An admitted data product is attached to the job.
+m4:
+  type: process
+  name:
+    ru: Валидация модели
+    en: Model validation
+  desc:
+    ru: ИИ-контролёр проводит инженерную валидацию качества и регрессии.
+    en: The AI controller runs engineering validation of quality and regression.
+m5:
+  type: process
+  name:
+    ru: Модель-кандидат
+    en: Model candidate
+  desc:
+    ru: Версия модели связана с данными, параметрами и заданием обучения. Связь проверяют на рубеже G3.
+    en: The model version is linked to data, parameters and the training job. Gate G3 verifies the link.
+v1:
+  type: process
+  name:
+    ru: Спецификация
+    en: Specification
+  desc:
+    ru: Уточняются требования и контракты будущего ИТ-продукта.
+    en: Requirements and contracts of the future IT product are refined.
+v2:
+  type: process
+  name:
+    ru: Создание кода
+    en: Code creation
+  desc:
+    ru: ИИ-инженер пишет код, тесты и агентов в рабочей ветви с ограниченной областью записи.
+    en: The AI engineer writes code, tests and agents in a working branch with a limited write scope.
+v3:
+  type: process
+  name:
+    ru: Сборка и проверка
+    en: Build and check
+  desc:
+    ru: Собирается точная версия кандидата, выполняются тесты и анализ зависимостей. Тесты автора изменения учитываются вместе с независимыми проверками по критериям допуска.
+    en: The exact candidate version is built, tests and dependency analysis run. Tests written by the change author count only together with independent checks against admission criteria.
+v4:
+  type: process
+  name:
+    ru: Интеграция
+    en: Integration
+  desc:
+    ru: Подключаются допущенные дата-продукт и модель, проверяются интеграции с инструментами.
+    en: Admitted data product and model are connected; tool integrations are checked.
+v5:
+  type: process
+  name:
+    ru: Кандидат ИТ-продукта
+    en: IT product candidate
+  desc:
+    ru: Фиксируется полная конфигурация кандидата ИТ-продукта.
+    en: The full configuration of the IT product candidate is recorded.
+o_eval:
+  type: process
+  name:
+    ru: Независимая оценка
+    en: Independent evaluation
+  desc:
+    ru: Испытания и ИИ-контролёр проверяют критерии на контрольных данных, которыми ИИ-инженер не управляет. Исполняет рубеж G4.
+    en: Tests and the AI controller verify criteria on control data the AI engineer cannot manage. Enforces gate G4.
+o_pack:
+  type: process
+  name:
+    ru: Целостность пакета
+    en: Package integrity
+  desc:
+    ru: Проверяется происхождение точного выпускаемого пакета, состав фиксируется в манифесте. Исполняет рубеж G5.
+    en: The provenance of the exact released package is verified and its content is recorded in a manifest. Enforces gate G5.
+o_release:
+  type: process
+  name:
+    ru: Допуск и публикация
+    en: Admission and publishing
+  desc:
+    ru: Защищённый механизм разрешает публикацию конкретной версии. Исполняет рубеж G6.
+    en: A protected mechanism allows publishing a specific version. Enforces gate G6.
+o_ops:
+  type: process
+  name:
+    ru: Эксплуатация продукта
+    en: Product operation
+  desc:
+    ru: Продукт обслуживает бизнес-процесс. Его запросы, ответы и действия проходят контроль исполнения.
+    en: The product serves a business process. Its requests, responses and actions pass runtime control.
+s_risk:
+  type: process
+  name:
+    ru: Анализ рисков
+    en: Risk analysis
+  desc:
+    ru: SecOps описывает профиль системы, оценивает риски и задаёт критерии рубежей. Исполняет рубеж G0.
+    en: SecOps describes the system profile, assesses risks and sets gate criteria. Enforces gate G0.
+s_src:
+  type: process
+  name:
+    ru: Проверка источников
+    en: Source verification
+  desc:
+    ru: SecOps проверяет происхождение источников, их целостность и условия использования. Исполняет рубеж G1.
+    en: SecOps verifies source provenance, integrity and terms of use. Enforces gate G1.
+s_prep:
+  type: process
+  name:
+    ru: Допуск подготовки
+    en: Preparation admission
+  desc:
+    ru: SecOps допускает входы и код задания, ограничивает права агента и изолирует выполнение. Исполняет рубеж G2.
+    en: SecOps admits inputs and job code, limits agent rights and isolates execution. Enforces gate G2.
+s_scan:
+  type: process
+  name:
+    ru: Профильная проверка
+    en: Profile-specific check
+  desc:
+    ru: Проверка зависит от продукта. Для данных это отравление и раскрытие, для модели целостность весов, для ИТ-продукта код, зависимости и секреты.
+    en: The check depends on the product. For data it covers poisoning and disclosure, for a model weight integrity, for an IT product code, dependencies and secrets.
+s_runtime:
+  type: process
+  name:
+    ru: Контроль исполнения
+    en: Runtime control
+  desc:
+    ru: PEP проверяет конкретное действие по решению политики, полномочиям и бюджету. ИИ-контролёр может дать дополнительную оценку; положительная модельная оценка не отменяет запрет правила.
+    en: The PEP checks a specific action against the policy decision, authority and budget. The AI controller may add an assessment; a positive model assessment never overrides a rule that denies.
+s_detect:
+  type: process
+  name:
+    ru: Мониторинг и обнаружение
+    en: Monitoring and detection
+  desc:
+    ru: События и трассы поступают в мониторинг. При признаках инцидента запускается реагирование.
+    en: Events and traces flow into monitoring. Signs of an incident trigger response.
+s_resp:
+  type: process
+  name:
+    ru: Реагирование
+    en: Response
+  desc:
+    ru: Опасные операции останавливаются, права отзываются, подозрительный компонент изолируется.
+    en: Dangerous operations stop, rights are revoked and a suspicious component is isolated.
+s_change:
+  type: process
+  name:
+    ru: Управление изменениями
+    en: Change management
+  desc:
+    ru: Изменение проходит рубеж G8. Обратная связь уходит в карантин DataOps и проходит рубежи заново.
+    en: A change passes gate G8. Feedback goes into DataOps quarantine and passes the gates again.
+s_retire:
+  type: process
+  name:
+    ru: Вывод из эксплуатации
+    en: Decommissioning
+  desc:
+    ru: Отзываются полномочия и интеграции, обрабатываются остаточные данные. Исполняет рубеж G9.
+    en: Authorities and integrations are revoked, residual data is processed. Enforces gate G9.

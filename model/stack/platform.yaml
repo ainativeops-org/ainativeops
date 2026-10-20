@@ -1,0 +1,37 @@
+# 02 · Платформа / 02 · Platform
+# Ключ RM-… после версии 1.0 не меняется и не переиспользуется. / An RM-… key is frozen after 1.0 and never reused.
+RM-PLT-01:
+  name:
+    ru: ОС и контейнеры
+    en: OS and containers
+  desc:
+    ru: Базовые образы ОС, контейнерные среды и ограничения исполнения. Версии и обновления подчинены управлению конфигурацией.
+    en: Base OS images, container runtimes and execution limits. Versions and updates follow configuration management.
+RM-PLT-02:
+  name:
+    ru: Kubernetes · планировщик GPU
+    en: Kubernetes · GPU scheduler
+  desc:
+    ru: Размещение сервисов и пакетных заданий, очереди CPU/GPU и квоты проектов. Изоляция EXP, EVAL и PROD задаётся профилем среды.
+    en: Places services and batch jobs, manages CPU and GPU queues and project quotas. The environment profile sets the isolation of EXP, EVAL and PROD.
+RM-PLT-03:
+  name:
+    ru: OLTP СУБД
+    en: OLTP databases
+  desc:
+    ru: Хранят транзакционные данные приложений, метаданные и состояния сервисов. Выбор согласованности и отказоустойчивости определяется контрактом сервиса; области доступа разделяются по средам и проектам.
+    en: Store transactional application data, metadata and service state. The service contract defines consistency and fault tolerance; access scopes are split by environment and project.
+RM-PLT-04:
+  name:
+    ru: Брокер сообщений
+    en: Message broker
+  desc:
+    ru: Брокеры заданий и событий с контролем доставки, повторов и изоляции потребителей. Внешние эффекты защищаются от повторного исполнения на уровне операции.
+    en: Job and event brokers with delivery, retry and consumer isolation control. External effects are protected from repeated execution at the operation level.
+RM-PLT-05:
+  name:
+    ru: IaC и GitOps
+    en: IaC and GitOps
+  desc:
+    ru: Инфраструктура как код, версии окружений и воспроизводимое развёртывание. Изменения проходят контроль доступа и проверку перед применением.
+    en: Infrastructure as code, environment versions and reproducible deployment. Changes pass access control and checks before they are applied.

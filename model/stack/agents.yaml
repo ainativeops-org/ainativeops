@@ -1,0 +1,58 @@
+# 05 · Агенты · Harness / 05 · Agents · Harness
+# Ключ RM-… после версии 1.0 не меняется и не переиспользуется. / An RM-… key is frozen after 1.0 and never reused.
+RM-AGT-01:
+  name:
+    ru: Оркестратор агентов
+    en: Agent orchestrator
+  desc:
+    ru: 'Декомпозиция цели и назначение функциональных ролей: анализ, создание артефакта и проверка. Подзадачи наследуют ограничения исходной задачи; делегирование сохраняет ответственность инициатора.'
+    en: 'Decomposes the goal and assigns functional roles: analysis, artifact creation and review. Subtasks inherit the constraints of the original task; delegation keeps the initiator accountable.'
+RM-AGT-02:
+  name:
+    ru: Agent Runtime
+    en: Agent Runtime
+  desc:
+    ru: Исполняет цикл сборки контекста, вызова модели и обработки результата. Предложенные действия передаёт Tool Router; завершает или приостанавливает задачу по правилам.
+    en: Runs the loop of building context, calling the model and processing the result. Passes proposed actions to the Tool Router; completes or suspends the task by rule.
+RM-AGT-03:
+  name:
+    ru: Context Manager
+    en: Context Manager
+  desc:
+    ru: Собирает инструкции, разрешённые знания и результаты инструментов для текущего шага. Управляет объёмом и приоритетами с сохранением происхождения сведений.
+    en: Assembles instructions, permitted knowledge and tool results for the current step. Manages volume and priority and keeps the provenance of information.
+RM-AGT-04:
+  name:
+    ru: Tool Router
+    en: Tool Router
+  desc:
+    ru: Проверяет схему предложенного вызова, запрашивает допуск PEP и направляет разрешённое действие исполнителю. Результат проходит контроль до возврата в контекст. Проверками охватываются MCP, shell и файловые операции.
+    en: Checks the schema of a proposed call, requests admission from the PEP and routes the allowed action to its executor. The result is checked before it returns to context. Checks cover MCP, shell and file operations.
+RM-AGT-05:
+  name:
+    ru: Хранилище чекпоинтов
+    en: Checkpoint store
+  desc:
+    ru: Сохраняет контрольные точки, ожидаемые согласования и завершённые шаги. При восстановлении исполнитель сверяет внешние эффекты перед повтором операции.
+    en: Stores checkpoints, pending approvals and completed steps. On recovery the runtime reconciles external effects before repeating an operation.
+RM-AGT-06:
+  name:
+    ru: Agent Memory
+    en: Agent Memory
+  desc:
+    ru: Хранит сведения для повторного использования между задачами. Области доступа, происхождение и сроки хранения задаются отдельно от состояния текущего исполнения.
+    en: Stores information for reuse across tasks. Access scopes, provenance and retention are set separately from the state of the current run.
+RM-AGT-07:
+  name:
+    ru: Реестр промптов и Skills
+    en: Prompt and Skills registry
+  desc:
+    ru: Версии системных инструкций, skills и схем инструментов связаны с манифестом. Изменения проходят ревью и регрессионные проверки; права изменения политик выделены отдельно.
+    en: Versions of system instructions, skills and tool schemas are linked to the manifest. Changes go through review and regression checks; the right to change policies is separate.
+RM-AGT-08:
+  name:
+    ru: Rate limits и бюджеты
+    en: Rate limits and budgets
+  desc:
+    ru: Учитывает время, стоимость и число шагов всей задачи, включая делегирование. Резервирует лимит до платной операции; при исчерпании останавливает выполнение или запрашивает решение.
+    en: Accounts for time, cost and number of steps of the whole task, including delegation. Reserves the limit before a paid operation; when exhausted it stops execution or asks for a decision.

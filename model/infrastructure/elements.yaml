@@ -1,0 +1,316 @@
+# Элементы инфраструктуры. С class: и без name/desc элемент берёт текст класса.
+# Infrastructure elements. With class: and no name/desc an element takes the class text.
+model-hubs:
+  type: node
+  name:
+    ru: Хабы моделей
+    en: Model hubs
+  desc:
+    ru: Внешние источники весов и адаптеров. Артефакты проходят входной контроль до подключения к инженерным средам.
+    en: External sources of weights and adapters. Artifacts pass intake control before they reach engineering environments.
+external-datasets:
+  type: node
+  name:
+    ru: Внешние датасеты
+    en: External datasets
+  desc:
+    ru: Внешние наборы данных и источники знаний с фиксируемыми условиями использования.
+    en: External datasets and knowledge sources with recorded terms of use.
+external-llm-api:
+  type: techsvc
+  class: RM-MOD-03
+  category: llm
+public-package-registries:
+  type: node
+  name:
+    ru: Публичные реестры пакетов
+    en: Public package registries
+  desc:
+    ru: Внешние источники библиотек и образов. Зависимости проходят проверку и публикуются во внутреннем зеркале.
+    en: External sources of libraries and images. Dependencies are checked and published to the internal mirror.
+external-apis-mcp:
+  type: appcomp
+  name:
+    ru: Внешние API и MCP
+    en: External APIs and MCP
+  desc:
+    ru: Внешние системы, операции которых доступны через адаптеры инструментов. Каждый вызов требует отдельного допуска.
+    en: External systems whose operations are reachable through tool adapters. Every call needs its own admission.
+artifact-intake:
+  type: techsvc
+  class: RM-SEC-03
+package-mirror:
+  type: syssw
+  class: RM-DEV-08
+  name:
+    ru: Зеркало пакетов
+    en: Package mirror
+  desc:
+    ru: Публикует проверенные версии пакетов и образов для внутренних сборок. Загрузка новой версии проходит входной контроль.
+    en: Publishes verified versions of packages and images for internal builds. A new version passes intake control before upload.
+egress-proxy:
+  type: techsvc
+  class: RM-SEC-02
+  name:
+    ru: Egress-прокси
+    en: Egress proxy
+  desc:
+    ru: Применяет сетевые правила выхода к внешним API. Разрешение соединения дополняет контроль конкретного модельного запроса или действия инструмента.
+    en: Applies network egress rules to external APIs. Allowing a connection complements the control of a specific model request or tool action.
+users:
+  type: actor
+  name:
+    ru: Пользователи
+    en: Users
+  desc:
+    ru: Сотрудники и подрядчики, которые работают с продуктом и платформой.
+    en: Employees and contractors who work with the product and the platform.
+erp-crm:
+  type: appcomp
+  name:
+    ru: ERP / CRM
+    en: ERP / CRM
+  desc:
+    ru: ERP, CRM, почта и платежи, где агент меняет внешнее состояние.
+    en: ERP, CRM, mail and payments, where an agent changes external state.
+iam-sso:
+  type: syssw
+  class: RM-SEC-01
+siem-soc:
+  type: syssw
+  class: RM-SEC-05
+tokenization:
+  type: techsvc
+  class: RM-DPR-02
+data-discovery:
+  type: techsvc
+  class: RM-DPR-01
+role-based-detokenization:
+  type: techsvc
+  class: RM-DPR-03
+data-access-proxy:
+  type: techsvc
+  class: RM-DPR-04
+input-guardrails:
+  type: techsvc
+  class: RM-AIC-01
+output-guardrails:
+  type: techsvc
+  class: RM-AIC-02
+rag-access-filter:
+  type: techsvc
+  class: RM-DPR-06
+memory-guard:
+  type: techsvc
+  class: RM-DPR-07
+zero-trust-git:
+  type: techsvc
+  class: RM-ACT-04
+pep:
+  type: techsvc
+  class: RM-ACT-02
+job-sandbox:
+  type: techsvc
+  class: RM-ACT-03
+provenance-registry:
+  type: techsvc
+  class: RM-TRS-05
+agent-orchestrator:
+  type: appcomp
+  class: RM-AGT-01
+agent-runtime:
+  type: appcomp
+  class: RM-AGT-02
+context-manager:
+  type: appcomp
+  class: RM-AGT-03
+prompt-skill-registry:
+  type: artifact
+  class: RM-AGT-07
+tool-router:
+  type: appcomp
+  class: RM-AGT-04
+agent-memory:
+  type: techsvc
+  class: RM-AGT-06
+  category: data
+notebooks:
+  type: node
+  class: RM-DEV-02
+dataset-versioning:
+  type: syssw
+  class: RM-DAT-04
+experiment-tracking:
+  type: syssw
+  class: RM-DEV-05
+gpu-training-cluster:
+  type: node
+  class: RM-DEV-04
+  name:
+    ru: GPU-кластер обучения
+    en: GPU training cluster
+  desc:
+    ru: Исполняет задания обучения и адаптации на выделенных вычислительных ресурсах. Выбор представления данных обосновывается качеством и политикой раскрытия.
+    en: Runs training and adaptation jobs on dedicated compute. The choice of data representation is justified by quality and the disclosure policy.
+eval-red-teaming:
+  type: node
+  class: RM-DEV-07
+  name:
+    ru: Стенд eval и red teaming
+    en: Eval and red teaming bench
+  desc:
+    ru: Выполняет независимые проверки конкретной версии кандидата на качество, безопасность и регрессию. Решение о выпуске принимает Release gate по совокупности свидетельств.
+    en: Runs independent checks of a specific candidate version for quality, safety and regression. The release gate decides on release from the combined evidence.
+eval-datasets:
+  type: artifact
+  class: RM-DAT-05
+  category: data
+llm-as-a-judge:
+  type: techsvc
+  class: RM-AIC-03
+  category: llm
+mcp-servers:
+  type: appcomp
+  class: RM-INT-02
+inference-servers:
+  type: techsvc
+  class: RM-MOD-07
+metrics-alerts:
+  type: syssw
+  class: RM-OPS-01
+business-apps:
+  type: appcomp
+  class: RM-APP-01
+landing-zone:
+  type: artifact
+  class: RM-DAT-01
+  name:
+    ru: Карантинная зона
+    en: Landing zone
+  desc:
+    ru: Изолированно хранит новые данные и обратную связь до допуска. Зафиксированы источник, цель обработки и срок хранения.
+    en: Keeps new data and feedback isolated until admission. The source, processing purpose and retention period are recorded.
+dataset-store:
+  type: artifact
+  class: RM-DAT-04
+  name:
+    ru: Хранилище датасетов
+    en: Dataset store
+  desc:
+    ru: Хранит содержимое допущенных версий обучающих и рабочих наборов. Версии и происхождение учитываются в версионировании датасетов.
+    en: Holds the content of admitted versions of training and production datasets. Versions and provenance are tracked in dataset versioning.
+vector-db:
+  type: techsvc
+  class: RM-DAT-07
+data-catalog:
+  type: syssw
+  class: RM-DAT-02
+git-repository:
+  type: syssw
+  class: RM-DEV-01
+  name:
+    ru: Git-репозиторий
+    en: Git repository
+  desc:
+    ru: Хранит версии исходного кода, тестов и конфигурации. Обеспечивает ревью и правила изменения ветвей.
+    en: Stores versions of source code, tests and configuration. Provides review and branch protection rules.
+ci-runner:
+  type: node
+  class: RM-DEV-06
+  name:
+    ru: CI-раннер
+    en: CI runner
+  desc:
+    ru: Создаёт временное окружение, собирает точную версию кандидата и запускает тесты. Фиксирует зависимости и результат; полномочия ограничены заданием.
+    en: Creates a temporary environment, builds the exact candidate version and runs tests. Records dependencies and the result; authority is limited to the job.
+artifact-registry:
+  type: syssw
+  class: RM-DEV-08
+sast-sca-secrets:
+  type: syssw
+  class: RM-SEC-04
+release-gate:
+  type: techsvc
+  class: RM-DEV-09
+cd-deployment:
+  type: techsvc
+  class: RM-DEV-10
+log-collectors:
+  type: syssw
+  class: RM-OPS-03
+  name:
+    ru: Агенты сбора логов
+    en: Log collection agents
+  desc:
+    ru: Собирают журналы, метрики и трассы у источников и доставляют их с учётом буферизации и повторов. Секреты исключаются до отправки; полнота доставки контролируется.
+    en: Collect logs, metrics and traces at the source and deliver them with buffering and retries. Secrets are removed before sending; delivery completeness is monitored.
+event-normalization:
+  type: syssw
+  class: RM-OPS-03
+  name:
+    ru: Нормализация событий
+    en: Event normalisation
+  desc:
+    ru: Разбирает, нормализует и обогащает события; маршрутизирует их потребителям. Формат выбирается по контракту получателя. Коллектор и процессор могут быть реализованы одним продуктом.
+    en: Parses, normalises and enriches events and routes them to consumers. The format follows the recipient contract. Collector and processor can be one product.
+log-metric-store:
+  type: syssw
+  class: RM-OPS-04
+hsm-kms:
+  type: device
+  class: RM-TRS-01
+pdp:
+  type: techsvc
+  class: RM-ACT-01
+agent-iam:
+  type: techsvc
+  class: RM-GOV-02
+audit-log:
+  type: techsvc
+  class: RM-TRS-04
+integrity-monitoring:
+  type: techsvc
+  class: RM-TRS-06
+checkpoint-store:
+  type: artifact
+  class: RM-AGT-05
+  category: llm
+rate-limits-budgets:
+  type: techsvc
+  class: RM-AGT-08
+  category: llm
+rule-based-checks:
+  type: techsvc
+  class: RM-DEV-07
+  name:
+    ru: Rule-based проверки
+    en: Rule-based checks
+  desc:
+    ru: Выполняет воспроизводимые проверки контрактов, свойств и пороговых значений. Фиксирует фактический результат и версию критерия для стенда eval.
+    en: Runs reproducible checks of contracts, properties and thresholds. Records the actual result and the criterion version for the eval bench.
+  category: node
+llm-gateway:
+  type: techsvc
+  class: RM-MOD-06
+  category: llm
+archive-backup:
+  type: syssw
+  class: RM-OPS-08
+  name:
+    ru: Архив · Backup
+    en: Archive · Backup
+  desc:
+    ru: Хранит файлы телеметрии и свидетельств длительного хранения. Режим неизменяемости, сроки удержания и процедура извлечения задаются политикой.
+    en: Stores telemetry files and long-term evidence. Immutability mode, retention and retrieval procedure are set by policy.
+token-vault:
+  type: techsvc
+  class: RM-TRS-02
+  category: asc
+secrets-manager:
+  type: techsvc
+  class: RM-TRS-03
+  category: asc
+kill-switch:
+  type: techsvc
+  class: RM-TRS-07
+  category: asc

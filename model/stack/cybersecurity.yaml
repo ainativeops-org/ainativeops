@@ -1,0 +1,51 @@
+# Кибербезопасность / Cybersecurity
+# Ключ RM-… после версии 1.0 не меняется и не переиспользуется. / An RM-… key is frozen after 1.0 and never reused.
+RM-SEC-01:
+  name:
+    ru: IAM / SSO
+    en: IAM / SSO
+  desc:
+    ru: Управляет идентичностями людей, агентов и сервисов, аутентификацией и машинными полномочиями. Решение по конкретному действию вычисляет Policy Engine; обязательное исполнение обеспечивает PEP.
+    en: Manages identities of people, agents and services, authentication and machine authority. The Policy Engine decides on a specific action; the PEP enforces the decision.
+RM-SEC-02:
+  name:
+    ru: Egress-прокси и WAF
+    en: Egress proxy and WAF
+  desc:
+    ru: Контроль входящих и исходящих соединений, допустимых адресов и протоколов. ДМЗ задаёт зону размещения, прокси исполняет правила обмена.
+    en: Controls inbound and outbound connections, allowed addresses and protocols. The DMZ is the placement zone; the proxy enforces exchange rules.
+RM-SEC-03:
+  name:
+    ru: Входной контроль артефактов
+    en: Artifact intake control
+  desc:
+    ru: Принимает внешние данные, модели и зависимости в карантин. Проверяет источник, формат и целостность; допустимость использования фиксируется до публикации.
+    en: Accepts external data, models and dependencies into quarantine. Checks source, format and integrity; permitted use is recorded before publishing.
+RM-SEC-04:
+  name:
+    ru: SAST / SCA / Secrets
+    en: SAST / SCA / Secrets
+  desc:
+    ru: Анализируют код, зависимости и образы; ищут секреты и уязвимые конфигурации. Результат относится к конкретной версии проверенного кандидата.
+    en: Analyse code, dependencies and images and search for secrets and vulnerable configurations. The result refers to the exact version of the checked candidate.
+RM-SEC-05:
+  name:
+    ru: SIEM / SOC
+    en: SIEM / SOC
+  desc:
+    ru: Коррелирует события безопасности и формирует инциденты. Использует нормализованные события и доступ к истории; управление реагированием задаётся регламентом.
+    en: Correlates security events and raises incidents. Uses normalised events and history access; response handling follows the procedure.
+RM-SEC-06:
+  name:
+    ru: Vulnerability Management
+    en: Vulnerability Management
+  desc:
+    ru: Учитывает компоненты и известные уязвимости, определяет приоритет исправления и контролирует выполнение. Обновления применяются через управление конфигурацией и выпуск.
+    en: Tracks components and known vulnerabilities, sets fix priorities and follows up. Updates are applied through configuration management and release.
+RM-SEC-07:
+  name:
+    ru: WORM-хранилище свидетельств
+    en: WORM evidence store
+  desc:
+    ru: Хранение решений контроля и результатов проверок с защитой от изменения. Раздельные права записи и администрирования; контроль целостности и полноты.
+    en: Stores control decisions and check results protected from modification. Write and administration rights are separate; integrity and completeness are verified.

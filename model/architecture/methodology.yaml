@@ -1,0 +1,153 @@
+# Методология / Methodology
+mt_profile:
+  type: dataobject
+  name:
+    ru: Профиль системы
+    en: System profile
+  desc:
+    ru: Владелец системы описывает её состав, данные и допустимую автономность. Профиль содержит карточки ИИ-инженера и ИИ-контролёра и решения на рубежах G0–G9.
+    en: The system owner describes its composition, data and permitted autonomy. The profile holds the AI engineer and AI controller cards and the decisions taken at gates G0–G9.
+mt_closure:
+  type: principle
+  name:
+    ru: Правило рекурсивного замыкания
+    en: Recursive closure rule
+  desc:
+    ru: В область анализа входит каждый ИИ, который создаёт, изменяет или оценивает систему. К каждому добавленному компоненту задают тот же вопрос, пока состав не перестанет меняться.
+    en: Every AI that creates, changes or evaluates the system is in scope. The same question is asked of each added component until the set stops changing.
+mt_tb:
+  type: principle
+  name:
+    ru: Границы доверия
+    en: Trust boundaries
+  desc:
+    ru: 'Граница проходит там, где содержание меняет роль или получает полномочия. Пример: документ из репозитория становится контекстом агента программирования.'
+    en: 'A boundary lies where content changes its role or gains authority. Example: a document from a repository becomes the context of a coding agent.'
+mt_assess:
+  type: assessment
+  name:
+    ru: Оценка и приоритет рисков
+    en: Risk assessment and priority
+  desc:
+    ru: Каждому риску назначают приоритет по масштабу последствий и достижимости. Риск высшего приоритета требует решения до промышленного допуска.
+    en: Each risk gets a priority from the scale of consequences and its feasibility. A top-priority risk requires a decision before production admission.
+mt_ev:
+  type: dataobject
+  name:
+    ru: Свидетельства допуска
+    en: Admission evidence
+  desc:
+    ru: Рубеж принимает решение по свидетельствам. Это отчёты проверок, подписи и записи происхождения, защищённые от изменения.
+    en: A gate decides on evidence. Evidence means check reports, signatures and provenance records protected from modification.
+g0:
+  type: gate
+  name:
+    ru: Задача
+    en: Task
+  desc:
+    ru: 'Условие допуска: определены назначение, недопустимые события и допустимая автономность.'
+    en: 'Admission condition: the purpose, unacceptable events and permitted autonomy are defined.'
+g1:
+  type: gate
+  name:
+    ru: Источники
+    en: Sources
+  desc:
+    ru: 'Условие допуска: известны происхождение и условия использования данных, моделей и инструментов.'
+    en: 'Admission condition: the provenance and terms of use of data, models and tools are known.'
+g2:
+  type: gate
+  name:
+    ru: Подготовка
+    en: Preparation
+  desc:
+    ru: 'Условие допуска: одобрены входы, преобразования и код задания, права агента ограничены.'
+    en: 'Admission condition: inputs, transformations and job code are approved; agent rights are limited.'
+g3:
+  type: gate
+  name:
+    ru: Модель
+    en: Model
+  desc:
+    ru: 'Условие допуска: версия модели и адаптеров связана с происхождением.'
+    en: 'Admission condition: the model and adapter version is linked to its provenance.'
+g4:
+  type: gate
+  name:
+    ru: Оценивание
+    en: Evaluation
+  desc:
+    ru: 'Условие допуска: критические критерии проверены на защищённых контрольных данных и не зависят только от проверяемого субъекта.'
+    en: 'Admission condition: critical criteria are verified on protected control data and do not rely only on the subject under review.'
+g5:
+  type: gate
+  name:
+    ru: Сборка
+    en: Build
+  desc:
+    ru: 'Условие допуска: выпускаемый артефакт связан с одобренными исходными материалами и процессом.'
+    en: 'Admission condition: the released artifact is linked to approved source materials and process.'
+g6:
+  type: gate
+  name:
+    ru: Выпуск
+    en: Release
+  desc:
+    ru: 'Условие допуска: проверена полная конфигурация вместе с откатом.'
+    en: 'Admission condition: the full configuration is verified together with its rollback.'
+g7:
+  type: gate
+  name:
+    ru: Исполнение
+    en: Execution
+  desc:
+    ru: 'Условие допуска: действие соответствует идентичности, политике раскрытия и бюджету.'
+    en: 'Admission condition: the action matches the identity, the disclosure policy and the budget.'
+g8:
+  type: gate
+  name:
+    ru: Изменение
+    en: Change
+  desc:
+    ru: 'Условие допуска: определено влияние изменения, затронутые проверки повторены.'
+    en: 'Admission condition: the impact of the change is known and affected checks are repeated.'
+g9:
+  type: gate
+  name:
+    ru: Вывод
+    en: Retirement
+  desc:
+    ru: 'Условие допуска: отозваны полномочия и интеграции, свидетельства сохранены.'
+    en: 'Admission condition: authorities and integrations are revoked, evidence is preserved.'
+mt_trust:
+  type: principle
+  name:
+    ru: Основания доверия
+    en: Trust anchors
+  desc:
+    ru: Основание доверия есть проверяемый механизм, защищённый от изменения тем, кого он ограничивает. Оно завершает рекурсию «кто проверит проверяющего».
+    en: A trust anchor is a verifiable mechanism protected from modification by whatever it constrains. It ends the recursion of "who checks the checker".
+mt_indep:
+  type: principle
+  name:
+    ru: Независимость оценки
+    en: Independent evaluation
+  desc:
+    ru: Контрольными данными и критериями управляют отдельно от проверяемого исполнителя. Модельная оценка дополняет воспроизводимые проверки; степень независимости фиксируется в профиле.
+    en: Control data and criteria are managed separately from the executor under review. Model-based evaluation complements reproducible checks; the degree of independence is recorded in the profile.
+mt_residual:
+  type: assessment
+  name:
+    ru: Решение по остаточному риску
+    en: Residual risk decision
+  desc:
+    ru: Решение фиксирует оставшийся риск, ограничения и компенсирующие меры. У решения есть владелец, срок действия и условия пересмотра.
+    en: The decision records the remaining risk, the constraints and the compensating measures. It has an owner, a validity period and review conditions.
+mt_review:
+  type: event
+  name:
+    ru: Пересмотр при изменении
+    en: Review on change
+  desc:
+    ru: Изменение любого элемента полной конфигурации запускает повторную оценку. Затронутые риски и рубежи находят по графу зависимостей.
+    en: A change to any element of the full configuration triggers re-evaluation. Affected risks and gates are found through the dependency graph.

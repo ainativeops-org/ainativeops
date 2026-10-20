@@ -1,0 +1,25 @@
+# Confidential Computing / Confidential Computing
+# Ключ RM-… после версии 1.0 не меняется и не переиспользуется. / An RM-… key is frozen after 1.0 and never reused.
+RM-CMP-01:
+  name:
+    ru: Confidential Computing · TEE
+    en: Confidential Computing · TEE
+  desc:
+    ru: Обучение и инференс выполняются внутри TEE. Оператор платформы не читает данные и веса во время обработки.
+    en: Training and inference run inside a TEE. The platform operator cannot read data and weights during processing.
+  optional: true
+RM-CMP-02:
+  name:
+    ru: Remote Attestation · KBS
+    en: Remote Attestation · KBS
+  desc:
+    ru: Ключ к модели или данным получает только среда, прошедшая аттестацию. Отчёт об аттестации сохраняется как свидетельство допуска.
+    en: Only an environment that passed attestation gets the key to a model or data. The attestation report is kept as admission evidence.
+  optional: true
+RM-CMP-03:
+  name:
+    ru: Криптооперации в HSM
+    en: Cryptographic operations in HSM
+  desc:
+    ru: Шифрование, подпись и выработка ключей выполняются внутри модуля. Ключи не покидают HSM.
+    en: Encryption, signing and key generation run inside the module. Keys never leave the HSM.

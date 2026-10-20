@@ -1,0 +1,16 @@
+cff-version: 1.2.0
+message: "If you use this model, please cite it as below."
+type: dataset
+title: "AiNativeOps reference model"
+abstract: "Open reference model of operations in which AI agents create, change and verify the target system: service classes, their placement across environments and scenarios. Community Interest Project."
+authors:
+  - name: "AiNativeOps contributors"
+version: 0.1.0-alpha
+url: "https://ainativeops.org"
+license: CC-BY-4.0
+keywords:
+  - AI-native operations
+  - reference model
+  - MLOps
+  - AI agents
+  - AI safety

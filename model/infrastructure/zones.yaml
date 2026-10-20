@@ -1,0 +1,161 @@
+# Зоны инфраструктуры и строки элементов в них. Набор зон задан раскладкой в site/app.js.
+# Infrastructure zones and their element rows. The set of zones is fixed by the layout in site/app.js.
+categories:
+  ext:
+    color: '#FFE0E0'
+    label:
+      ru: Внешние поставщики
+      en: External providers
+  perim:
+    color: '#F5DEAA'
+    label:
+      ru: Периметр
+      en: Perimeter
+  asc:
+    color: '#CCCCFF'
+    label:
+      ru: AI Safety Core
+      en: AI Safety Core
+  llm:
+    color: '#B5FFFF'
+    label:
+      ru: Агенты и модели
+      en: Agents and models
+  data:
+    color: '#FFFFB5'
+    label:
+      ru: Сервисы данных
+      en: Data services
+  node:
+    color: '#C9E7B7'
+    label:
+      ru: Сервисы платформы
+      en: Platform services
+zones:
+  - id: corp
+    title:
+      ru: Корпоративный контур
+      en: Corporate perimeter
+    category: node
+    rows:
+      - [users, erp-crm, iam-sso]
+      - [siem-soc]
+  - id: ai-safety-core
+    title:
+      ru: AI Safety Core
+      en: AI Safety Core
+    category: node
+    accent: core
+  - id: ext
+    title:
+      ru: Внешний контур
+      en: External zone
+    category: ext
+    rows:
+      - [model-hubs]
+      - [external-datasets]
+      - [external-llm-api]
+      - [public-package-registries]
+      - [external-apis-mcp]
+  - id: dmz
+    title:
+      ru: Периметр
+      en: Perimeter
+    category: perim
+    rows:
+      - [artifact-intake]
+      - [package-mirror]
+      - [egress-proxy]
+  - id: data-protection
+    title:
+      ru: Защита данных
+      en: Data protection
+    category: asc
+    rows:
+      - [data-discovery, tokenization]
+      - [data-access-proxy, role-based-detokenization]
+  - id: guardrails
+    title:
+      ru: Guardrails
+      en: Guardrails
+    category: asc
+    rows:
+      - [input-guardrails, output-guardrails]
+      - [rag-access-filter, memory-guard]
+  - id: operation-admission
+    title:
+      ru: Допуск операций
+      en: Operation admission
+    category: asc
+    rows:
+      - [job-sandbox, zero-trust-git]
+      - [pep, provenance-registry]
+  - id: agents
+    title:
+      ru: Агенты · Harness
+      en: Agents · Harness
+    category: llm
+    accent: harness
+    rows:
+      - [context-manager, agent-runtime, tool-router, rate-limits-budgets]
+      - [agent-memory, agent-orchestrator, prompt-skill-registry, checkpoint-store]
+  - id: exp
+    title:
+      ru: EXP · исследования и обучение
+      en: EXP · research and training
+    category: node
+    rows:
+      - [notebooks, dataset-versioning]
+      - [gpu-training-cluster, experiment-tracking]
+  - id: eval
+    title:
+      ru: EVAL · независимые испытания
+      en: EVAL · independent testing
+    category: node
+    rows:
+      - [eval-datasets, eval-red-teaming]
+      - [rule-based-checks, llm-as-a-judge]
+  - id: prod
+    title:
+      ru: PROD · эксплуатация
+      en: PROD · operation
+    category: node
+    rows:
+      - [business-apps, llm-gateway]
+      - [mcp-servers, inference-servers]
+      - [metrics-alerts]
+  - id: data-platform
+    title:
+      ru: Платформа данных
+      en: Data platform
+    category: data
+    rows:
+      - [landing-zone, dataset-store, data-catalog, vector-db]
+  - id: ci-cd
+    title:
+      ru: CI/CD
+      en: CI/CD
+    category: node
+    rows:
+      - [git-repository, ci-runner]
+      - [sast-sca-secrets, artifact-registry]
+      - [release-gate, cd-deployment]
+  - id: observability
+    title:
+      ru: Observability
+      en: Observability
+    category: node
+    rows:
+      - [log-collectors, event-normalization]
+      - [log-metric-store, archive-backup]
+  - id: trusted-services
+    title:
+      ru: Доверенные сервисы
+      en: Trusted services
+    category: asc
+    accent: core
+    rows:
+      - [hsm-kms, token-vault]
+      - [pdp, secrets-manager]
+      - [agent-iam, kill-switch]
+      - [audit-log, integrity-monitoring]

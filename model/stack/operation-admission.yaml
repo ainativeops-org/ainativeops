@@ -1,0 +1,30 @@
+# Допуск операций · PDP / PEP / Operation admission · PDP / PEP
+# Ключ RM-… после версии 1.0 не меняется и не переиспользуется. / An RM-… key is frozen after 1.0 and never reused.
+RM-ACT-01:
+  name:
+    ru: Policy Engine · PDP
+    en: Policy Engine · PDP
+  desc:
+    ru: Вычисляет решение по версии политики, идентичности и контексту операции. Управление политиками отделено от проверяемого агента; PEP обеспечивает исполнение решения.
+    en: Computes a decision from the policy version, the identity and the operation context. Policy management is separated from the agent under review; the PEP enforces the decision.
+RM-ACT-02:
+  name:
+    ru: Policy Enforcement · PEP
+    en: Policy Enforcement · PEP
+  desc:
+    ru: 'Принудительно проверяет точный вызов до исполнения: права, аргументы, бюджет и необходимое согласование. Недоступность обязательной проверки блокирует действие. Исполнение ограничений обеспечивается адаптерами, сетью и ОС.'
+    en: Checks the exact call before execution against rights, arguments, budget and required approval. If a mandatory check is unavailable, the action is blocked. Adapters, network and OS enforce the constraints.
+RM-ACT-03:
+  name:
+    ru: Sandbox заданий
+    en: Job sandbox
+  desc:
+    ru: Создаёт временную среду с ограничениями файловой системы, сети и ресурсов. Среда принадлежит конкретному заданию; после выгрузки результата уничтожается.
+    en: Creates a temporary environment with file system, network and resource limits. The environment belongs to one job and is destroyed after the result is collected.
+RM-ACT-04:
+  name:
+    ru: Zero-trust Git
+    en: Zero-trust Git
+  desc:
+    ru: Контролирует представление кода при хранении и раскрытии. Для недоверенного сервера может применяться защищённое представление; раскрытие выполняется в доверенной рабочей среде.
+    en: Controls the representation of code at rest and on disclosure. An untrusted server can hold a protected representation; disclosure happens in a trusted workspace.

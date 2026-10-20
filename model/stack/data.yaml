@@ -1,0 +1,67 @@
+# 03 · Данные и знания / 03 · Data and knowledge
+# Ключ RM-… после версии 1.0 не меняется и не переиспользуется. / An RM-… key is frozen after 1.0 and never reused.
+RM-DAT-01:
+  name:
+    ru: Ingestion · ETL / ELT
+    en: Ingestion · ETL / ELT
+  desc:
+    ru: Коннекторы к исходным системам, разбор документов и извлечение текста; при необходимости OCR. Новые материалы проходят карантин, классификацию и проверку допустимой цели обработки.
+    en: Connectors to source systems, document parsing and text extraction, with OCR when needed. New material passes quarantine, classification and a check of the permitted processing purpose.
+RM-DAT-02:
+  name:
+    ru: Data Catalog
+    en: Data Catalog
+  desc:
+    ru: Хранит описания источников и наборов, владельцев и правила использования. Указывает происхождение и доступные версии; содержимое хранится в специализированных хранилищах.
+    en: Holds descriptions of sources and datasets, owners and usage rules. Shows provenance and available versions; content lives in specialised stores.
+RM-DAT-03:
+  name:
+    ru: Семантический слой
+    en: Semantic layer
+  desc:
+    ru: Согласованные определения показателей и сущностей, правила вычисления и связи с источниками. Обеспечивает единое толкование данных в приложениях и контексте агентов.
+    en: Agreed definitions of metrics and entities, calculation rules and links to sources. Gives applications and agent context one interpretation of the data.
+RM-DAT-04:
+  name:
+    ru: Версионирование датасетов
+    en: Dataset versioning
+  desc:
+    ru: Хранит версии и манифесты наборов, ссылки на содержимое и результаты проверок качества. Связывает выборки с источниками и преобразованиями.
+    en: Stores dataset versions and manifests, content references and quality check results. Links samples to sources and transformations.
+RM-DAT-05:
+  name:
+    ru: Eval-датасеты
+    en: Eval datasets
+  desc:
+    ru: Хранит контрольные наборы и критерии допуска с версиями. ИИ-инженер не имеет права записи в реестр.
+    en: Stores control sets and admission criteria with versions. The AI engineer has no write access to this registry.
+RM-DAT-06:
+  name:
+    ru: DWH / Data Lake
+    en: DWH / Data Lake
+  desc:
+    ru: Хранение и обработка корпоративных данных; допустимые зоны доступа, версии и сроки хранения. Представление данных выбирается по требованиям конкретной задачи.
+    en: Stores and processes enterprise data with access zones, versions and retention. The data representation is chosen by the requirements of the specific task.
+RM-DAT-07:
+  name:
+    ru: Vector DB · retrieval
+    en: Vector DB · retrieval
+  desc:
+    ru: Индексирует допущенные знания, ищет релевантные фрагменты и возвращает их с источниками. Поддерживает полнотекстовый, векторный или гибридный поиск по потребности. RAG использует этот сервис при подготовке контекста.
+    en: Indexes admitted knowledge, finds relevant fragments and returns them with sources. Supports full-text, vector or hybrid search as needed. RAG uses this service to prepare context.
+RM-DAT-08:
+  name:
+    ru: Граф знаний
+    en: Knowledge graph
+  desc:
+    ru: Связи сущностей, бизнес-процессов и документов с указанием происхождения. Дополняет извлечение контекста там, где задача требует анализа отношений.
+    en: Links entities, business processes and documents with provenance. Complements retrieval where the task requires analysing relations.
+  optional: true
+RM-DAT-09:
+  name:
+    ru: Feature Store
+    en: Feature Store
+  desc:
+    ru: Версионирует признаки и преобразования для обучения и применения предиктивных моделей. Временная согласованность выборок проверяется до обучения; актуальность значений контролируется при выдаче.
+    en: Versions features and transformations for training and serving predictive models. Temporal consistency of samples is checked before training; value freshness is checked at serving.
+  optional: true

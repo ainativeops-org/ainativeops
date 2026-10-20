@@ -1,0 +1,31 @@
+# 06 · Интеграция и инструменты / 06 · Integration and tools
+# Ключ RM-… после версии 1.0 не меняется и не переиспользуется. / An RM-… key is frozen after 1.0 and never reused.
+RM-INT-01:
+  name:
+    ru: API Gateway
+    en: API Gateway
+  desc:
+    ru: Публикация API приложений, авторизация запросов и ограничение частоты обращений. Идентичность инициатора передаётся в Harness.
+    en: Publishes application APIs, authorises requests and limits call rates. The initiator identity is passed to the Harness.
+RM-INT-02:
+  name:
+    ru: MCP-серверы и коннекторы
+    en: MCP servers and connectors
+  desc:
+    ru: Коннекторы к ERP, CRM и другим системам через MCP, HTTP API и локальные инструменты. Получают только разрешённые вызовы из диспетчера; служебные секреты подставляются вне контекста модели.
+    en: Connectors to ERP, CRM and other systems through MCP, HTTP APIs and local tools. They receive only calls allowed by the Tool Router; service secrets are injected outside the model context.
+RM-INT-03:
+  name:
+    ru: Event Bus · вебхуки
+    en: Event Bus · webhooks
+  desc:
+    ru: Принимает и публикует прикладные события по контрактам, преобразует сообщения и выбирает адресатов. Брокер сообщений обеспечивает транспорт; шлюз реализует правила прикладного обмена.
+    en: Receives and publishes application events by contract, transforms messages and selects recipients. The message broker provides transport; the bus implements application exchange rules.
+RM-INT-04:
+  name:
+    ru: A2A-шлюз
+    en: A2A gateway
+  desc:
+    ru: Передача задач между независимыми агентными системами с проверкой отправителя, области полномочий и состава контекста. Внутреннее делегирование может выполняться средствами Harness.
+    en: Passes tasks between independent agent systems and checks the sender, the authority scope and the context content. Internal delegation can run inside the Harness.
+  optional: true

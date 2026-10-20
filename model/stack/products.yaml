@@ -1,0 +1,31 @@
+# 07 · Продукты / 07 · Products
+# Ключ RM-… после версии 1.0 не меняется и не переиспользуется. / An RM-… key is frozen after 1.0 and never reused.
+RM-APP-01:
+  name:
+    ru: Бизнес-приложения
+    en: Business applications
+  desc:
+    ru: Прикладные продукты используют данные и модели для поиска, анализа и выполнения действий. Для каждого продукта задаются назначение, владелец и критерии результата.
+    en: Applied products use data and models for search, analysis and actions. Each product has a purpose, an owner and result criteria.
+RM-APP-02:
+  name:
+    ru: UI и чат-интерфейсы
+    en: UI and chat interfaces
+  desc:
+    ru: Веб-интерфейсы, чаты и рабочие места разработчиков. Пользовательская сессия сохраняет идентичность инициатора до конкретного действия агента.
+    en: Web interfaces, chats and developer workplaces. The user session keeps the initiator identity down to a specific agent action.
+RM-APP-03:
+  name:
+    ru: Консоль оператора · HITL
+    en: Operator console · HITL
+  desc:
+    ru: Постановка цели и приёмка результата; просмотр точного действия перед согласованием. Решение человека связано с задачей, аргументами и сроком действия.
+    en: Setting goals and accepting results; reviewing the exact action before approval. The human decision is bound to the task, the arguments and a validity period.
+RM-APP-04:
+  name:
+    ru: BPM-движок
+    en: BPM engine
+  desc:
+    ru: Исполняет заданные бизнес-процессы, состояния и правила переходов. Вызывает агентные задачи там, где это предусмотрено сценарием; оркестратор агентов управляет внутренним делегированием.
+    en: Executes defined business processes, states and transition rules. Calls agent tasks where the process provides for it; the agent orchestrator manages internal delegation.
+  optional: true

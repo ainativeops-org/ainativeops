@@ -1,0 +1,238 @@
+# Вид «Архитектура»: уровни, группы с координатами, потоки. Элементы уровня лежат в файле <file>.yaml.
+# Architecture view: levels, groups with coordinates, flows. A level's elements live in <file>.yaml.
+canvas:
+  width: 2080
+  height: 1460
+layers:
+  - id: biz
+    number: '01'
+    title:
+      ru: Бизнес
+      en: Business
+    y: 20
+    height: 250
+    band: '#FFFDE8'
+    fill: '#FFFFB5'
+    file: business
+  - id: meth
+    number: '02'
+    title:
+      ru: Методология
+      en: Methodology
+    y: 290
+    height: 250
+    band: '#F4F1FF'
+    fill: '#DCD3FF'
+    file: methodology
+  - id: ops
+    number: '03'
+    title:
+      ru: Ops
+      en: Ops
+    y: 560
+    height: 610
+    band: '#EEFFFF'
+    fill: '#B5FFFF'
+    file: ops
+  - id: tech
+    number: '04'
+    title:
+      ru: Технологии
+      en: Technology
+    y: 1190
+    height: 250
+    band: '#F1F8EC'
+    fill: '#C9E7B7'
+    file: technology
+groups:
+  - id: goals
+    layer: biz
+    title:
+      ru: Цели
+      en: Goals
+    x: 200
+    y: 40
+    cols: 1
+    items: [b_goal, b_np]
+  - id: requirements
+    layer: biz
+    title:
+      ru: Требования
+      en: Requirements
+    x: 420
+    y: 40
+    cols: 2
+    items: [b_reqsec, b_reqprod, b_law]
+  - id: procedures
+    layer: biz
+    title:
+      ru: Регламенты
+      en: Procedures
+    x: 820
+    y: 40
+    cols: 2
+    items: [b_regrelease, b_regchange, b_regincident, b_regretire]
+  - id: policies
+    layer: biz
+    title:
+      ru: Политики
+      en: Policies
+    x: 1220
+    y: 40
+    cols: 2
+    items: [b_poldisc, b_polagent, b_polext, b_polbudget]
+  - id: ownership
+    layer: biz
+    title:
+      ru: Ответственность
+      en: Ownership
+    x: 1620
+    y: 40
+    cols: 2
+    items: [b_ownproc, b_owndata, b_ownmodel, b_ownrisk]
+  - id: analysis
+    layer: meth
+    title:
+      ru: Анализ системы
+      en: System analysis
+    x: 200
+    y: 310
+    cols: 2
+    items: [mt_profile, mt_closure, mt_tb, mt_assess]
+  - id: evidence
+    layer: meth
+    title:
+      ru: Свидетельства и решение
+      en: Evidence and decision
+    x: 620
+    y: 310
+    cols: 1
+    items: [mt_ev, mt_residual]
+  - id: gates
+    layer: meth
+    title:
+      ru: Контрольные рубежи
+      en: Control gates
+    x: 1000
+    y: 310
+    cols: 5
+    width: 84
+    items: [g0, g1, g2, g3, g4, g5, g6, g7, g8, g9]
+  - id: trust
+    layer: meth
+    title:
+      ru: Доверие
+      en: Trust
+    x: 1560
+    y: 310
+    cols: 2
+    items: [mt_trust, mt_indep, mt_review]
+  - id: dataops
+    layer: ops
+    title:
+      ru: DataOps · создание дата-продукта
+      en: DataOps · data product
+    x: 200
+    y: 580
+    cols: 5
+    items: [d1, d2, d3, d4, d5]
+  - id: mlops
+    layer: ops
+    title:
+      ru: MLOps · создание модели
+      en: MLOps · model
+    x: 200
+    y: 720
+    cols: 5
+    items: [m1, m2, m3, m4, m5]
+  - id: devops
+    layer: ops
+    title:
+      ru: DevOps · создание ИТ-продукта
+      en: DevOps · IT product
+    x: 200
+    y: 860
+    cols: 5
+    items: [v1, v2, v3, v4, v5]
+  - id: shared
+    layer: ops
+    title:
+      ru: Общие рубежи допуска
+      en: Shared admission gates
+    x: 1160
+    y: 720
+    cols: 3
+    items: [o_eval, o_pack, o_release]
+  - id: operation
+    layer: ops
+    title:
+      ru: Эксплуатация
+      en: Operation
+    x: 1760
+    y: 720
+    cols: 1
+    items: [o_ops]
+  - id: secops
+    layer: ops
+    title:
+      ru: SecOps · операции безопасности
+      en: SecOps · security operations
+    x: 200
+    y: 1010
+    cols: 9
+    items: [s_risk, s_src, s_prep, s_scan, s_runtime, s_detect, s_resp, s_change, s_retire]
+  - id: tech-ai
+    layer: tech
+    title:
+      ru: LLM и ИИ-агенты
+      en: LLMs and AI agents
+    x: 200
+    y: 1210
+    cols: 3
+    items: [t_eng, t_ctl, t_base, t_target, t_ext]
+  - id: tech-data
+    layer: tech
+    title:
+      ru: Данные и знания
+      en: Data and knowledge
+    x: 780
+    y: 1210
+    cols: 2
+    items: [t_store, t_vec, t_mem]
+  - id: tech-dev
+    layer: tech
+    title:
+      ru: Разработка и выпуск
+      en: Build and release
+    x: 1180
+    y: 1210
+    cols: 2
+    items: [t_repo, t_gpu, t_ci, t_reg]
+  - id: tech-ops
+    layer: tech
+    title:
+      ru: Эксплуатация и наблюдаемость
+      en: Operation and observability
+    x: 1580
+    y: 1210
+    cols: 2
+    items: [t_prod, t_gw, t_iam, t_siem]
+flows:
+  - [d1, d2]
+  - [d2, d3]
+  - [d3, d4]
+  - [d4, d5]
+  - [m1, m2]
+  - [m2, m3]
+  - [m3, m4]
+  - [m4, m5]
+  - [v1, v2]
+  - [v2, v3]
+  - [v3, v4]
+  - [v4, v5]
+  - [o_eval, o_pack]
+  - [o_pack, o_release]
+  - [d5, o_eval]
+  - [m5, o_eval]
+  - [v5, o_eval]
+  - [o_release, o_ops]

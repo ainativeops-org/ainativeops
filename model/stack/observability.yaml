@@ -1,0 +1,58 @@
+# Observability / Observability
+# Ключ RM-… после версии 1.0 не меняется и не переиспользуется. / An RM-… key is frozen after 1.0 and never reused.
+RM-OPS-01:
+  name:
+    ru: Метрики и алерты
+    en: Metrics and alerts
+  desc:
+    ru: Доступность, задержки и ошибки сервисов, использование CPU/GPU. Пороговые значения связаны с требованиями продукта.
+    en: Availability, latency and errors of services, CPU and GPU usage. Thresholds are linked to product requirements.
+RM-OPS-02:
+  name:
+    ru: Трассировка · OpenTelemetry
+    en: Tracing · OpenTelemetry
+  desc:
+    ru: Связывает шаги задачи, делегирование, модельные запросы и вызовы инструментов. В трассе фиксируются версии контекста и решений контроля; содержимое очищается по политике.
+    en: Links task steps, delegation, model requests and tool calls. The trace records context versions and control decisions; content is redacted by policy.
+RM-OPS-03:
+  name:
+    ru: Сбор логов
+    en: Log collection
+  desc:
+    ru: Коллекторы принимают журналы, метрики и трассы. Процессоры событий выполняют нормализацию и маршрутизацию по контрактам потребителей. Эти роли могут обслуживаться одним продуктом; обязательность каждого этапа определяется источником.
+    en: Collectors receive logs, metrics and traces. Event processors normalise and route them by consumer contract. One product can serve both roles; the source defines which stages are mandatory.
+RM-OPS-04:
+  name:
+    ru: Хранилище логов и метрик
+    en: Log and metric store
+  desc:
+    ru: Хранилища метрик, трасс и событий выбираются по типу запросов. Объектный архив обслуживает длительное хранение файлов; аналитические запросы выполняются специализированным сервисом. Политики доступа и сроков хранения задаются для каждого класса.
+    en: Stores for metrics, traces and events are chosen by query type. The object archive handles long-term file retention; a specialised service runs analytical queries. Access and retention policies are set per class.
+RM-OPS-05:
+  name:
+    ru: Мониторинг дрейфа и качества
+    en: Drift and quality monitoring
+  desc:
+    ru: Контроль качества ответов, достоверности извлечения и успешности задач. Деградация запускает оценку изменения; производственная обратная связь проходит карантин.
+    en: Tracks answer quality, retrieval accuracy and task success. Degradation triggers a change assessment; production feedback goes through quarantine.
+RM-OPS-06:
+  name:
+    ru: FinOps · токены и GPU
+    en: FinOps · tokens and GPU
+  desc:
+    ru: Учёт затрат по задаче и проекту, эффективность кеша и загрузка вычислений. Планирование бюджета и ресурсов опирается на фактические метрики.
+    en: Accounts costs per task and project, cache efficiency and compute utilisation. Budget and capacity planning rely on actual metrics.
+RM-OPS-07:
+  name:
+    ru: Управление изменениями
+    en: Change management
+  desc:
+    ru: Связывает замечание или отказ с конфигурацией и воспроизводимым случаем. Изменения памяти, данных и моделей повторяют затронутые проверки допуска.
+    en: Links a complaint or failure to the configuration and a reproducible case. Changes to memory, data and models repeat the affected admission checks.
+RM-OPS-08:
+  name:
+    ru: Backup и DR
+    en: Backup and DR
+  desc:
+    ru: Создаёт согласованные резервные копии и выполняет проверяемое восстановление с целевыми RPO/RTO. После восстановления учитываются актуальные политики и отозванные полномочия.
+    en: Creates consistent backups and runs verifiable recovery with target RPO and RTO. After recovery the current policies and revoked authorities apply.

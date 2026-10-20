@@ -1,0 +1,51 @@
+# Доверенные сервисы / Trusted services
+# Ключ RM-… после версии 1.0 не меняется и не переиспользуется. / An RM-… key is frozen after 1.0 and never reused.
+RM-TRS-01:
+  name:
+    ru: HSM / KMS
+    en: HSM / KMS
+  desc:
+    ru: Защищает криптографические ключи и выполняет разрешённые криптографические операции. Ключ подписи не раскрывается агенту. Token Vault имеет собственный интерфейс и может работать на том же доверенном программно-аппаратном комплексе.
+    en: Protects cryptographic keys and performs permitted cryptographic operations. The signing key is never disclosed to an agent. The token vault has its own interface and can share the same trusted appliance.
+RM-TRS-02:
+  name:
+    ru: Token Vault
+    en: Token Vault
+  desc:
+    ru: Защищённо хранит соответствия токенов исходным значениям. Обратная подмена выполняется по хранилищу и политике раскрытия; криптографический ключ для восстановления не нужен. Хранилище токенов, ключи и секреты могут работать на одном доверенном программно-аппаратном комплексе.
+    en: Stores token-to-value mappings in protected form. Reverse substitution follows the vault and the disclosure policy; no cryptographic key is needed for recovery. Vault, keys and secrets can run on one trusted appliance.
+RM-TRS-03:
+  name:
+    ru: Secrets Manager
+    en: Secrets Manager
+  desc:
+    ru: Выдаёт или подставляет секрет доверенному исполнителю под ограниченную операцию. Управляет сроком действия, ротацией и отзывом; секрет исключается из модельного контекста.
+    en: Issues or injects a secret to a trusted executor for a limited operation. Manages validity, rotation and revocation; secrets stay out of the model context.
+RM-TRS-04:
+  name:
+    ru: Audit Log
+    en: Audit Log
+  desc:
+    ru: Фиксирует субъект, действие и основание решения. Событие связывается с версией политики и передаётся в защищённое хранилище; доступ к содержимому ограничен.
+    en: Records the subject, the action and the basis of the decision. The event is linked to the policy version and sent to protected storage; access to content is restricted.
+RM-TRS-05:
+  name:
+    ru: Provenance-реестр
+    en: Provenance registry
+  desc:
+    ru: Связывает точные версии исходных материалов, задания и результаты проверок с манифестом выпуска. Записи защищены от изменения исполнителем.
+    en: Links exact versions of source materials, jobs and check results to the release manifest. Records are protected from modification by the executor.
+RM-TRS-06:
+  name:
+    ru: Integrity Monitoring
+    en: Integrity Monitoring
+  desc:
+    ru: Проверяет, что политики, артефакты и записи происхождения не изменены после допуска.
+    en: Verifies that policies, artifacts and provenance records have not changed since admission.
+RM-TRS-07:
+  name:
+    ru: Kill switch и отзыв
+    en: Kill switch and revocation
+  desc:
+    ru: Блокирует новые действия и отзывает полномочия независимо от агента. При уже совершённых внешних операциях инициирует сверку и предусмотренную компенсацию.
+    en: Blocks new actions and revokes authority independently of the agent. For external operations already performed it starts reconciliation and the defined compensation.

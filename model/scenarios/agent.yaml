@@ -1,0 +1,20 @@
+# Сценарий / Scenario: Цикл агента · внутренняя модель и API / Agent loop · internal model and API
+# Шаг = [элемент, [участники]] / Step = [element, [participants]]
+order: 7
+name:
+  ru: Цикл агента · внутренняя модель и API
+  en: Agent loop · internal model and API
+routes:
+  stack:
+    - [RM-INT-01, [RM-SEC-01]]
+    - [RM-AGT-01, [RM-AGT-08]]
+    - [RM-AGT-03, [RM-AGT-07, RM-DAT-07, RM-AGT-06]]
+    - [RM-AIC-01, [RM-ACT-01]]
+    - [RM-MOD-06, [RM-MOD-08]]
+    - [RM-MOD-07, []]
+    - [RM-AGT-02, []]
+    - [RM-AGT-04, []]
+    - [RM-ACT-02, [RM-ACT-01, RM-AIC-03, RM-AIC-04]]
+    - [RM-INT-02, [RM-TRS-03, RM-SEC-02]]
+    - [RM-AIC-02, [RM-DPR-07]]
+    - [RM-AGT-05, [RM-OPS-02, RM-TRS-04]]

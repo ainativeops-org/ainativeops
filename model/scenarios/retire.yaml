@@ -1,0 +1,38 @@
+# Сценарий / Scenario: Вывод из эксплуатации / Decommissioning
+# Шаг = [элемент, [участники]] / Step = [element, [participants]]
+order: 6
+name:
+  ru: Вывод из эксплуатации
+  en: Decommissioning
+routes:
+  architecture:
+    - [b_regretire, []]
+    - [s_retire, [g9]]
+    - [t_iam, []]
+    - [t_vec, []]
+    - [t_mem, []]
+    - [t_ext, [b_polext]]
+    - [t_siem, []]
+    - [mt_ev, []]
+    - [mt_residual, [b_ownproc]]
+  infrastructure:
+    - [kill-switch, []]
+    - [agent-iam, [secrets-manager]]
+    - [llm-gateway, [egress-proxy]]
+    - [mcp-servers, []]
+    - [agent-memory, [checkpoint-store]]
+    - [vector-db, [dataset-store]]
+    - [token-vault, [hsm-kms]]
+    - [provenance-registry, []]
+    - [archive-backup, [audit-log]]
+  stack:
+    - [RM-TRS-07, [RM-AGT-02]]
+    - [RM-SEC-01, [RM-TRS-03]]
+    - [RM-DEV-10, [RM-APP-01, RM-MOD-07]]
+    - [RM-AGT-06, [RM-DPR-07]]
+    - [RM-DAT-07, [RM-DAT-02]]
+    - [RM-AGT-05, []]
+    - [RM-MOD-06, [RM-SEC-02]]
+    - [RM-OPS-08, []]
+    - [RM-GOV-01, [RM-GOV-04]]
+    - [RM-SEC-07, [RM-TRS-04]]

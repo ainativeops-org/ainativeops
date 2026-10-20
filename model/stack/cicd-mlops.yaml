@@ -1,0 +1,73 @@
+# CI/CD и MLOps / CI/CD and MLOps
+# Ключ RM-… после версии 1.0 не меняется и не переиспользуется. / An RM-… key is frozen after 1.0 and never reused.
+RM-DEV-01:
+  name:
+    ru: Git-репозитории
+    en: Git repositories
+  desc:
+    ru: Хранит версии исходного кода, тестов и конфигурации. Обеспечивает ревью и правила изменения ветвей. При защищённом представлении кода доверенная среда раскрытия задаётся отдельно.
+    en: Store versions of source code, tests and configuration. Provide review and branch protection rules. When code is stored in protected form, the trusted environment for disclosure is defined separately.
+RM-DEV-02:
+  name:
+    ru: Ноутбуки · Jupyter
+    en: Notebooks · Jupyter
+  desc:
+    ru: Интерактивная работа аналитиков и агентов с выборками. Данные поступают через Data Access Proxy в токенизированном виде.
+    en: Interactive work of analysts and agents with samples. Data arrives through the Data Access Proxy in tokenised form.
+  optional: true
+RM-DEV-03:
+  name:
+    ru: Оркестратор пайплайнов
+    en: Pipeline orchestrator
+  desc:
+    ru: Управляет подготовкой, разметкой и публикацией дата-продуктов. Проверяет контракты качества и фиксирует преобразования.
+    en: Manages preparation, labelling and publishing of data products. Checks quality contracts and records transformations.
+RM-DEV-04:
+  name:
+    ru: Обучение и fine-tuning
+    en: Training and fine-tuning
+  desc:
+    ru: План эксперимента, запуск вычислений и формирование модели-кандидата. Преобразования защищаемых данных допускаются после проверки пригодности для задачи.
+    en: Experiment plan, compute runs and building the model candidate. Transformations of protected data are allowed after a fitness check for the task.
+RM-DEV-05:
+  name:
+    ru: Experiment Tracking
+    en: Experiment Tracking
+  desc:
+    ru: Связывает запуск с кодом, параметрами и метриками. Артефакт модели передаётся на испытания и в реестр; регистрация запуска сама по себе допуска не даёт.
+    en: Links a run to its code, parameters and metrics. The model artifact goes to testing and the registry; registering a run grants no admission by itself.
+RM-DEV-06:
+  name:
+    ru: CI-раннеры
+    en: CI runners
+  desc:
+    ru: Собирает кандидата в эфемерной среде, запускает тесты и сканирование. Фиксирует зависимости и хеш пакета; дальнейшая оценка относится к этой версии.
+    en: Build the candidate in an ephemeral environment and run tests and scans. Record dependencies and the package hash; further evaluation refers to this version.
+RM-DEV-07:
+  name:
+    ru: Eval и red teaming
+    en: Eval and red teaming
+  desc:
+    ru: Стенды качества, безопасности и регрессии для данных, моделей и агентов. Контрольные наборы и критерии защищены от изменения проверяемым исполнителем. Оценка LLM дополняет проверяемые критерии.
+    en: Quality, safety and regression benches for data, models and agents. Control sets and criteria are protected from the executor under review. LLM evaluation complements verifiable criteria.
+RM-DEV-08:
+  name:
+    ru: Artifact Registry
+    en: Artifact Registry
+  desc:
+    ru: Пакеты, образы и дата-продукты с неизменяемыми версиями и происхождением. Реестр моделей имеет отдельный профиль метаданных.
+    en: Packages, images and data products with immutable versions and provenance. The model registry has its own metadata profile.
+RM-DEV-09:
+  name:
+    ru: Release gate · подпись
+    en: Release gate · signing
+  desc:
+    ru: Проверяет обязательные свидетельства и манифест полной конфигурации. Разрешает выпуск точной версии и запрашивает подпись с использованием защищённого ключа.
+    en: Checks mandatory evidence and the manifest of the full configuration. Allows release of the exact version and requests a signature with a protected key.
+RM-DEV-10:
+  name:
+    ru: CD · развёртывание
+    en: CD · deployment
+  desc:
+    ru: Продвигает допущенную конфигурацию в PROD с проверкой подписи и поэтапным включением. Откат учитывает совместимость схем и совершённые внешние действия.
+    en: Promotes the admitted configuration to PROD after a signature check, with staged rollout. Rollback considers schema compatibility and external actions already taken.

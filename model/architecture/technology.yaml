@@ -1,0 +1,143 @@
+# Технологии / Technology
+t_eng:
+  type: llm
+  name:
+    ru: ИИ-инженер · LLM-агент
+    en: AI engineer · LLM agent
+  desc:
+    ru: Языковая модель с инструментами, которая пишет код, размечает данные и запускает обучение. На неё заводят отдельную карточку системы.
+    en: A language model with tools that writes code, labels data and runs training. It gets its own card in the system profile.
+t_ctl:
+  type: llm
+  name:
+    ru: ИИ-контролёр · LLM-as-a-Judge
+    en: AI controller · LLM-as-a-Judge
+  desc:
+    ru: Внутренняя модель формирует дополнительные оценки для испытаний и контроля исполнения. Окончательное решение о допуске принимает защищённый механизм правил.
+    en: An internal model produces supplementary assessments for testing and runtime control. A protected rule mechanism takes the final admission decision.
+  class: RM-AIC-03
+t_base:
+  type: llm
+  name:
+    ru: Foundation-модель
+    en: Foundation model
+  desc:
+    ru: Предобученная модель поставщика. Её принимают с проверкой происхождения и формата весов.
+    en: A provider's pretrained model. It is accepted after provenance and weight format checks.
+  class: RM-MOD-01
+t_target:
+  type: llm
+  name:
+    ru: Fine-tuned модель и LoRA
+    en: Fine-tuned model and LoRA
+  desc:
+    ru: Модель, которую выпускает MLOps и использует целевая система.
+    en: The model that MLOps releases and the target system uses.
+  class: RM-MOD-02
+t_ext:
+  type: llm
+  name:
+    ru: Внешний LLM API
+    en: External LLM API
+  desc:
+    ru: ИИ поставщика за пределами контура. Его недоступные для проверки процессы записывают как ограничение и основание остаточного риска.
+    en: A provider's AI outside the perimeter. Its processes that cannot be verified are recorded as a constraint and as grounds for residual risk.
+  class: RM-MOD-03
+t_store:
+  type: node
+  name:
+    ru: Карантинная зона и датасеты
+    en: Landing zone and datasets
+  desc:
+    ru: Хранит исходные и подготовленные данные. Новые записи проходят карантин до допуска.
+    en: Stores source and prepared data. New records stay in quarantine until admitted.
+  class: RM-DAT-01
+t_vec:
+  type: node
+  name:
+    ru: Vector DB · retrieval
+    en: Vector DB · retrieval
+  desc:
+    ru: Индексирует допущенные знания, ищет релевантные фрагменты и возвращает их с источниками. Поддерживает полнотекстовый, векторный или гибридный поиск по потребности. RAG использует этот сервис при подготовке контекста.
+    en: Indexes admitted knowledge, finds relevant fragments and returns them with sources. Supports full-text, vector or hybrid search as needed. RAG uses this service to prepare context.
+  class: RM-DAT-07
+t_mem:
+  type: node
+  name:
+    ru: Agent Memory
+    en: Agent Memory
+  desc:
+    ru: Хранит сведения для повторного использования между задачами. Области доступа, происхождение и сроки хранения задаются отдельно от состояния текущего исполнения.
+    en: Stores information for reuse across tasks. Access scopes, provenance and retention are set separately from the state of the current run.
+  class: RM-AGT-06
+t_repo:
+  type: node
+  name:
+    ru: Git-репозиторий
+    en: Git repository
+  desc:
+    ru: Код, тесты и конфигурация сборки. Служит источником контекста для ИИ-инженера.
+    en: Code, tests and build configuration. It is a context source for the AI engineer.
+  class: RM-DEV-01
+t_gpu:
+  type: node
+  name:
+    ru: GPU-кластер обучения
+    en: GPU training cluster
+  desc:
+    ru: Изолированная среда заданий обучения с ограниченной сетью и секретами.
+    en: An isolated environment for training jobs with restricted network and secrets.
+  class: RM-DEV-04
+t_ci:
+  type: node
+  name:
+    ru: CI/CD
+    en: CI/CD
+  desc:
+    ru: Сборка и тесты. Агент не имеет права менять правила допуска в конвейере.
+    en: Build and tests. The agent has no right to change admission rules in the pipeline.
+  class: RM-DEV-06
+t_reg:
+  type: node
+  name:
+    ru: Artifact Registry
+    en: Artifact Registry
+  desc:
+    ru: Хранит версии моделей и пакетов, связанные с манифестом выпуска.
+    en: Stores model and package versions linked to the release manifest.
+  class: RM-DEV-08
+t_prod:
+  type: node
+  name:
+    ru: PROD-среда
+    en: PROD environment
+  desc:
+    ru: Среда исполнения целевой системы.
+    en: The runtime environment of the target system.
+t_gw:
+  type: node
+  name:
+    ru: Tool Router и PEP
+    en: Tool Router and PEP
+  desc:
+    ru: Исполняет авторизацию, политику раскрытия и бюджеты вне модели. У агента нет канала к инструментам в обход этой точки.
+    en: Enforces authorisation, the disclosure policy and budgets outside the model. The agent has no channel to tools that bypasses this point.
+  class: RM-ACT-02
+t_iam:
+  type: node
+  name:
+    ru: IAM / SSO
+    en: IAM / SSO
+  desc:
+    ru: Идентичности людей, агентов и сервисов, аутентификация и ограниченные машинные полномочия. Выдача служебных секретов имеет отдельный интерфейс и политику.
+    en: Identities of people, agents and services, authentication and limited machine authority. Service secrets are issued through a separate interface and policy.
+  class: RM-SEC-01
+t_siem:
+  type: node
+  name:
+    ru: SIEM / SOC
+    en: SIEM / SOC
+  desc:
+    ru: Коррелирует события безопасности и формирует инциденты. Использует нормализованные события и доступ к истории; управление реагированием задаётся регламентом.
+    en: Correlates security events and raises incidents. Uses normalised events and history access; response handling follows the procedure.
+  class: RM-SEC-05

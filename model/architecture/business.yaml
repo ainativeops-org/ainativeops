@@ -1,0 +1,137 @@
+# Бизнес / Business
+b_goal:
+  type: goal
+  name:
+    ru: Цель и критерии приёмки
+    en: Goal and acceptance criteria
+  desc:
+    ru: Владелец процесса утверждает назначение продукта, ожидаемый результат и критерии приёмки. Рубеж G0 проверяет, что они определены.
+    en: The process owner approves the product purpose, the expected result and the acceptance criteria. Gate G0 checks that they are defined.
+b_np:
+  type: assessment
+  name:
+    ru: Недопустимые события
+    en: Unacceptable events
+  desc:
+    ru: Владелец процесса формулирует события, которые система не должна допустить. Формулировка называет класс данных, действие и порог ущерба.
+    en: The process owner states the events the system must not allow. Each statement names the data class, the action and the damage threshold.
+b_reqsec:
+  type: requirement
+  name:
+    ru: Применимые требования ИБ
+    en: Applicable security requirements
+  desc:
+    ru: Для конкретной системы фиксируются применимые нормативные требования и организационные меры. Ссылки на документы, редакции и пункты включаются в профиль системы после проверки применимости.
+    en: The applicable regulatory requirements and organisational measures are recorded for the specific system. References to documents, editions and clauses enter the system profile after an applicability check.
+b_reqprod:
+  type: requirement
+  name:
+    ru: Требования к продукту
+    en: Product requirements
+  desc:
+    ru: Функциональные требования, интерфейсы и ограничения продукта. Из них выводят допустимую автономность и критерии испытаний.
+    en: Functional requirements, interfaces and constraints of the product. The permitted autonomy and the test criteria are derived from them.
+b_law:
+  type: constraint
+  name:
+    ru: Правовые и договорные ограничения
+    en: Legal and contractual constraints
+  desc:
+    ru: Ограничения на обработку и передачу данных по закону и договору. Неправомерная обработка считается недопустимым событием, даже если данные не раскрыты.
+    en: Limits on processing and transferring data under law and contract. Unlawful processing counts as an unacceptable event even when no data is disclosed.
+b_regrelease:
+  type: representation
+  name:
+    ru: Регламент выпуска
+    en: Release procedure
+  desc:
+    ru: Порядок допуска полной конфигурации. Регламент называет подписантов, обязательные свидетельства и порядок отката.
+    en: The procedure for admitting a full configuration. It names the signatories, the mandatory evidence and the rollback procedure.
+b_regchange:
+  type: representation
+  name:
+    ru: Регламент изменений
+    en: Change procedure
+  desc:
+    ru: Порядок пересмотра при изменении модели, данных, инструкций или поставщика. Регламент определяет, какие рубежи повторяют.
+    en: The procedure for review when a model, data, instructions or a supplier change. It defines which gates are repeated.
+b_regincident:
+  type: representation
+  name:
+    ru: Регламент реагирования
+    en: Incident response procedure
+  desc:
+    ru: Порядок остановки опасных действий, изоляции компонента и отзыва прав. Регламент задаёт и порядок расследования.
+    en: The procedure for stopping dangerous actions, isolating a component and revoking rights. It also sets the investigation procedure.
+b_regretire:
+  type: representation
+  name:
+    ru: Регламент вывода
+    en: Decommissioning procedure
+  desc:
+    ru: Порядок вывода из эксплуатации. Регламент требует отозвать доступ, удалить остаточные данные и сохранить свидетельства.
+    en: The procedure for taking a system out of service. It requires revoking access, deleting residual data and preserving evidence.
+b_poldisc:
+  type: principle
+  name:
+    ru: Политика раскрытия данных
+    en: Data disclosure policy
+  desc:
+    ru: Определяет, какие значения и в каком представлении получает субъект, например маскированные или токенизированные. Действует во всех каналах, включая память и журналы.
+    en: Defines which values a subject receives and in what form, for example masked or tokenised. It applies to every channel, including memory and logs.
+b_polagent:
+  type: principle
+  name:
+    ru: Политика полномочий агентов
+    en: Agent authority policy
+  desc:
+    ru: Разделяет полномочия ИИ-инженера на предложение, изменение, выполнение и выпуск. Агент не получает права менять механизм, который его ограничивает.
+    en: Splits the AI engineer's authority into proposing, changing, executing and releasing. An agent never gets the right to change the mechanism that constrains it.
+b_polext:
+  type: principle
+  name:
+    ru: Политика внешних ИИ-сервисов
+    en: External AI services policy
+  desc:
+    ru: Определяет, какие данные можно передавать внешнему поставщику ИИ и по каким каналам.
+    en: Defines which data may be sent to an external AI provider and through which channels.
+b_polbudget:
+  type: principle
+  name:
+    ru: Политика бюджетов
+    en: Budget policy
+  desc:
+    ru: Задаёт совокупный бюджет задачи, глубину делегирования и лимиты платных операций.
+    en: Sets the total task budget, the delegation depth and the limits for paid operations.
+b_ownproc:
+  type: role
+  name:
+    ru: Владелец процесса
+    en: Process owner
+  desc:
+    ru: Утверждает задачу и недопустимые события. Решает, какой остаточный риск допустим.
+    en: Approves the task and the unacceptable events. Decides which residual risk is acceptable.
+b_owndata:
+  type: role
+  name:
+    ru: Владелец данных
+    en: Data owner
+  desc:
+    ru: Отвечает за источники, разрешённые цели обработки и сроки хранения.
+    en: Responsible for sources, permitted processing purposes and retention periods.
+b_ownmodel:
+  type: role
+  name:
+    ru: Владелец модели
+    en: Model owner
+  desc:
+    ru: Отвечает за происхождение модели, обучение, адаптацию и регрессию.
+    en: Responsible for model provenance, training, adaptation and regression.
+b_ownrisk:
+  type: role
+  name:
+    ru: Владелец рубежа
+    en: Gate owner
+  desc:
+    ru: Исполняет условия допуска и управляет исключениями. Ни он, ни проверяемый агент не меняют единолично артефакт, критерий и свидетельство.
+    en: Enforces admission conditions and handles exceptions. Neither the gate owner nor the agent under review changes an artifact, a criterion and its evidence alone.

@@ -1,0 +1,32 @@
+# Layer stewards review changes to their part of the model (see GOVERNANCE.md).
+# Replace @maintainers with GitHub handles or teams before publication and uncomment the lines.
+#
+# Stack layers
+# /model/stack/_layers.yaml                    @maintainers
+# /model/stack/gov.yaml                        @maintainers
+# /model/stack/products.yaml                   @maintainers
+# /model/stack/integration.yaml                @maintainers
+# /model/stack/agents.yaml                     @maintainers
+# /model/stack/models.yaml                     @maintainers
+# /model/stack/data.yaml                       @maintainers
+# /model/stack/platform.yaml                   @maintainers
+# /model/stack/hardware.yaml                   @maintainers
+# /model/stack/cicd-mlops.yaml                 @maintainers
+# /model/stack/observability.yaml              @maintainers
+# /model/stack/cybersecurity.yaml              @maintainers
+# AI Safety Core
+# /model/stack/operation-admission.yaml        @maintainers
+# /model/stack/guardrails.yaml                 @maintainers
+# /model/stack/data-protection.yaml            @maintainers
+# /model/stack/confidential-computing.yaml     @maintainers
+# /model/stack/trusted-services.yaml           @maintainers
+#
+# Other views
+# /model/infrastructure/                       @maintainers
+# /model/architecture/                         @maintainers
+# /model/scenarios/                            @maintainers
+#
+# Code
+# /site/                                       @maintainers
+# /tools/                                      @maintainers
+# /.github/                                    @maintainers

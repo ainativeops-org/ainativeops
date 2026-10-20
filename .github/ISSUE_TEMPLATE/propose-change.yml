@@ -1,0 +1,57 @@
+name: Предложить правку / Propose a change
+description: Изменить класс, элемент или связь модели / Change a class, element or relation of the model
+labels: ["proposal"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Кнопка «Предложить правку» на карте заполняет первые поля сама. / The map's "Propose a change" button fills in the first fields.
+  - type: input
+    id: element
+    attributes:
+      label: Элемент / Element
+      description: RM-идентификатор или ключ элемента и его название / RM identifier or element key and its name
+      placeholder: RM-ACT-02 · Policy Enforcement · PEP
+    validations:
+      required: true
+  - type: input
+    id: view
+    attributes:
+      label: Вид и файл / View and file
+      placeholder: Стек платформы · model/stack/operation-admission.yaml
+  - type: textarea
+    id: current
+    attributes:
+      label: Текущее описание / Current text
+  - type: dropdown
+    id: kind
+    attributes:
+      label: Тип изменения / Kind of change
+      options:
+        - Формулировка или перевод / Wording or translation
+        - Новый класс / New class
+        - Новая или изменённая связь / New or changed relation
+        - Перенос, разделение или удаление класса / Move, split or remove a class
+        - Сценарий / Scenario
+        - Другое / Other
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Предложение / Proposal
+      description: Новый текст или описание изменения / New text or description of the change
+    validations:
+      required: true
+  - type: textarea
+    id: rationale
+    attributes:
+      label: Обоснование / Rationale
+      description: Почему это нужно; источник или практический случай / Why it is needed; a source or a practical case
+  - type: checkboxes
+    id: license
+    attributes:
+      label: Лицензия / License
+      options:
+        - label: Я согласен, что мой вклад распространяется по CC BY 4.0 / I agree that my contribution is licensed under CC BY 4.0
+          required: true

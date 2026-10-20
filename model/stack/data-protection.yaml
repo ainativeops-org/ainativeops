@@ -1,0 +1,51 @@
+# Защита данных / Data protection
+# Ключ RM-… после версии 1.0 не меняется и не переиспользуется. / An RM-… key is frozen after 1.0 and never reused.
+RM-DPR-01:
+  name:
+    ru: Data Discovery · классификация
+    en: Data Discovery · classification
+  desc:
+    ru: Определяет категории защищаемых значений и метки чувствительности. Подмена и проверка доступа используют его результат, качество классификации проверяют на контрольной выборке.
+    en: Determines the categories of protected values and sensitivity labels. Tokenisation and access checks use the result; classification quality is checked on a control sample.
+RM-DPR-02:
+  name:
+    ru: Токенизация и маскирование
+    en: Tokenisation and masking
+  desc:
+    ru: Заменяет выбранные политикой значения токенами. Соответствия хранятся в защищённом Token Vault. Пригодность преобразованных данных для конкретного обучения или аналитики проверяется отдельно.
+    en: Replaces values selected by policy with tokens. Mappings are kept in a protected token vault. Fitness of transformed data for a specific training or analytics task is checked separately.
+RM-DPR-03:
+  name:
+    ru: Детокенизация по ролям
+    en: Role-based detokenisation
+  desc:
+    ru: Возвращает разрешённое представление данных по роли, задаче и цели обработки. Обратная подмена обращается к Token Vault в разрешённой точке выдачи.
+    en: Returns the permitted representation of data by role, task and processing purpose. Reverse substitution queries the token vault at an allowed disclosure point.
+RM-DPR-04:
+  name:
+    ru: Data Access Proxy
+    en: Data Access Proxy
+  desc:
+    ru: Среды исследований, обучения и конвейеры читают выборки только через этот шлюз. Шлюз применяет решение Policy Engine к каждому запросу.
+    en: Research and training environments and pipelines read samples only through this proxy. The proxy applies the Policy Engine decision to every request.
+RM-DPR-05:
+  name:
+    ru: Шифрование · TDE / FLE
+    en: Encryption · TDE / FLE
+  desc:
+    ru: Шифрует данные при хранении, передаче и на уровне полей. Ключи хранятся в HSM и не попадают в среды агентов.
+    en: Encrypts data at rest, in transit and at field level. Keys live in the HSM and never reach agent environments.
+RM-DPR-06:
+  name:
+    ru: RAG-фильтр доступа
+    en: RAG access filter
+  desc:
+    ru: Проверяет права и происхождение фрагментов RAG, файлов и графа знаний. Материалы задачи отбираются до сборки контекста; запрещённые сведения исключаются из результатов поиска.
+    en: Checks rights and provenance of RAG fragments, files and knowledge graph entries. Task material is selected before context assembly; forbidden information is excluded from search results.
+RM-DPR-07:
+  name:
+    ru: Memory guard
+    en: Memory guard
+  desc:
+    ru: Контроль записи и извлечения долговременной памяти, разделение областей и карантин новых сведений. Источник и статус доверия сохраняются при сжатии или переносе между задачами.
+    en: Controls writing to and reading from long-term memory, separates scopes and quarantines new information. Source and trust status survive compaction and transfer between tasks.
