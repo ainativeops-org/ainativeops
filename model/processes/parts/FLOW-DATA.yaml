@@ -1,0 +1,89 @@
+# Этапы и варианты процессов. Ключ этапа процесса: <процесс>--<этап>.
+# Stages and variants of processes. A process stage key is <process>--<stage>.
+FLOW-DATA--CONTRACT:
+  kind: operation
+  name:
+    ru: Контракт и условия потребления
+    en: Consumer contract and terms
+  description:
+    - Задать владельца, разрешённые цели и получателей, схему, минимальные показатели качества, период хранения и порядок изменения контракта.
+    - Set the owner, allowed purposes and recipients, schema, minimum quality metrics, retention and change procedure.
+  classes: [RM-DAT-02, RM-GOV-03]
+  architectureSteps: [b_owndata, b_poldisc, b_law, b_goal]
+  workflowNode: contract
+FLOW-DATA--INGEST:
+  kind: operation
+  name:
+    ru: Приём в карантин
+    en: Quarantine intake
+  description:
+    - Снять точную версию источника, хеш и атрибуты происхождения. Загружать с ограниченными правами в карантин, отдельно проверять неожиданные схемы и вредоносное содержимое.
+    - Capture the exact source revision, digest and provenance attributes. Ingest with limited rights into quarantine; check schema surprises and malicious content.
+  classes: [RM-DAT-01, RM-SEC-03, RM-DAT-06, RM-TRS-05]
+  architectureSteps: [d1, s_src, g1, t_store]
+  workflowNode: ingest
+FLOW-DATA--PERMIT:
+  kind: operation
+  name:
+    ru: Обработка и доступ разрешены?
+    en: Are processing and access authorized?
+  description:
+    - Проверить назначение, категорию, права и сроки. Выбрать минимальное представление, отделить запрещённые данные. Обратимая подмена допустима только с отдельным контролем словаря и раскрытия.
+    - Verify purpose, classification, access and retention. Choose the minimum representation and separate prohibited data. Reversible substitution requires separate mapping and disclosure controls.
+  classes: [RM-DPR-01, RM-DPR-04, RM-DAT-02, RM-ACT-02]
+  architectureSteps: [d2, b_poldisc, s_prep, g2]
+  workflowNode: permit
+FLOW-DATA--TRANSFORM:
+  kind: operation
+  name:
+    ru: Очистка, разметка и преобразования
+    en: Clean, label and transform
+  description:
+    - 'Закрепить код, параметры и правила дедупликации. Если ИИ разметил или синтезировал данные, отметить их происхождение: каждый вызов проходит входные и выходные guardrails, а результат проверяется до попадания в набор.'
+    - 'Pin code, settings and deduplication rules. If AI labels or generates data, mark its provenance: every invocation passes input and output guardrails, and results are checked before entering the dataset.'
+  classes:
+    - RM-DAT-01
+    - RM-DEV-01
+    - RM-DEV-03
+    - RM-DAT-04
+    - RM-AIC-01
+    - RM-AIC-05
+    - RM-MOD-12
+    - RM-MOD-13
+    - RM-MOD-06
+    - RM-AIC-02
+  architectureSteps: [d3, v2, t_store, t_input, t_infer, t_result]
+  workflowNode: transform
+FLOW-DATA--QUALITY:
+  kind: operation
+  name:
+    ru: Контракт качества соблюдён?
+    en: Does quality meet the contract?
+  description:
+    - Проверить полноту, схему, дубликаты, пригодность преобразований и отсутствие запрещённых записей. Для обучающих данных проверить разделение тренировочной и контрольной выборок.
+    - Check completeness, schema, duplicates, transformation fitness and absence of prohibited records. For training data, verify separation of training and evaluation splits.
+  classes: [RM-DAT-05, RM-DEV-07, RM-DPR-01]
+  architectureSteps: [d4, g4, mt_indep]
+  workflowNode: quality
+FLOW-DATA--PACKAGE:
+  kind: operation
+  name:
+    ru: Версия и манифест набора
+    en: Dataset version and manifest
+  description:
+    - Связать снимок набора с исходниками, преобразованиями, схемой, результатами проверок, правами и сроком хранения. Регистрация манифеста не открывает доступ.
+    - Bind the snapshot to sources, transforms, schema, test results, access and retention. Registering the manifest does not grant access.
+  classes: [RM-DAT-04, RM-DAT-06, RM-DAT-02, RM-TRS-05, RM-DEV-08]
+  architectureSteps: [d5, o_pack, g5, mt_ev]
+  workflowNode: package
+FLOW-DATA--ADMIT:
+  kind: operation
+  name:
+    ru: Версию можно предоставить?
+    en: Can the version be made available?
+  description:
+    - Сверить согласие владельца, правила доступа и целостность манифеста. Испытать разрешённый и запрещённый запрос потребителя. При несоответствии не публиковать и сохранить текущую версию.
+    - Check owner approval, access rules and manifest integrity. Test allowed and denied consumer queries. On failure, withhold publication and retain the current version.
+  classes: [RM-DEV-09, RM-DPR-04, RM-TRS-06, RM-AIC-04]
+  architectureSteps: [o_release, g6, b_owndata, b_ownrisk]
+  workflowNode: admit

@@ -1,0 +1,25 @@
+# Маршрут / Route: Независимая оценка и допуск ИИ-системы / Independent AI Evaluation and Admission
+# Шаг = [элемент, [участники]] / Step = [element, [participants]]
+order: 21
+name:
+  ru: Независимая оценка и допуск ИИ-системы
+  en: Independent AI Evaluation and Admission
+routes:
+  stack:
+    - [RM-DEV-08, [RM-MOD-12, RM-MOD-13, RM-MOD-05, RM-TRS-05, RM-AIC-01, RM-MOD-06, RM-AIC-02, RM-TRS-04, RM-MOD-07, RM-AIC-05, RM-OPS-06, RM-TRS-06, RM-DEV-10]]
+    - [RM-DAT-05, [RM-DEV-07]]
+    - [RM-DEV-07, [RM-DAT-05, RM-ACT-03, RM-AIC-01, RM-AIC-02, RM-AIC-03, RM-TRS-04]]
+    - [RM-DEV-09, [RM-GOV-04, RM-TRS-05, RM-TRS-06, RM-TRS-01, RM-TRS-04, RM-DEV-10]]
+  infrastructure:
+    - [artifact-registry, [request-classifier, model-call-planner, model-registry, provenance-registry, input-guardrails, llm-gateway, output-guardrails, audit-log, eval-inference-service, inference-quotas, usage-billing, integrity-monitoring, cd-deployment]]
+    - [eval-datasets, [eval-red-teaming]]
+    - [eval-red-teaming, [eval-datasets, job-sandbox, rule-based-checks, llm-as-a-judge, audit-log]]
+    - [release-gate, [provenance-registry, integrity-monitoring, hsm-kms, audit-log, artifact-registry, cd-deployment]]
+  architecture:
+    - [mt_profile, [t_route, t_plan, v5, g5, t_input, t_infer, t_result, t_audit, t_base, t_eval]]
+    - [b_goal, [mt_indep, g4]]
+    - [o_eval, [g4, t_ctl]]
+    - [g4, [mt_indep, mt_ev]]
+    - [g5, [o_pack, mt_ev]]
+    - [b_ownrisk, [mt_residual, g6, o_release]]
+    - [g6, [o_release, t_audit, s_runtime]]

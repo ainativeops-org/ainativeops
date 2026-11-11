@@ -1,0 +1,31 @@
+# Реестр процессов · Вывод из эксплуатации / Process registry · Retirement
+RET-01:
+  name:
+    ru: Отзыв доступа и удаление данных
+    en: Data access revocation and disposal
+  start:
+    - Изменились права, истёк срок хранения или принято решение об удалении.
+    - Access rights changed, a retention period expired or a deletion decision was made.
+  result:
+    - Прекращён доступ и проверены производные хранилища и сроки удаления.
+    - Access is terminated, and derived stores and deletion deadlines are checked.
+  check:
+    - Проверить исходные записи, историю чата, кеш, индекс, память и резервные копии по применимым правилам.
+    - Check source records, chat history, cache, index, memory and backups under the applicable rules.
+  gates: G8 G9*
+  classes: [RM-DAT-02, RM-DAT-07, RM-DPR-07, RM-MOD-10, RM-OPS-08, RM-TRS-04]
+RET-02:
+  name:
+    ru: Вывод ИИ-системы из эксплуатации
+    en: AI system retirement
+  start:
+    - Принято решение прекратить применение модели или сервиса.
+    - A decision is made to stop using a model or service.
+  result:
+    - Отозванные маршруты, полномочия и зависимости, обработанные остаточные данные и допустимый архив.
+    - Revoked routes, permissions and dependencies, handled residual data and a permitted archive.
+  check:
+    - Старая точка входа недоступна. Проверить последующее восстановление, завершение заданий и сохранность необходимых свидетельств.
+    - The old entry point is unavailable. Check subsequent restores, job completion and retention of required evidence.
+  gates: G9
+  classes: [RM-GOV-01, RM-GOV-04, RM-TRS-07, RM-OPS-07, RM-SEC-07]

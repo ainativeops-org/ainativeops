@@ -1,0 +1,28 @@
+# Маршрут / Route: Выполнение корпоративной заявки агентом · в своём контуре / Agentic Enterprise Request Fulfilment · local
+# Шаг = [элемент, [участники]] / Step = [element, [participants]]
+order: 19
+name:
+  ru: Выполнение корпоративной заявки агентом · в своём контуре
+  en: Agentic Enterprise Request Fulfilment · local
+routes:
+  stack:
+    - [RM-APP-01, [RM-SEC-01, RM-GOV-02, RM-AGT-02, RM-AGT-08]]
+    - [RM-AGT-02, [RM-MOD-12, RM-AGT-03, RM-AIC-01, RM-MOD-06, RM-AIC-02, RM-AGT-04, RM-TRS-04, RM-MOD-07, RM-AIC-05, RM-OPS-06]]
+    - [RM-AGT-04, [RM-ACT-01, RM-ACT-02, RM-TRS-04]]
+    - [RM-AIC-04, [RM-APP-03, RM-AGT-05, RM-TRS-04]]
+    - [RM-ACT-02, [RM-ACT-01, RM-AGT-05, RM-AIC-04, RM-INT-02, RM-TRS-03, RM-ACT-03]]
+    - [RM-AIC-02, [RM-AGT-05, RM-ACT-02, RM-TRS-04]]
+    - [RM-APP-01, [RM-AIC-02, RM-TRS-04]]
+  infrastructure:
+    - [business-apps, [iam-sso, agent-iam, agent-runtime, rate-limits-budgets]]
+    - [agent-runtime, [request-classifier, context-manager, input-guardrails, llm-gateway, output-guardrails, tool-router, audit-log, inference-servers, inference-quotas, usage-billing]]
+    - [tool-router, [pdp, pep, audit-log]]
+    - [checkpoint-store, [pep, audit-log]]
+    - [pep, [pdp, checkpoint-store, mcp-servers, erp-crm, secrets-manager, job-sandbox]]
+    - [output-guardrails, [checkpoint-store, erp-crm, audit-log]]
+    - [business-apps, [output-guardrails, audit-log]]
+  architecture:
+    - [t_harness, [t_route, t_iam, b_polagent, t_input, t_infer, t_result, t_gw, t_audit, t_base]]
+    - [t_gw, [g7, b_polagent, s_runtime, t_audit]]
+    - [g7, [t_audit]]
+    - [t_result, [t_gw, t_audit]]

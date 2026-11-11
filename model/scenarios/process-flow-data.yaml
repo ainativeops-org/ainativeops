@@ -1,0 +1,33 @@
+# Маршрут / Route: Создание и публикация продукта данных с помощью ИИ / AI-assisted Data Product Development
+# Шаг = [элемент, [участники]] / Step = [element, [participants]]
+order: 4
+name:
+  ru: Создание и публикация продукта данных с помощью ИИ
+  en: AI-assisted Data Product Development
+routes:
+  stack:
+    - [RM-DAT-02, [RM-GOV-03]]
+    - [RM-DAT-01, [RM-SEC-03, RM-DAT-06, RM-TRS-05, RM-MOD-12, RM-MOD-13, RM-DEV-01, RM-DEV-03, RM-DAT-04, RM-AIC-01, RM-MOD-06, RM-AIC-02, RM-TRS-04, RM-MOD-07, RM-AIC-05, RM-OPS-06]]
+    - [RM-DPR-01, [RM-DPR-04, RM-DAT-02, RM-ACT-02]]
+    - [RM-DAT-05, [RM-DEV-07, RM-DPR-01]]
+    - [RM-DAT-04, [RM-DAT-06, RM-DAT-02, RM-TRS-05, RM-DEV-08]]
+    - [RM-DEV-09, [RM-DPR-04, RM-TRS-06, RM-AIC-04]]
+    - [RM-DAT-02, [RM-DPR-04, RM-TRS-04, RM-OPS-07]]
+  infrastructure:
+    - [data-catalog, [analytical-store]]
+    - [landing-zone, [artifact-intake, dataset-store]]
+    - [data-discovery, [data-access-proxy, data-catalog, pep]]
+    - [dataset-store, [request-classifier, model-call-planner, git-repository, dataset-versioning, input-guardrails, llm-gateway, output-guardrails, audit-log, inference-servers, inference-quotas, usage-billing]]
+    - [eval-datasets, [rule-based-checks, eval-red-teaming]]
+    - [dataset-versioning, [dataset-store, data-catalog, provenance-registry, artifact-registry]]
+    - [release-gate, [data-access-proxy, integrity-monitoring]]
+    - [data-catalog, [data-access-proxy, audit-log]]
+  architecture:
+    - [b_owndata, [b_poldisc, b_law, b_goal]]
+    - [d1, [s_src, g1, t_store]]
+    - [d2, [b_poldisc, s_prep, g2]]
+    - [d3, [t_route, t_plan, v2, t_store, t_input, t_infer, t_result, t_audit, t_base]]
+    - [d4, [g4, mt_indep]]
+    - [d5, [o_pack, g5, mt_ev]]
+    - [o_release, [g6, b_owndata, b_ownrisk]]
+    - [o_ops, [b_owndata, t_audit]]

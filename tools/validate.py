@@ -16,7 +16,7 @@ MODEL = ROOT / "model"
 LANGS = ("ru", "en")
 
 ARCH_TYPES = {"goal", "assessment", "requirement", "constraint", "representation", "principle", "role",
-              "dataobject", "gate", "event", "process", "llm", "node"}
+              "dataobject", "gate", "event", "process", "llm", "node", "appcomp", "techsvc"}
 INFRA_TYPES = {"node", "device", "actor", "appcomp", "syssw", "techsvc", "artifact"}
 RELATIONS = {"flow", "serving", "triggering", "access"}
 PLACEMENTS = {"top", "left", "column", "core"}
@@ -120,9 +120,56 @@ def load_model():
     for s in scenarios:
         s.pop("order", None)
 
+    workbench = load_workbench(problems)
+
     if problems:
         raise ModelFileError("\n".join(problems))
-    return {"architecture": arch, "stack": stack, "infrastructure": infra, "scenarios": {"scenarios": scenarios}}
+    return {"architecture": arch, "stack": stack, "infrastructure": infra, "scenarios": {"scenarios": scenarios},
+            "workbench": workbench}
+
+
+def load_workbench(problems):
+    """Read processes, profiles, dependencies and sources into the 'workbench' part of the model.
+
+      processes/_groups.yaml         process groups in display order
+      processes/flows/<id>.yaml      a process on the map; its 'workflow' holds diagram nodes and edges
+      processes/parts/<owner>.yaml   stages and variants; a part may hold its own 'workflow'
+      profiles.yaml, dependencies/*.yaml, sources/registry.yaml, sources/bindings.yaml
+    """
+    P = MODEL / "processes"
+    flows, flow_wf = {}, {}
+    for f in sorted((P / "flows").glob("*.yaml")):
+        row = load(f) or {}
+        flow_wf[f.stem] = row.pop("workflow", None)
+        flows[f.stem] = row
+    flows = dict(sorted(flows.items(), key=lambda kv: (kv[1].get("order", 10 ** 6), kv[0])))
+    parts, part_wf = {}, {}
+    for f in sorted((P / "parts").glob("*.yaml")):
+        for pid, row in (load(f) or {}).items():
+            owner = pid.split("--")[0] if "--" in pid else "_shared"
+            if owner != f.stem:
+                problems.append(f"model/processes/parts/{f.name}: part {pid} belongs in {owner}.yaml")
+            if pid in parts:
+                problems.append(f"model/processes/parts/{f.name}: part {pid} is defined twice")
+            wf = row.pop("workflow", None)
+            if wf is not None:
+                part_wf[pid] = wf
+            parts[pid] = row
+
+    dep = MODEL / "dependencies"
+    return {
+        "processGroups": load(P / "_groups.yaml") or {},
+        "sources": load(MODEL / "sources" / "registry.yaml") or {},
+        "bindings": load(MODEL / "sources" / "bindings.yaml") or {},
+        "profiles": load(MODEL / "profiles.yaml") or {},
+        "processMaps": {"flows": flows, "parts": parts},
+        "dependencies": {
+            "stack": (load(dep / "stack.yaml") or {}).get("dependencies", []),
+            "infra": (load(dep / "infrastructure.yaml") or {}).get("dependencies", []),
+            "boundaries": load(dep / "boundaries.yaml") or {},
+        },
+        "workflows": {"flows": {k: v for k, v in flow_wf.items() if v is not None}, "parts": part_wf},
+    }
 
 
 def validate(m):
@@ -285,6 +332,11 @@ def validate(m):
                 continue
             if not steps:
                 err(f"{where} {view}: empty route")
+            # a route visits each element once; only the last step may bring the answer back to the first
+            order = [st[0] for st in steps if st]
+            for i, x in enumerate(order):
+                if x in order[:i] and not (i == len(order) - 1 and x == order[0] and i > 2):
+                    err(f"{where} {view}: step {i + 1} returns to {x!r}; make it a participant of an earlier step")
             for step in steps:
                 if len(step) != 2 or not isinstance(step[1], list):
                     err(f"{where} {view}: step must be [element, [participants]]")
@@ -294,7 +346,218 @@ def validate(m):
                         err(f"{where} {view}: unknown element {x!r}")
                     elif view == "stack" and x not in active:
                         err(f"{where} {view}: class {x!r} is deprecated")
+
+    # CORE-01: a route that calls a model passes input and output guardrails and leaves an audit record
+    for s in m["scenarios"]["scenarios"]:
+        used = {x for step in (s.get("routes") or {}).get("stack", []) if len(step) == 2 for x in [step[0], *step[1]]}
+        if used & INFERENCE:
+            for rm in sorted(GUARDED - used):
+                err(f"scenario {s['id']} stack: the route calls a model and must include {rm}")
+        # every touch of an agent is metered: a model call, an action, a job run or a knowledge query
+        touch = sorted(x for x in used if x in TOUCH or x.startswith("RM-AGT-"))
+        if touch and BILLING not in used:
+            err(f"scenario {s['id']} stack: the route uses {touch[0]} and must include {BILLING}")
+
+    validate_workbench(m, err, text, views, ids)
     return errors
+
+
+INFERENCE = {"RM-MOD-03", "RM-MOD-06", "RM-MOD-07"}
+GUARDED = {"RM-AIC-01", "RM-AIC-02", "RM-AIC-05", "RM-TRS-04"}
+TOUCH = INFERENCE | {"RM-ACT-02", "RM-ACT-03", "RM-DPR-06", "RM-INT-02", "RM-INT-04"}
+BILLING = "RM-OPS-06"
+SOURCE_TYPES = {"standard", "practice", "example"}
+NODE_KINDS = {"step", "decision", "outcome"}
+DATE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
+
+
+def validate_workbench(m, err, text, views, scenario_ids):
+    """Processes, profiles, dependencies and sources: references resolve and both languages are present."""
+    wb = m["workbench"]
+    classes = m["stack"]["classes"]
+    sources = wb["sources"]
+    pm = wb["processMaps"]
+    flows, parts = pm["flows"], pm["parts"]
+
+    def pair(where, v, required=True):
+        if v is None:
+            if required:
+                err(f"{where}: missing")
+            return
+        if not (isinstance(v, list) and len(v) == 2 and all(isinstance(x, str) and x.strip() for x in v)):
+            err(f"{where}: expected a pair [ru, en] of non-empty strings")
+
+    def known_class(where, rm):
+        if rm not in classes:
+            err(f"{where}: class {rm!r} does not exist")
+
+    def source_ref(where, key):
+        if key not in sources:
+            err(f"{where}: source {key!r} is not in model/sources/registry.yaml")
+
+    # sources
+    for key, s in sources.items():
+        where = f"source {key}"
+        if s.get("type") not in SOURCE_TYPES:
+            err(f"{where}: type must be one of {sorted(SOURCE_TYPES)}")
+        title = s.get("title")
+        if isinstance(title, dict):
+            text(f"{where} title", title)
+        elif not (isinstance(title, str) and title.strip()):
+            err(f"{where}: title must be a string or {{ru, en}}")
+        if not str(s.get("url", "")).startswith("https://"):
+            err(f"{where}: url must start with https://")
+        text(f"{where} scope", s.get("scope"))
+        checked = s.get("checked", "")
+        if checked and not DATE.match(str(checked)):
+            err(f"{where}: checked must be empty or YYYY-MM-DD")
+    # 'platform' is the logical AI platform boundary that site/app.js draws around its zones
+    used = {k for rows in wb["bindings"].values() for keys in rows.values() for k in keys}
+    used |= {k for view in ("stack", "infra") for d in wb["dependencies"][view] for k in d.get("sources", [])}
+    used |= {b.get("source") for g in ("flows", "parts") for wf in wb["workflows"][g].values() for b in wf.get("basis", [])}
+    for key in sources:
+        if key not in used:
+            err(f"source {key}: no element, dependency or workflow refers to it")
+    element_sets = {"stack": classes, "meta": views["architecture"], "infra": views["infrastructure"],
+                    "zones": {**{z["id"]: z for z in m["infrastructure"]["zones"]}, "platform": {}}}
+    for view, rows in wb["bindings"].items():
+        if view not in element_sets:
+            err(f"bindings: unknown view {view!r}")
+            continue
+        for el, keys in rows.items():
+            if el not in element_sets[view]:
+                err(f"bindings {view}: unknown element {el!r}")
+            for key in keys:
+                source_ref(f"bindings {view} {el}", key)
+    for view in ("stack", "meta", "infra"):
+        unbound = [e for e in element_sets[view] if e not in wb["bindings"].get(view, {})]
+        if unbound:
+            err(f"bindings {view}: elements without a source: {', '.join(unbound[:8])}{' …' if len(unbound) > 8 else ''}")
+
+    groups = wb["processGroups"]
+    for code, name in groups.items():
+        pair(f"process group {code} name", name)
+        if not any(f.get("group") == code for f in flows.values()):
+            err(f"process group {code}: no process on the map uses it")
+
+    def workflow(where, wf):
+        nodes = {}
+        for n in wf.get("nodes", []):
+            if n["id"] in nodes:
+                err(f"{where} workflow: node {n['id']} is defined twice")
+            nodes[n["id"]] = n
+            if n.get("kind") not in NODE_KINDS:
+                err(f"{where} workflow node {n['id']}: kind must be one of {sorted(NODE_KINDS)}")
+            pair(f"{where} workflow node {n['id']} label", n.get("label"))
+            pair(f"{where} workflow node {n['id']} detail", n.get("detail"))
+            for view, ids in (n.get("components") or {}).items():
+                if view not in views:
+                    err(f"{where} workflow node {n['id']}: unknown view {view!r}")
+                    continue
+                for x in ids:
+                    if x not in views[view]:
+                        err(f"{where} workflow node {n['id']} {view}: unknown element {x!r}")
+        exits = {}
+        for e in wf.get("edges", []):
+            for x in (e.get("from"), e.get("to")):
+                if x not in nodes:
+                    err(f"{where} workflow edge {e.get('from')} -> {e.get('to')}: unknown node {x!r}")
+            pair(f"{where} workflow edge {e.get('from')} -> {e.get('to')} label", e.get("label"))
+            exits[e.get("from")] = exits.get(e.get("from"), 0) + 1
+        # a step continues and may also leave on a failure; a decision branches; an outcome ends the process
+        for nid, n in nodes.items():
+            count = exits.get(nid, 0)
+            if n.get("kind") == "step" and count < 1:
+                err(f"{where} workflow node {nid}: a step needs at least one exit")
+            if n.get("kind") == "decision" and count < 2:
+                err(f"{where} workflow node {nid}: a decision needs at least two exits")
+            if n.get("kind") == "outcome" and count:
+                err(f"{where} workflow node {nid}: an outcome has no exits")
+        for x in wf.get("main", []):
+            if x not in nodes:
+                err(f"{where} workflow main: unknown node {x!r}")
+        for f in ("summary", "synthesis"):
+            pair(f"{where} workflow {f}", wf.get(f))
+        for b in wf.get("basis", []):
+            source_ref(f"{where} workflow basis", b.get("source"))
+            pair(f"{where} workflow basis {b.get('source')} claim", b.get("claim"))
+        return nodes
+
+    def route_refs(where, row):
+        if row.get("path") and row["path"] not in scenario_ids:
+            err(f"{where}: path {row['path']!r} is not a scenario in model/scenarios")
+        for key, sid in (row.get("paths") or {}).items():
+            if sid not in scenario_ids:
+                err(f"{where}: paths.{key} {sid!r} is not a scenario in model/scenarios")
+        if row.get("option") and row["option"] not in wb["profiles"].get("options", {}):
+            err(f"{where}: option {row['option']!r} is not in profiles.yaml options")
+
+    flow_nodes = {}
+    for fid, f in flows.items():
+        where = f"process map {fid}"
+        text(f"{where} name", f.get("name"))
+        if f.get("group") not in groups:
+            err(f"{where}: group {f.get('group')!r} is not in model/processes/_groups.yaml")
+        for f_ in ("owner", "start", "result", "check"):
+            pair(f"{where} {f_}", f.get(f_))
+        for pid in f.get("parts", []):
+            if pid not in parts:
+                err(f"{where}: part {pid!r} does not exist")
+        for c in f.get("calls", []):
+            if c.get("id") not in flows:
+                err(f"{where}: calls unknown process {c.get('id')!r}")
+            pair(f"{where} call {c.get('id')} when", c.get("when"))
+        route_refs(where, f)
+        wf = wb["workflows"]["flows"].get(fid)
+        flow_nodes[fid] = workflow(where, wf) if wf else {}
+    for pid, p in parts.items():
+        where = f"process part {pid}"
+        text(f"{where} name", p.get("name"))
+        pair(f"{where} description", p.get("description"))
+        for rm in p.get("classes", []):
+            known_class(where, rm)
+        for x in p.get("architectureSteps", []):
+            if x not in views["architecture"]:
+                err(f"{where}: unknown architecture element {x!r}")
+        owner = pid.split("--")[0] if "--" in pid else None
+        if p.get("workflowNode") and owner in flow_nodes and p["workflowNode"] not in flow_nodes[owner]:
+            err(f"{where}: workflowNode {p['workflowNode']!r} is not a node of {owner}")
+        for f_ in ("start", "result", "check"):
+            pair(f"{where} {f_}", p.get(f_), required=False)
+        if not any(pid in f.get("parts", []) for f in flows.values()):
+            err(f"{where}: no process uses this part")
+        route_refs(where, p)
+        if pid in wb["workflows"]["parts"]:
+            workflow(where, wb["workflows"]["parts"][pid])
+
+    # profiles
+    prof = wb["profiles"]
+    options = prof.get("options", {})
+    for key, o in options.items():
+        pair(f"profile option {key} name", o.get("name"))
+        for value, label in (o.get("values") or {}).items():
+            pair(f"profile option {key} value {value}", label)
+        if not any(r.get("option") == key for r in [*flows.values(), *parts.values()]):
+            err(f"profile option {key}: no process uses it")
+    for key, value in prof.get("defaults", {}).items():
+        if key not in options or value not in options[key].get("values", {}):
+            err(f"profiles defaults: {key}={value!r} is not a declared option value")
+
+    # dependencies
+    for view, els in (("stack", classes), ("infra", views["infrastructure"])):
+        for d in wb["dependencies"][view]:
+            where = f"dependency {view} {d.get('from')} -> {d.get('to')}"
+            for x in (d.get("from"), d.get("to")):
+                if x not in els:
+                    err(f"{where}: unknown element {x!r}")
+            for f in ("when", "phase", "reason"):
+                pair(f"{where} {f}", d.get(f))
+            for key in d.get("sources", []):
+                source_ref(where, key)
+        for el, why in wb["dependencies"]["boundaries"].get(view, {}).items():
+            if el not in els:
+                err(f"dependency boundary {view}: unknown element {el!r}")
+            pair(f"dependency boundary {view} {el}", why)
 
 
 def main():
@@ -314,8 +577,11 @@ def main():
         print(f"\n{len(errors)} error(s)", file=sys.stderr)
         return 1
     st = m["stack"]["classes"]
+    wb = m["workbench"]
     print(f"model OK: {len(st)} classes, {len(m['infrastructure']['elements'])} infrastructure elements, "
-          f"{len(m['architecture']['elements'])} architecture elements, {len(m['scenarios']['scenarios'])} scenarios")
+          f"{len(m['architecture']['elements'])} architecture elements, {len(m['scenarios']['scenarios'])} routes, "
+          f"{len(wb['processMaps']['flows'])} processes, {len(wb['processMaps']['parts'])} process parts, "
+          f"{len(wb['sources'])} sources")
     return 0
 
 

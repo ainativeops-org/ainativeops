@@ -1,0 +1,42 @@
+# Группы реестра процессов. Файл группы: model/processes/registry/<file>.yaml.
+# Groups of the process registry. A group file is model/processes/registry/<file>.yaml.
+# Текст процессов задаётся парой [ru, en]. / Process text is a pair [ru, en].
+CORE:
+  file: core
+  name: [Общий защитный контур, Shared protection core]
+INF:
+  file: inf
+  name: [Инференс и применение, Inference and use]
+KNW:
+  file: knw
+  name: [Знания и поиск, Knowledge and retrieval]
+AGT:
+  file: agt
+  name: [Агенты и действия, Agents and actions]
+DAT:
+  file: dat
+  name: [Данные и признаки, Data and features]
+MOD:
+  file: mod
+  name: [Создание моделей, Model development]
+DEV:
+  file: dev
+  name: [Инженерия ИИ-систем, AI systems engineering]
+RUN:
+  file: run
+  name: [Эксплуатация, Operation]
+SEC:
+  file: sec
+  name: [Защита и реагирование, Security and response]
+EVA:
+  file: eva
+  name: [Оценка и допуск, Evaluation and admission]
+REL:
+  file: rel
+  name: [Выпуск, Release]
+GOV:
+  file: gov
+  name: [Управление ИИ, AI governance]
+RET:
+  file: ret
+  name: [Вывод из эксплуатации, Retirement]

@@ -1,0 +1,121 @@
+# Реестр процессов · Инженерия ИИ-систем / Process registry · AI systems engineering
+DEV-01:
+  name:
+    ru: Проектирование ИИ-приложения
+    en: AI application design
+  start:
+    - Владелец утвердил задачу и критерии результата.
+    - The owner has approved the task and result criteria.
+  result:
+    - Контракты продукта, взаимодействий, данных и границ полномочий.
+    - Contracts for the product, interactions, data and authority boundaries.
+  check:
+    - Каждое требование связано с потребителем результата и проверкой. Сценарий без полномочий на запись остаётся таким на уровне интерфейса.
+    - Each requirement is linked to a result consumer and a check. A scenario without write authority stays that way at the interface level.
+  gates: G0
+  classes: [RM-APP-01, RM-APP-02, RM-GOV-04, RM-DEV-01]
+DEV-02:
+  name:
+    ru: Разработка инструкций и контекста
+    en: Instruction and context engineering
+  start:
+    - Требуется изменение инструкций, шаблонов или сборки контекста.
+    - A change to instructions, templates or context assembly is required.
+  result:
+    - Версия конфигурации инструкций и контекста с результатами регрессии.
+    - A version of the instruction and context configuration with regression results.
+  check:
+    - Происхождение и приоритеты контекста заданы. Сокращение истории не удаляет защищённые правила.
+    - Context provenance and priorities are defined. History truncation does not remove protected rules.
+  gates: G4 G8 И*
+  classes: [RM-AGT-03, RM-AGT-07, RM-DAT-05, RM-DEV-07, RM-GOV-03]
+DEV-03:
+  name:
+    ru: Разработка инструментов и интеграций
+    en: Tool and integration engineering
+  start:
+    - Агенту или приложению нужен новый доступный ресурс.
+    - An agent or application needs access to a new resource.
+  result:
+    - Проверенный контракт инструмента, типов аргументов и допустимых эффектов.
+    - A verified contract for the tool, its argument types and permitted effects.
+  check:
+    - Разделить обнаружение инструмента и разрешение операции. Отказ не вызывает ресурс, результат проверяется до передачи агенту.
+    - Separate tool discovery from operation authorization. A denial does not call the resource, and the result is checked before it reaches the agent.
+  gates: G1 G4 G7*
+  classes: [RM-INT-02, RM-INT-03, RM-AGT-04, RM-ACT-02, RM-DEV-07]
+DEV-04:
+  name:
+    ru: Разработка и настройка агента
+    en: Agent application engineering
+  start:
+    - Описаны задача, модель, инструменты, бюджет и допустимая автономность.
+    - The task, model, tools, budget and permitted autonomy are described.
+  result:
+    - Версионированная конфигурация агента и испытанный маршрут исполнения.
+    - A versioned agent configuration and a tested execution route.
+  check:
+    - Версия агента закреплена на запуске. Проверить завершение, передачу контекста, отзыв, ошибки инструмента и восстановление.
+    - The agent version is pinned at run start. Check completion, context handover, revocation, tool errors and recovery.
+  gates: G0 G4
+  classes: [RM-APP-01, RM-AGT-01, RM-AGT-02, RM-AGT-07, RM-DEV-01, RM-DEV-07]
+DEV-05:
+  name:
+    ru: Разработка с ИИ-инженером
+    en: Governed AI-assisted engineering
+  start:
+    - ИИ-инженеру поручена правка кода, тестов или инфраструктуры.
+    - An AI engineer is assigned a change to code, tests or infrastructure.
+  result:
+    - Кандидат изменения с источником, проверками и границей разрешённых прав.
+    - A candidate change with its source, checks and the boundary of granted permissions.
+  check:
+    - Инженер работает с кандидатом; независимые критерии, допуск, подпись и промышленное развёртывание управляются отдельно.
+    - The engineer works on the candidate; independent criteria, admission, signing and production deployment are managed separately.
+  gates: G0 G4 G5 И*
+  classes: [RM-AGT-02, RM-ACT-03, RM-DEV-01, RM-DEV-06, RM-DEV-07, RM-SEC-04]
+DEV-06:
+  name:
+    ru: Инженерия среды обучения и инференса
+    en: Training and serving runtime engineering
+  start:
+    - Нужна новая среда, распределение нагрузки или изменение ресурсов.
+    - A new environment, load distribution or resource change is needed.
+  result:
+    - Воспроизводимая среда исполнения и проверенная конфигурация восстановления.
+    - A reproducible runtime environment and a verified recovery configuration.
+  check:
+    - Отдельно проверить планирование, работу участников, хранилище, согласованный перезапуск и изоляцию.
+    - Separately check scheduling, worker operation, storage, coordinated restart and isolation.
+  gates: G2 G4 G5
+  classes: [RM-PLT-01, RM-PLT-02, RM-PLT-05, RM-DEV-04, RM-MOD-07, RM-HW-05]
+DEV-07:
+  name:
+    ru: Совместная оптимизация модели и среды
+    en: Model and runtime co-design
+  start:
+    - Требования к ёмкости или задержке зависят и от модели, и от среды.
+    - Capacity or latency requirements depend on both the model and the environment.
+  result:
+    - Согласованная конфигурация модели и среды с результатами нагрузочных испытаний.
+    - A matched model and environment configuration with load test results.
+  check:
+    - Проверить переносимость, производительность, стоимость и регрессию качества относительно установленной базы.
+    - Check portability, performance, cost and quality regression against the established baseline.
+  gates: G3 G4
+  classes: [RM-DEV-04, RM-DEV-05, RM-DEV-07, RM-MOD-07, RM-OPS-01, RM-OPS-06]
+DEV-08:
+  name:
+    ru: Настройка и проверка профиля песочницы
+    en: Sandbox profile design and qualification
+  start:
+    - Агенту требуется исполнение кода, команд или доступ, подлежащий изоляции.
+    - An agent needs code execution, commands or access that must be isolated.
+  result:
+    - Версия ограничений среды и результаты проверки их фактического применения.
+    - A version of environment restrictions and results of checks on their actual enforcement.
+  check:
+    - Недопущенные сеть, файлы, команда или секрет недоступны; выдача рабочих артефактов проверена.
+    - Network, files, commands or secrets that are not admitted are unavailable; output of work artifacts is checked.
+  gates: G2 G4 G5 G8
+  classes: [RM-ACT-03, RM-ACT-02, RM-SEC-02, RM-TRS-03, RM-DEV-07]

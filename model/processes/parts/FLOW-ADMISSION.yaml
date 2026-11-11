@@ -1,0 +1,79 @@
+# Этапы и варианты процессов. Ключ этапа процесса: <процесс>--<этап>.
+# Stages and variants of processes. A process stage key is <process>--<stage>.
+FLOW-ADMISSION--CANDIDATE:
+  kind: operation
+  name:
+    ru: Зафиксировать кандидата
+    en: Freeze the candidate
+  description:
+    - Связать идентификатор и хеш кандидата с применимыми версиями кода, модели, данных, среды, инструкций, инструментов и политик. Отдельно указать цель выпуска и план возврата.
+    - Bind the candidate identifier and digest to applicable versions of code, model, data, runtime, instructions, tools and policies. Record the release purpose and rollback plan separately.
+  classes: [RM-DEV-08, RM-MOD-05, RM-TRS-05]
+  architectureSteps: [mt_profile, v5, g5]
+  workflowNode: candidate
+FLOW-ADMISSION--CRITERIA:
+  kind: operation
+  name:
+    ru: Назначить критерии оценки
+    en: Set assessment criteria
+  description:
+    - Независимый оценщик утверждает наборы, пороги, запрещённые исходы и негативные пробы для заявленных маршрутов. Автор не может изменить эти критерии или контрольные наборы.
+    - An independent evaluator approves datasets, thresholds, forbidden outcomes and negative tests for the declared paths. The author cannot change the criteria or control datasets.
+  classes: [RM-DAT-05, RM-DEV-07]
+  architectureSteps: [b_goal, mt_indep, g4]
+  workflowNode: criteria
+FLOW-ADMISSION--EVALUATE:
+  kind: operation
+  name:
+    ru: Испытать версию в EVAL
+    en: Test the version in EVAL
+  description:
+    - 'В изолированной среде проверить качество, регрессию и защиту: запрет раскрытия, обход входа или выхода, отказы обязательных проверок и эффекты на тестовых целях. ИИ-контролёр может дополнить проверку; его вызовы тоже проходят защитный маршрут.'
+    - 'In an isolated environment, test quality, regressions and controls: disclosure denial, input or output bypass, mandatory-check failures and effects on test targets. An AI controller can assist; its own calls follow the guarded path.'
+  classes: [RM-DEV-07, RM-DAT-05, RM-ACT-03, RM-AIC-01, RM-AIC-02, RM-AIC-03]
+  architectureSteps: [o_eval, g4, t_ctl, t_eval]
+  workflowNode: evaluate
+FLOW-ADMISSION--EVAL-GATE:
+  kind: operation
+  name:
+    ru: Критерии выполнены?
+    en: Did the candidate pass?
+  description:
+    - Сверить результаты с заранее утверждёнными критериями, версией кандидата и охватом тестов. Обязательный провал, неполнота или неразрешённое расхождение блокируют переход.
+    - Reconcile results with the agreed criteria, candidate version and test coverage. A mandatory failure, missing evidence or an unresolved discrepancy blocks progression.
+  classes: [RM-DEV-07, RM-DAT-05, RM-TRS-04]
+  architectureSteps: [g4, mt_indep, mt_ev]
+  workflowNode: eval-gate
+FLOW-ADMISSION--VERIFY-PACKAGE:
+  kind: operation
+  name:
+    ru: Проверить пакет и откат
+    en: Verify package and rollback
+  description:
+    - Подтвердить происхождение и целостность точного выпускаемого пакета. На стенде проверить возврат к допущенной версии, совместимость схем и порядок сверки возможных внешних эффектов.
+    - Verify provenance and integrity of the exact package to be released. In staging, test return to an admitted version, schema compatibility and how any external effects would be reconciled.
+  classes: [RM-DEV-08, RM-TRS-05, RM-TRS-06, RM-DEV-10]
+  architectureSteps: [g5, o_pack, mt_ev]
+  workflowNode: verify-package
+FLOW-ADMISSION--RELEASE-GATE:
+  kind: operation
+  name:
+    ru: Версию можно допустить?
+    en: Can this version be admitted?
+  description:
+    - Владелец рубежа сверяет манифест, обязательные свидетельства и готовность отката. Остаточный риск принимается в заданных пределах со сроком и ответственным; исключение не отменяет обязательный запрет.
+    - The gate owner verifies the manifest, mandatory evidence and rollback readiness. Residual risk may be accepted within defined bounds with an expiry and owner; an exception cannot override a mandatory prohibition.
+  classes: [RM-DEV-09, RM-GOV-04, RM-TRS-05, RM-TRS-06]
+  architectureSteps: [b_ownrisk, mt_residual, g6, o_release]
+  workflowNode: release-gate
+FLOW-ADMISSION--SIGN:
+  kind: operation
+  name:
+    ru: Подпись и запись созданы?
+    en: Are signature and record complete?
+  description:
+    - Связать решение, версию политики, назначение и срок с хешем полной конфигурации. Подписать разрешённый манифест защищённым ключом. Ошибка подписи или записи означает отсутствие допуска.
+    - Bind decision, policy version, purpose and expiry to the full configuration digest. Sign the authorized manifest with a protected key. A signing or record failure means no admission.
+  classes: [RM-DEV-09, RM-TRS-01, RM-TRS-04, RM-TRS-05]
+  architectureSteps: [g6, o_release, t_audit]
+  workflowNode: sign

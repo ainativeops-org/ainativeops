@@ -1,0 +1,87 @@
+# Этапы и варианты процессов. Ключ этапа процесса: <процесс>--<этап>.
+# Stages and variants of processes. A process stage key is <process>--<stage>.
+AGT-ACTION--REQUEST:
+  kind: operation
+  name:
+    ru: Принять и ограничить заявку
+    en: Receive and scope the request
+  description:
+    - Установить заявителя и идентичность агента, допустимые ресурсы, действия, срок и бюджет. Зарегистрировать задачу; полномочия агента не шире делегированных.
+    - Establish the requester and agent identity, permitted resources and actions, deadline, and budget. Register the task; the agent's authority does not exceed delegation.
+  classes: [RM-APP-01, RM-SEC-01, RM-GOV-02, RM-AGT-02, RM-AGT-08]
+  architectureSteps: [t_harness, t_iam, b_polagent]
+  workflowNode: request
+AGT-ACTION--PROPOSAL:
+  kind: operation
+  name:
+    ru: Подготовить точное действие
+    en: Prepare exact action
+  description:
+    - Каждый модельный шаг проходит входную и выходную проверки через шлюз; чтение для уточнения заявки проходит допуск инструмента. Сформировать ресурс, операцию, канонические параметры и ID эффекта.
+    - Each model step passes input and output checks through the gateway; reads to clarify the request require tool admission. Prepare the resource, operation, canonical arguments, and effect ID.
+  classes:
+    - RM-AGT-02
+    - RM-AGT-03
+    - RM-AIC-01
+    - RM-AIC-05
+    - RM-MOD-12
+    - RM-MOD-06
+    - RM-AIC-02
+    - RM-AGT-04
+  architectureSteps: [t_harness, t_input, t_infer, t_result, t_gw]
+  workflowNode: proposal
+AGT-ACTION--POLICY:
+  kind: operation
+  name:
+    ru: Действие в полномочиях?
+    en: Is the action within authority?
+  description:
+    - Проверить точный объект, метод, схему, допустимые значения, актуальные права и лимит. Определить, требуется ли согласование. При запрете или недоступном обязательном контроле не исполнять.
+    - Check the exact object, method, schema, permitted values, current authority, and budget. Determine whether approval is required. Do not execute after denial or if mandatory checks are unavailable.
+  classes: [RM-AGT-04, RM-ACT-01, RM-ACT-02, RM-TRS-04]
+  architectureSteps: [t_gw, g7, b_polagent]
+  workflowNode: policy
+AGT-ACTION--APPROVAL:
+  kind: operation
+  name:
+    ru: Операция согласована?
+    en: Is the operation approved?
+  description:
+    - Приостановить задачу и показать ответственному точное изменение, субъект, адресат и последствия. Решение привязать к параметрам, версии политики и сроку; отказ или истечение останавливают исполнение.
+    - Pause and show the accountable reviewer the exact change, actor, target, and consequences. Bind the decision to arguments, policy version, and expiry; rejection or expiry stops execution.
+  classes: [RM-AIC-04, RM-APP-03, RM-AGT-05, RM-TRS-04]
+  architectureSteps: [g7, t_audit]
+  workflowNode: approval
+AGT-ACTION--ENFORCE:
+  kind: operation
+  name:
+    ru: Повторный допуск пройден?
+    en: Did final admission pass?
+  description:
+    - У ресурса повторно проверить права, политику, параметры, согласование, ID эффекта и остаток бюджета; заранее сохранить состояние операции. Изменение параметров требует нового согласования.
+    - At the resource boundary recheck current permissions, policy, exact arguments, approval, effect ID, and remaining budget; persist operation state before execution. Changed arguments require fresh approval.
+  classes: [RM-ACT-02, RM-ACT-01, RM-AGT-05, RM-AIC-04]
+  architectureSteps: [t_gw, s_runtime, t_audit]
+  workflowNode: enforce
+AGT-ACTION--EXECUTE:
+  kind: operation
+  name:
+    ru: Выполнить допущенное изменение
+    en: Execute admitted change
+  description:
+    - Передать допущенный вызов адаптеру ERP/CRM с ограниченными полномочиями, без секретов в контексте. Код, если он нужен, запускать только в допущенной изолированной среде без прямого доступа к целевой системе.
+    - Send the admitted call to the ERP/CRM adapter under limited authority, with no secrets in model context. Run any required code only in an admitted sandbox without direct access to the target system.
+  classes: [RM-ACT-02, RM-INT-02, RM-TRS-03, RM-ACT-03]
+  architectureSteps: [t_gw, s_runtime]
+  workflowNode: execute
+AGT-ACTION--EFFECT:
+  kind: operation
+  name:
+    ru: Эффект подтверждён?
+    en: Is the effect confirmed?
+  description:
+    - Проверить ответ инструмента до включения в контекст и сверить факт изменения у цели по ID операции. Повтор возможен в пределах срока и лимита попыток только при установленном отсутствии эффекта, повторном допуске и защите от дубля.
+    - Check tool output before adding it to context and reconcile the actual target state by operation ID. Retry within the deadline and attempt limit only when no effect is established, admission is repeated, and duplication is prevented.
+  classes: [RM-AIC-02, RM-AGT-05, RM-ACT-02, RM-TRS-04]
+  architectureSteps: [t_result, t_gw, t_audit]
+  workflowNode: effect

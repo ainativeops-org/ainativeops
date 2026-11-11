@@ -1,0 +1,257 @@
+# Процесс на карте / Process on the map: INF-01
+# workflow: узлы и переходы схемы; SVG схемы строит tools/build.py через Graphviz.
+# workflow: diagram nodes and edges; tools/build.py renders the SVG with Graphviz.
+name:
+  ru: Защищённая работа сотрудника с ИИ-помощником
+  en: Protected Employee AI Assistance
+group: INF
+owner: [Владелец корпоративного чата, Enterprise chat owner]
+start:
+  - Сотрудник отправил сообщение в новом или существующем диалоге.
+  - An employee submits a message in a new or existing conversation.
+result:
+  - Проверенный ответ сохранён и выдан в разрешённом диалоге, либо показан безопасный отказ.
+  - A checked response is stored and delivered in the authorized conversation, or a safe denial is shown.
+check:
+  - Запрещённый ввод не доходит до модели, запрещённый вывод не попадает в чат и историю. Подмена ID чужого диалога и прямой вызов сервера отклоняются; решения связаны с ID запроса.
+  - Blocked input never reaches the model and blocked output never enters chat or history. Substituting another conversation ID and calling the server directly are rejected; decisions are tied to the request ID.
+maturity: [Базовый референсный маршрут, Baseline reference workflow]
+calls: []
+order: 9
+protection:
+  - Каждый вызов модели проходит проверку идентичности и прав, защиту входа и выхода и аудит в разрешённом объёме. Вызовы инструментов допускаются отдельно; код исполняется в изолированной среде. Согласование и ограничения раскрытия задаются политикой.
+  - Every model call uses identity and authorization checks, input and output protections, and permitted audit retention. Tool calls are authorized separately; code runs in a sandbox. Approval and disclosure restrictions follow policy.
+parts:
+  - INF-03
+  - INF-02
+  - FLOW-HYBRID
+  - CORE-01
+  - INF-01--REQUEST
+  - INF-01--SESSION
+  - INF-01--CONTEXT
+  - INF-01--INPUT
+  - INF-01--CLASSIFY
+  - INF-01--PLAN
+  - INF-01--INVOKE
+  - INF-01--OUTPUT
+  - INF-01--RECORD
+tags: [Protected Employee AI Assistance]
+option: placement
+paths:
+  local: process-inf-01-local
+  external: process-inf-01-external
+workflow:
+  summary:
+    - Сотрудник отправил сообщение в новом или существующем диалоге. Проверенный ответ сохранён и выдан в разрешённом диалоге, либо показан безопасный отказ.
+    - An employee submits a message in a new or existing conversation. A checked response is stored and delivered in the authorized conversation, or a safe denial is shown.
+  synthesis:
+    - Последовательность, условия переходов и сопоставление компонентов — проектный синтез AiNativeOps. Источники подтверждают отдельные практики в указанной области, а не всю схему.
+    - The sequence, conditions and component mapping are AiNativeOps design synthesis. Sources support individual practices within their stated scope, not the entire diagram.
+  basis:
+    - source: AWS-G
+      claim:
+        - В поддерживаемом маршруте IAM может отказать вызову, если он не использует заданную проверку.
+        - On a supported route, IAM can deny a call that does not use the specified guardrail.
+    - source: LLM-C
+      claim:
+        - Отделение инструкций от данных, проверки ввода и выхода, многослойный контроль.
+        - Covers separating instructions from data, input and output guardrails, and layered controls.
+    - source: ZT
+      claim:
+        - Логические компоненты и рисунок 1. PDP, Policy Engine, Policy Administrator и PEP.
+        - 'Covers the logical components and Figure 1: PDP, Policy Engine, Policy Administrator, and PEP.'
+    - source: LOG
+      claim: ['Сбор, хранение и управление журналами.', 'Covers log collection, storage, and management.']
+  nodes:
+    - id: request
+      label: [Принять сообщение, Receive message]
+      detail:
+        - Установить идентичность сотрудника, организацию, назначение чата и ID запроса. Не раскрывать существование чужих диалогов.
+        - Establish employee identity, organization, chat purpose, and request ID. Do not reveal whether another user's conversation exists.
+      kind: step
+      components:
+        architecture: [t_chat, t_iam]
+        infrastructure: [chat-app, iam-sso]
+        stack: [RM-APP-02, RM-SEC-01]
+    - id: session
+      label: ['Диалог доступен?', 'Is the conversation accessible?']
+      detail:
+        - Проверить права на текущий диалог или создание нового. Загружать только историю разрешённого диалога.
+        - Check access to the current conversation or permission to create a new one. Load only authorized conversation history.
+      kind: decision
+      components:
+        architecture: [t_history, t_iam]
+        infrastructure: [conversation-store, iam-sso, pdp]
+        stack: [RM-PLT-03, RM-SEC-01, RM-ACT-01]
+    - id: context
+      label: [Подготовить контекст, Prepare context]
+      detail:
+        - Собрать текущий запрос и разрешённую часть истории. Развести системные инструкции и пользовательские данные; применить ограничения объёма и назначения.
+        - Assemble the current request and permitted history. Keep system instructions separate from user data and apply size and purpose limits.
+      kind: step
+      components:
+        architecture: [t_chat, t_history, t_input]
+        infrastructure: [chat-app, conversation-store, input-guardrails]
+        stack: [RM-APP-02, RM-PLT-03, RM-AIC-01]
+    - id: input
+      label: ['Вход допущен?', 'Is input admitted?']
+      detail:
+        - 'Проверить весь сформированный контекст по версии политики: чувствительность, формат, допустимое представление. Не отправлять ввод при отказе или недоступности обязательной проверки.'
+        - Check the entire assembled context against the policy version for sensitivity, format, and permitted representation. Do not send it after a denial or if a mandatory check is unavailable.
+      kind: decision
+      components:
+        architecture: [t_input, b_poldisc, s_runtime]
+        infrastructure: [input-guardrails, pdp, audit-log]
+        stack: [RM-AIC-01, RM-GOV-03, RM-ACT-01, RM-TRS-04]
+    - id: classify
+      kind: decision
+      label: ['Запрос составной?', 'Is the request composite?']
+      detail:
+        - Классификатор оценивает сложность и длительность рассуждения и выбирает модель среди разрешённых политикой раскрытия.
+        - The classifier estimates complexity and reasoning length and chooses a model among those the disclosure policy permits.
+      components:
+        architecture: [t_route, b_poldisc]
+        infrastructure: [request-classifier, pdp]
+        stack: [RM-MOD-12, RM-ACT-01]
+    - id: plan
+      kind: step
+      label: [Разбить на подзадачи, Split into subtasks]
+      detail:
+        - Планировщик строит граф подзадач, назначает каждой самую дешёвую достаточную модель и берёт готовые результаты из кеша.
+        - The planner builds a subtask graph, assigns each the cheapest sufficient model and takes finished results from the cache.
+      components:
+        architecture: [t_plan]
+        infrastructure: [model-call-planner, usage-billing]
+        stack: [RM-MOD-13, RM-MOD-10, RM-OPS-06]
+    - id: subcalls
+      kind: decision
+      label: ['Подзадачи выполнены?', 'Are the subtasks done?']
+      detail:
+        - Каждая подзадача вызывает модель через шлюз с входными и выходными проверками, квотой и учётом; планировщик собирает ответ.
+        - Every subtask calls a model through the gateway with input and output checks, quota and metering; the planner assembles the answer.
+      components:
+        architecture: [t_plan, t_infer]
+        infrastructure: [model-call-planner, llm-gateway, inference-quotas, usage-billing]
+        stack: [RM-MOD-13, RM-MOD-06, RM-AIC-05, RM-OPS-06]
+    - id: invoke
+      label: ['Допущенный вызов выполнен?', 'Did the admitted invocation complete?']
+      detail:
+        - Шлюз проверяет модель, маршрут и бюджет. Для внешнего размещения отдельно разрешает получателя и раскрытие. Ограниченный повтор возможен при техническом отказе после повторной проверки маршрута.
+        - The gateway checks model, route, and budget. External placement separately requires recipient and disclosure approval. A technical failure may be retried within limits after rechecking the route.
+      kind: decision
+      components:
+        architecture: [t_infer, b_polext, b_polbudget]
+        infrastructure: [llm-gateway, model-registry, inference-servers]
+        stack: [RM-MOD-06, RM-MOD-05, RM-MOD-07, RM-AGT-08, RM-ACT-01]
+    - id: output
+      label: ['Ответ можно выдать?', 'Can the reply be delivered?']
+      detail:
+        - До выдачи и записи проверить содержимое, формат и права получателя. Передавать в чат только проверенное представление, без исходного ответа при блокировке.
+        - Check content, format, and recipient permissions before delivery and storage. Give the chat only the checked representation; never return the raw reply after a block.
+      kind: decision
+      components:
+        architecture: [t_result, b_poldisc]
+        infrastructure: [output-guardrails, chat-app]
+        stack: [RM-AIC-02, RM-APP-02]
+    - id: record
+      label: ['Проверки зафиксированы?', 'Are checks recorded?']
+      detail:
+        - Зафиксировать ID запроса, маршрут, доступный идентификатор версии модели и решения входного и выходного контроля. При отсутствии обязательного свидетельства не выдавать ответ.
+        - Record the request ID, route, available model version identifier, and input and output decisions. Withhold the reply if required evidence cannot be recorded.
+      kind: decision
+      components:
+        architecture: [t_audit, mt_ev]
+        infrastructure: [audit-log]
+        stack: [RM-TRS-04, RM-OPS-02]
+    - id: delivered
+      label: [Выдать и сохранить ответ, Deliver and store reply]
+      detail:
+        - Вернуть проверенный ответ сотруднику и сохранить его в том же разрешённом диалоге в пределах политики хранения.
+        - Return the checked reply to the employee and store it in the same authorized conversation under its retention policy.
+      kind: outcome
+      components:
+        architecture: [t_chat, t_history]
+        infrastructure: [chat-app, conversation-store]
+        stack: [RM-APP-02, RM-PLT-03]
+    - id: denied
+      label: [Вернуть безопасный отказ, Return a safe denial]
+      detail:
+        - Показать безопасное объяснение без запрещённых данных. Записать основание отказа и этап; не выдавать и не сохранять заблокированный результат.
+        - Show a safe explanation without prohibited data. Record the reason and stage; do not deliver or store the blocked result.
+      kind: outcome
+      components:
+        architecture: [t_chat, t_audit]
+        infrastructure: [chat-app, audit-log]
+        stack: [RM-APP-02, RM-TRS-04]
+    - id: unavailable
+      label: [Сообщить о недоступности, Report unavailability]
+      detail:
+        - Не выдавать непроверенный ответ при исчерпанном бюджете, недоступности маршрута, контроля или обязательного аудита. Зафиксировать технический сбой доступным разрешённым способом.
+        - Do not deliver unchecked content when budget is exhausted or routing, controls, or required audit is unavailable. Record the technical failure through an available approved channel.
+      kind: outcome
+      components:
+        architecture: [t_chat, t_audit, s_detect]
+        infrastructure: [chat-app, audit-log, metrics-alerts]
+        stack: [RM-APP-02, RM-TRS-04, RM-OPS-01]
+  edges:
+    - from: request
+      to: session
+      label: [Идентичность установлена, Identity established]
+    - from: session
+      to: context
+      label: [Доступ разрешён, Access permitted]
+    - from: session
+      to: denied
+      label: [Нет прав, Access denied]
+    - from: context
+      to: input
+      label: [Контекст собран, Context assembled]
+    - from: input
+      to: denied
+      label: [Запрещённый ввод, Prohibited input]
+    - from: input
+      to: unavailable
+      label: [Проверка недоступна, Check unavailable]
+    - from: invoke
+      to: output
+      label: [Модель ответила, Model replied]
+    - from: invoke
+      to: denied
+      label: [Маршрут не разрешён, Route denied]
+    - from: invoke
+      to: unavailable
+      label: [Сбой или лимит, Failure or limit reached]
+    - from: output
+      to: record
+      label: [Выдача допустима, Delivery permitted]
+    - from: output
+      to: denied
+      label: [Вывод запрещён, Output prohibited]
+    - from: output
+      to: unavailable
+      label: [Проверка недоступна, Check unavailable]
+    - from: record
+      to: delivered
+      label: [Свидетельство записано, Evidence recorded]
+    - from: record
+      to: unavailable
+      label: [Аудит недоступен, Audit unavailable]
+    - from: input
+      to: classify
+      label: [Вход допустим, Input allowed]
+    - from: classify
+      to: invoke
+      label: ['Нет, одна модель', 'No, one model']
+    - from: classify
+      to: plan
+      label: [Да, 'Yes']
+    - from: plan
+      to: subcalls
+      label: [План построен, Plan built]
+    - from: subcalls
+      to: output
+      label: [Ответ собран, Answer assembled]
+    - from: subcalls
+      to: unavailable
+      label: [Сбой или лимит, Failure or limit]
+  main: [request, session, context, input, classify, invoke, output, record, delivered]

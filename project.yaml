@@ -1,15 +1,19 @@
 # Project metadata shown in the map ("?" panel).
 name: AiNativeOps
-version: 0.1.0-alpha
+version: 0.2.0-alpha
 status: alpha
 type: Community Interest Project
 license: CC BY 4.0 (model) · MIT (code)
 homepage: https://ainativeops.org
 # Versions shown in the version switcher. The first entry is the current one.
-# Add a published release with its own url, for example https://ainativeops.org/v1/.
+# An earlier release names its git tag and its folder on the site: tools/build_versions.py
+# builds it from the tag into dist/<folder>/ during publishing.
 versions:
+  - label: alpha 0.2
+    url: /
   - label: alpha 0.1
-    url: ""
+    url: /0.1/
+    tag: v0.1.0-alpha
 # Leave empty to take the URL from the AINO_REPOSITORY environment variable.
 # The GitHub Pages workflow sets it automatically.
 repository: ""

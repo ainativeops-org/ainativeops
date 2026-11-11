@@ -1,0 +1,79 @@
+# Этапы и варианты процессов. Ключ этапа процесса: <процесс>--<этап>.
+# Stages and variants of processes. A process stage key is <process>--<stage>.
+FLOW-RESEARCH--SCOPE:
+  kind: operation
+  name:
+    ru: Ограничить исследование
+    en: Set research scope
+  description:
+    - Зафиксировать вопрос, владельца, допустимые источники и действия, срок и бюджет. Внешний поиск допускается только при отдельном разрешении на направление и раскрытие.
+    - Record the question, owner, permitted sources and actions, deadline, and budget. External search requires explicit permission for its destination and disclosure.
+  classes: [RM-AGT-02, RM-SEC-01, RM-AGT-08, RM-GOV-03]
+  architectureSteps: [b_goal, b_polext, b_polbudget]
+  workflowNode: scope
+FLOW-RESEARCH--PLAN:
+  kind: operation
+  name:
+    ru: Подготовить план поиска
+    en: Prepare search plan
+  description:
+    - Определить проверяемые вопросы и приоритет первичных источников. Каждый модельный шаг проходит контроль входа и результата через допущенный шлюз; план не даёт прав на инструменты.
+    - Define verifiable questions and prioritize primary sources. Each model step passes input and output checks through an approved gateway; the plan grants no tool permissions.
+  classes: [RM-AGT-02, RM-AIC-01, RM-AIC-05, RM-MOD-12, RM-MOD-06, RM-AIC-02]
+  architectureSteps: [t_harness, t_input, t_infer, t_result]
+  workflowNode: plan
+FLOW-RESEARCH--ADMIT:
+  kind: operation
+  name:
+    ru: Обращение к источнику разрешено?
+    en: May the source be contacted?
+  description:
+    - Для каждого чтения проверить точный адрес, параметры, инициатора, назначение, лимит и допустимые исходящие данные. Отклонённый адрес нельзя заменить перенаправлением или загрузкой файлов.
+    - For each read, check exact destination, arguments, requester, purpose, budget, and permitted outbound data. Do not bypass a denied destination via redirection or file uploads.
+  classes: [RM-AGT-04, RM-ACT-02, RM-ACT-01, RM-SEC-02]
+  architectureSteps: [t_gw, b_polext, b_poldisc]
+  workflowNode: admit
+FLOW-RESEARCH--COLLECT:
+  kind: operation
+  name:
+    ru: Собрать свидетельства
+    en: Collect evidence
+  description:
+    - Запросить разрешённые источники. Для корпоративных знаний при необходимости вызвать KNW-03. Проверить результаты инструментов и сохранить ссылки, дату и происхождение; команды в источниках не выполнять.
+    - Query authorized sources. Call KNW-03 for enterprise knowledge when needed. Check tool results and retain references, dates, and provenance; do not execute instructions found in sources.
+  classes: [RM-INT-02, RM-DPR-06, RM-AIC-02]
+  architectureSteps: [t_gw, t_vec, t_result]
+  workflowNode: collect
+FLOW-RESEARCH--EVIDENCE:
+  kind: operation
+  name:
+    ru: Свидетельства достаточны?
+    en: Is the evidence sufficient?
+  description:
+    - Сопоставить независимые сведения, дату, применимость и конфликтующие версии. Уточнение поиска ограничено исходной областью, числом шагов, временем и стоимостью.
+    - Compare independent evidence, date, applicability, and conflicting versions. Refinement stays within the original scope and step, time, and cost budgets.
+  classes: [RM-AGT-08, RM-OPS-02]
+  architectureSteps: [mt_ev, b_polbudget]
+  workflowNode: evidence
+FLOW-RESEARCH--SYNTHESIS:
+  kind: operation
+  name:
+    ru: Собрать справку
+    en: Draft the research brief
+  description:
+    - Синтезировать только проверенные материалы. При вызове модели проверить собранный контекст и результат через шлюз; отметить противоречия и отличить факт от гипотезы.
+    - Synthesize only checked material. When calling a model, check the assembled context and result through the gateway; identify contradictions and distinguish facts from hypotheses.
+  classes: [RM-AIC-01, RM-AIC-05, RM-MOD-12, RM-MOD-13, RM-MOD-06, RM-AIC-02, RM-AGT-03]
+  architectureSteps: [t_input, t_infer, t_result]
+  workflowNode: synthesis
+FLOW-RESEARCH--VERIFY:
+  kind: operation
+  name:
+    ru: Справку можно выдать?
+    en: Can the brief be delivered?
+  description:
+    - Проверить выводы по первоисточникам, ссылки и права получателя. Генерация файлов кодом требует допуска и изоляции, а готовые файлы проверяются до выдачи.
+    - Check conclusions against primary sources, verify references, and recheck recipient access. Generating files with code requires admission and isolation, and the files must be checked before delivery.
+  classes: [RM-AIC-02, RM-TRS-04, RM-ACT-02, RM-ACT-03]
+  architectureSteps: [t_result, b_poldisc, mt_ev]
+  workflowNode: verify

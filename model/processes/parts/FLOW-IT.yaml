@@ -1,0 +1,140 @@
+# Этапы и варианты процессов. Ключ этапа процесса: <процесс>--<этап>.
+# Stages and variants of processes. A process stage key is <process>--<stage>.
+FLOW-IT--BRIEF:
+  kind: operation
+  name:
+    ru: Цель и границы продукта
+    en: Product goal and scope
+  description:
+    - Записать потребность пользователя, владельца, ожидаемый эффект, пределы бюджета и события, которых продукт не должен допускать. Согласовать измеримый критерий успеха.
+    - Record the user need, owner, expected outcome, budget limits and prohibited events. Agree on a measurable success criterion.
+  classes: [RM-APP-01, RM-GOV-04]
+  architectureSteps: [g0, b_goal, b_np, b_ownproc]
+  workflowNode: brief
+FLOW-IT--SPEC:
+  kind: operation
+  name:
+    ru: Требования и приёмка
+    en: Requirements and acceptance
+  description:
+    - Версионировать сценарии пользователей, интерфейсы, требования к доступности и безопасности. До реализации закрепить примеры, требования к данным и критерии приёмки за ответственными ролями.
+    - Version user journeys, interfaces, availability and security requirements. Before implementation, assign ownership of acceptance cases, data requirements and criteria.
+  classes: [RM-DEV-01, RM-DEV-07, RM-GOV-03]
+  architectureSteps: [v1, b_reqprod, b_reqsec, b_poldisc]
+  workflowNode: spec
+FLOW-IT--DESIGN:
+  kind: operation
+  name:
+    ru: Проектирование и прототип
+    en: Design and prototype
+  description:
+    - Спроектировать модули, контракты, схему данных, границы доверия, зависимости и путь отката. Если ИИ помогает оценить варианты, каждый запрос и результат проходят входные и выходные guardrails; решения и риски фиксирует инженер.
+    - Design modules, contracts, schemas, trust boundaries, dependencies and the rollback path. If AI assists with alternatives, every invocation passes input and output guardrails; an engineer records decisions and risks.
+  classes:
+    - RM-DEV-01
+    - RM-GOV-04
+    - RM-SEC-03
+    - RM-AIC-01
+    - RM-AIC-05
+    - RM-MOD-12
+    - RM-MOD-13
+    - RM-MOD-06
+    - RM-AIC-02
+  architectureSteps: [mt_tb, mt_assess, v1, v4, t_input, t_infer, t_result]
+  workflowNode: design
+FLOW-IT--AUTHORITY:
+  kind: operation
+  name:
+    ru: План и полномочия допущены?
+    en: Are plan and authority admitted?
+  description:
+    - Утвердить архитектурный вариант и риск, выдать ограниченное рабочее окружение и полномочия по репозиторию, данным и инструментам. Не выдавать агенту права на выпуск или обход ревью.
+    - Approve the design and risk; provision a bounded workspace and repository, data and tool permissions. Do not grant the agent release or review-bypass authority.
+  classes: [RM-GOV-02, RM-ACT-03, RM-ACT-04, RM-ACT-01, RM-ACT-02]
+  architectureSteps: [s_prep, b_polagent, mt_residual, t_harness]
+  workflowNode: authority
+FLOW-IT--IMPLEMENT:
+  kind: operation
+  name:
+    ru: Реализация и тесты
+    en: Implementation and tests
+  description:
+    - Подготовить код, тесты и документацию в допущенной области. Каждый вызов модели, включая подагентов, проходит входные и выходные guardrails, а чтение или запись через инструмент проверяется PEP перед выполнением. Сохранить изменения на ревью.
+    - Prepare code, tests and documentation in the approved scope. Every model invocation, including subagents, passes input and output guardrails; PEP checks tool reads and writes before execution. Submit changes for review.
+  classes:
+    - RM-DEV-01
+    - RM-AGT-01
+    - RM-AGT-02
+    - RM-ACT-03
+    - RM-AGT-04
+    - RM-ACT-02
+    - RM-AIC-01
+    - RM-AIC-05
+    - RM-MOD-12
+    - RM-MOD-06
+    - RM-AIC-02
+  architectureSteps: [v2, t_eng, t_harness, t_gw, g7, t_input, t_infer, t_result]
+  workflowNode: implement
+FLOW-IT--INTEGRATE:
+  kind: operation
+  name:
+    ru: Интеграция и сборка
+    en: Integration and build
+  description:
+    - Собрать кандидата из точной ревизии в CI, проверить миграции и контракты интеграций, зависимости и секреты. Зарегистрировать хеш пакета и свидетельство происхождения.
+    - Build the candidate from the exact revision in CI. Test migration and integration contracts, dependencies and secrets. Register the package digest and provenance evidence.
+  classes: [RM-DEV-06, RM-SEC-04, RM-DEV-08, RM-TRS-05]
+  architectureSteps: [v3, v4, v5, g5, s_scan, o_pack]
+  workflowNode: integrate
+FLOW-IT--VERIFY:
+  kind: operation
+  name:
+    ru: Независимая приёмка пройдена?
+    en: Does independent acceptance pass?
+  description:
+    - Проверить функциональность, интеграции, нагрузку и негативные сценарии на независимом стенде. Если оценивают ИИ-функцию или используют ИИ-контролёра, каждый модельный вызов проходит входные и выходные guardrails; решение опирается на проверяемые критерии и ревью. До допуска отрепетировать откат, проверить совместимость миграций; для первой версии подтвердить безопасное отключение.
+    - Check functionality, integrations, load and negative cases in an independent environment. When testing an AI feature or using an AI controller, every model call passes input and output guardrails; verifiable criteria and review drive the decision. Rehearse rollback and migration compatibility before admission; for a first release verify safe shutdown.
+  classes:
+    - RM-DEV-07
+    - RM-DAT-05
+    - RM-AIC-03
+    - RM-AIC-04
+    - RM-AIC-01
+    - RM-AIC-05
+    - RM-MOD-12
+    - RM-MOD-13
+    - RM-MOD-06
+    - RM-AIC-02
+  architectureSteps: [o_eval, g4, mt_indep, mt_ev, t_input, t_infer, t_result]
+  workflowNode: verify
+FLOW-IT--ADMIT:
+  kind: operation
+  name:
+    ru: Выпуск точной версии разрешён?
+    en: Is the exact version admitted for release?
+  description:
+    - Сверить манифест кода, зависимостей, данных и конфигураций, включая модели, инструкции и политики при их наличии. Ответственный утверждает точный пакет; подпись и сохранение свидетельств относятся к этому хешу.
+    - Verify the manifest of code, dependencies, data and configurations, including models, instructions and policies where used. The responsible owner approves the exact package; its signature and evidence bind to that digest.
+  classes: [RM-DEV-09, RM-TRS-01, RM-TRS-05, RM-TRS-06]
+  architectureSteps: [o_release, g6, b_ownrisk, mt_ev]
+  workflowNode: admit
+FLOW-IT--ROLLOUT:
+  kind: operation
+  name:
+    ru: Выкладка выдержала контроль?
+    en: Does rollout pass its checks?
+  description:
+    - Развернуть допущенный пакет с проверкой подписи и наблюдением. Если контрольная операция вызывает модель, запрос и результат идут через штатные guardrails. При нарушении порогов остановить продвижение и применить проверенный откат или эскалировать необратимые эффекты.
+    - Deploy the approved package with signature verification and monitoring. If a smoke check calls a model, its request and response pass production guardrails. On threshold breaches, stop promotion and apply the rehearsed rollback or escalate irreversible effects.
+  classes:
+    - RM-DEV-10
+    - RM-OPS-01
+    - RM-TRS-06
+    - RM-AIC-01
+    - RM-AIC-05
+    - RM-MOD-12
+    - RM-MOD-13
+    - RM-MOD-06
+    - RM-AIC-02
+  architectureSteps: [o_ops, t_prod, g7, s_runtime, s_detect, t_input, t_infer, t_result]
+  workflowNode: rollout

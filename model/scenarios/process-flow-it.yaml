@@ -1,0 +1,36 @@
+# Маршрут / Route: Разработка ИТ-продукта с помощью ИИ / AI-assisted IT Product Development
+# Шаг = [элемент, [участники]] / Step = [element, [participants]]
+order: 1
+name:
+  ru: Разработка ИТ-продукта с помощью ИИ
+  en: AI-assisted IT Product Development
+routes:
+  stack:
+    - [RM-APP-01, [RM-GOV-04]]
+    - [RM-DEV-01, [RM-MOD-12, RM-DEV-07, RM-GOV-03, RM-GOV-04, RM-SEC-03, RM-AIC-01, RM-MOD-06, RM-AIC-02, RM-TRS-04, RM-MOD-07, RM-AIC-05, RM-OPS-06, RM-AGT-01, RM-AGT-02, RM-ACT-03, RM-AGT-04, RM-ACT-02]]
+    - [RM-GOV-02, [RM-ACT-03, RM-ACT-04, RM-ACT-01, RM-ACT-02]]
+    - [RM-DEV-06, [RM-SEC-04, RM-DEV-08, RM-TRS-05]]
+    - [RM-DEV-07, [RM-DAT-05, RM-AIC-03, RM-AIC-04, RM-AIC-01, RM-MOD-06, RM-AIC-02]]
+    - [RM-DEV-09, [RM-TRS-01, RM-TRS-05, RM-TRS-06]]
+    - [RM-DEV-10, [RM-OPS-01, RM-TRS-06, RM-AIC-01, RM-MOD-06, RM-AIC-02]]
+    - [RM-APP-01, [RM-OPS-01, RM-TRS-04]]
+  infrastructure:
+    - [business-apps, []]
+    - [git-repository, [request-classifier, rule-based-checks, artifact-intake, input-guardrails, llm-gateway, output-guardrails, audit-log, inference-servers, inference-quotas, usage-billing]]
+    - [agent-iam, [job-sandbox, zero-trust-git, pdp, pep]]
+    - [agent-orchestrator, [agent-runtime, job-sandbox, tool-router, pep, git-repository, input-guardrails, llm-gateway, output-guardrails]]
+    - [ci-runner, [sast-sca-secrets, artifact-registry, provenance-registry]]
+    - [eval-red-teaming, [eval-datasets, rule-based-checks, llm-as-a-judge, input-guardrails, llm-gateway, output-guardrails]]
+    - [release-gate, [integrity-monitoring, provenance-registry, hsm-kms]]
+    - [cd-deployment, [metrics-alerts, integrity-monitoring, input-guardrails, llm-gateway, output-guardrails]]
+    - [business-apps, [metrics-alerts, audit-log]]
+  architecture:
+    - [g0, [b_goal, b_np, b_ownproc]]
+    - [v1, [b_reqprod, b_reqsec, b_poldisc]]
+    - [mt_tb, [t_route, mt_assess, v1, v4, t_input, t_infer, t_result, t_audit, t_base]]
+    - [s_prep, [b_polagent, mt_residual, t_harness]]
+    - [v2, [t_eng, t_harness, t_gw, g7, t_input, t_infer, t_result]]
+    - [v3, [v4, v5, g5, s_scan, o_pack]]
+    - [o_eval, [g4, mt_indep, mt_ev, t_input, t_infer, t_result]]
+    - [o_release, [g6, b_ownrisk, mt_ev]]
+    - [o_ops, [t_prod, g7, s_runtime, s_detect, t_input, t_infer, t_result, b_ownproc, t_audit]]

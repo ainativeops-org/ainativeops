@@ -1,0 +1,151 @@
+# Реестр процессов · Агенты и действия / Process registry · Agents and actions
+AGT-01:
+  name:
+    ru: Выполнение задания с инструментами чтения
+    en: Read-only tool-using task execution
+  start:
+    - Пользователь делегирует задачу, требующую разрешённого чтения.
+    - A user delegates a task that requires permitted read access.
+  result:
+    - Проверенный результат со ссылками на обращения к инструментам.
+    - A checked result with references to the tool calls.
+  check:
+    - Для чтения проверяются субъект, ресурс и цель. Результат инструмента проходит контроль перед контекстом.
+    - For each read, the subject, resource and purpose are checked. The tool result passes a check before it enters the context.
+  gates: И G7
+  classes: [RM-AGT-02, RM-AGT-03, RM-AGT-04, RM-ACT-02, RM-INT-02]
+AGT-02:
+  name:
+    ru: Подготовка операции для согласования
+    en: Action proposal for approval
+  start:
+    - Задача требует предложить значимое действие и объяснить его.
+    - A task requires proposing a significant action and explaining it.
+  result:
+    - Предложение с точными параметрами, эффектом и основанием для согласования.
+    - A proposal with exact parameters, the expected effect and the justification for approval.
+  check:
+    - Согласование привязано к предложению и сроку действия. Подмена параметров создаёт новое предложение.
+    - The approval is bound to the proposal and its validity period. Changing the parameters creates a new proposal.
+  gates: И
+  classes: [RM-AGT-02, RM-AIC-04, RM-APP-03, RM-TRS-04]
+AGT-03:
+  name:
+    ru: Выполнение внешнего действия
+    en: State-changing tool execution
+  start:
+    - Получено разрешённое предложение изменения в бизнес-системе или внешнем ресурсе.
+    - An approved proposal to change a business system or external resource arrives.
+  result:
+    - Результат операции и наблюдаемое состояние ресурса.
+    - The operation result and the observed state of the resource.
+  check:
+    - PEP у исполнителя проверяет точное действие и актуальные права. Запрет исключает изменение. Повтор сверяет фактический эффект.
+    - The PEP at the executor checks the exact action and current permissions. A denial prevents the change. A retry reconciles the actual effect.
+  gates: И G7
+  classes: [RM-ACT-01, RM-ACT-02, RM-AGT-04, RM-AGT-05, RM-INT-02, RM-TRS-04]
+AGT-04:
+  name:
+    ru: Изолированное исполнение кода
+    en: Sandboxed code execution
+  start:
+    - Модель или пользователь предлагает запустить разрешённый код или команду.
+    - A model or user proposes running permitted code or a command.
+  result:
+    - Проверенный результат и допущенные к выдаче артефакты.
+    - A checked result and artifacts admitted for output.
+  check:
+    - Проверить ограничения среды, файлов, сети, секретов и бюджета. Публикация файла проходит отдельную проверку.
+    - Check the limits on the environment, files, network, secrets and budget. Publishing a file passes a separate check.
+  gates: И* G7
+  classes: [RM-ACT-03, RM-ACT-02, RM-AGT-04, RM-TRS-03, RM-SEC-02]
+AGT-05:
+  name:
+    ru: Исполнение заданного процесса с ИИ
+    en: AI-enabled workflow execution
+  start:
+    - Событие запускает формальный процесс с заданными ролями и переходами.
+    - An event starts a formal workflow with defined roles and transitions.
+  result:
+    - Результат процесса и записи пройденных переходов.
+    - The workflow result and records of the transitions taken.
+  check:
+    - Модельный результат проверяется на входе следующего шага. Непредусмотренный переход не исполняется.
+    - A model result is checked at the input of the next step. An undefined transition is not executed.
+  gates: И G7*
+  classes: [RM-APP-04, RM-AGT-01, RM-AGT-02, RM-INT-03, RM-ACT-02]
+AGT-06:
+  name:
+    ru: Ведение длительного агентного задания
+    en: Durable agent run management
+  start:
+    - Задание длится дольше одного запроса либо требует паузы или согласования.
+    - A task runs longer than one request or requires a pause or approval.
+  result:
+    - Идентификатор запуска, история событий, чекпоинты и конечный статус.
+    - A run identifier, event history, checkpoints and the final status.
+  check:
+    - После возобновления повторно проверяются права и политика. Отмена останавливает новые операции, фактические эффекты сверяются.
+    - After resumption, permissions and policy are checked again. Cancellation stops new operations, and actual effects are reconciled.
+  gates: И G7*
+  classes: [RM-AGT-02, RM-AGT-05, RM-APP-03, RM-INT-03, RM-TRS-07]
+AGT-07:
+  name:
+    ru: Делегирование задания внутри домена
+    en: In-domain agent delegation
+  start:
+    - Основной исполнитель выделяет подзадачу или передаёт управление.
+    - The primary executor splits off a subtask or hands over control.
+  result:
+    - Результат подзадачи или оформленная передача ответственности.
+    - The subtask result or a formal handover of responsibility.
+  check:
+    - Дочерние права и бюджет ограничены исходным заданием. Контекст отбирается по назначению и правам.
+    - Child permissions and budget are limited by the original task. Context is selected by purpose and permissions.
+  gates: И G7*
+  classes: [RM-AGT-01, RM-AGT-08, RM-GOV-02, RM-OPS-02]
+AGT-08:
+  name:
+    ru: Делегирование между доменами
+    en: Cross-domain agent delegation
+  start:
+    - Для выполнения части задачи требуется независимый агентный контур.
+    - Part of the task requires an independent agent domain.
+  result:
+    - Принятая или отклонённая передача задачи и связанное свидетельство результата.
+    - An accepted or rejected task handover and linked evidence of the result.
+  check:
+    - Подтвердить обе стороны, права, допустимый состав контекста, версию контракта и механизм отмены.
+    - Verify both parties, permissions, the permitted context content, the contract version and the cancellation mechanism.
+  gates: И G7*
+  classes: [RM-INT-04, RM-SEC-02, RM-ACT-02, RM-TRS-04]
+AGT-09:
+  name:
+    ru: Автономное исполнение в пределах мандата
+    en: Bounded autonomous execution
+  start:
+    - Владелец утверждает цель, сроки, бюджеты, права и допустимые действия.
+    - The owner approves the goal, deadlines, budgets, permissions and permitted actions.
+  result:
+    - Проверяемый результат, остановка по лимиту либо эскалация.
+    - A verifiable result, a stop on a limit, or an escalation.
+  check:
+    - Отзыв, истечение срока и исчерпание бюджета блокируют новые действия независимо от результата модели.
+    - Revocation, expiry and budget exhaustion block new actions regardless of the model output.
+  gates: G0 И G7
+  classes: [RM-AGT-01, RM-AGT-02, RM-AGT-08, RM-ACT-02, RM-TRS-07]
+AGT-10:
+  name:
+    ru: Управление физическим процессом с ИИ
+    en: AI-assisted physical control
+  start:
+    - Объект выдаёт измерения и принимает только допустимые управляющие воздействия.
+    - The physical system reports measurements and accepts only permitted control actions.
+  result:
+    - Разрешённое действие или безопасный отказ с записью результата.
+    - A permitted action or a safe denial with a recorded result.
+  check:
+    - Отдельный контур безопасности оборудования и испытания предметной области проверяют задержки, пределы и отказ модели.
+    - A separate equipment safety system and domain tests check latency, limits and model failure.
+  gates: И G7
+  classes: [RM-ACT-02, RM-OPS-01, RM-TRS-07]

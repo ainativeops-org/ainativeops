@@ -1,0 +1,26 @@
+# Маршрут / Route: Управляемое улучшение действующей ИИ-системы / Controlled AI System Improvement
+# Шаг = [элемент, [участники]] / Step = [element, [participants]]
+order: 22
+name:
+  ru: Управляемое улучшение действующей ИИ-системы
+  en: Controlled AI System Improvement
+routes:
+  stack:
+    - [RM-OPS-01, [RM-OPS-05, RM-OPS-07, RM-TRS-04, RM-OPS-04, RM-OPS-06]]
+    - [RM-GOV-01, [RM-OPS-07, RM-TRS-05, RM-DAT-05]]
+    - [RM-GOV-04, [RM-OPS-05, RM-OPS-07, RM-TRS-04]]
+    - [RM-DEV-01, [RM-DEV-06, RM-DEV-07, RM-DEV-08, RM-OPS-07]]
+    - [RM-DEV-09, [RM-GOV-04, RM-TRS-05]]
+    - [RM-DEV-10, [RM-MOD-12, RM-MOD-13, RM-MOD-06, RM-OPS-01, RM-ACT-02, RM-AIC-01, RM-AIC-02, RM-TRS-04, RM-MOD-07, RM-AIC-05, RM-OPS-06, RM-GOV-01, RM-OPS-07]]
+  infrastructure:
+    - [metrics-alerts, [landing-zone, audit-log, eval-datasets, log-metric-store]]
+    - [provenance-registry, [prompt-skill-registry, model-registry, eval-datasets]]
+    - [git-repository, [ci-runner, artifact-registry, eval-red-teaming]]
+    - [release-gate, [provenance-registry]]
+    - [cd-deployment, [request-classifier, model-call-planner, llm-gateway, metrics-alerts, pep, input-guardrails, output-guardrails, audit-log, inference-servers, inference-quotas, usage-billing, provenance-registry]]
+  architecture:
+    - [s_detect, [t_route, t_plan, s_change, mt_review, t_input, t_infer, t_result, t_audit, t_base]]
+    - [g8, [s_change, mt_assess, g6, o_release]]
+    - [b_ownproc, [b_goal, g8, mt_review]]
+    - [v3, [s_change, g8]]
+    - [o_ops, [g7, t_prod, s_detect, mt_review, s_change, g8]]

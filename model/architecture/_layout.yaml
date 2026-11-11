@@ -1,8 +1,8 @@
-# Вид «Архитектура»: уровни, группы с координатами, потоки. Элементы уровня лежат в файле <file>.yaml.
-# Architecture view: levels, groups with coordinates, flows. A level's elements live in <file>.yaml.
+# Уровни, группы с координатами и потоки вида «Архитектура».
+# Levels, positioned groups and flows of the Architecture view.
 canvas:
   width: 2080
-  height: 1460
+  height: 1570
 layers:
   - id: biz
     number: '01'
@@ -40,7 +40,7 @@ layers:
       ru: Технологии
       en: Technology
     y: 1190
-    height: 250
+    height: 360
     band: '#F1F8EC'
     fill: '#C9E7B7'
     file: technology
@@ -134,8 +134,8 @@ groups:
       en: DataOps · data product
     x: 200
     y: 580
-    cols: 5
-    items: [d1, d2, d3, d4, d5]
+    cols: 6
+    items: [d1, d2, d_extract, d3, d4, d5]
   - id: mlops
     layer: ops
     title:
@@ -189,7 +189,7 @@ groups:
     x: 200
     y: 1210
     cols: 3
-    items: [t_eng, t_ctl, t_base, t_target, t_ext]
+    items: [t_eng, t_ctl, t_base, t_target, t_ext, t_eval]
   - id: tech-data
     layer: tech
     title:
@@ -217,6 +217,24 @@ groups:
     y: 1210
     cols: 2
     items: [t_prod, t_gw, t_iam, t_siem]
+  - id: guarded-inference
+    layer: tech
+    title:
+      ru: ИИ-платформа · защищённый инференс
+      en: AI platform · guarded inference
+    x: 200
+    y: 1420
+    cols: 8
+    items: [t_chat, t_history, t_input, t_route, t_plan, t_infer, t_result, t_audit]
+  - id: agent-execution
+    layer: tech
+    title:
+      ru: ИИ-платформа · Harness
+      en: AI platform · Harness
+    x: 1700
+    y: 1420
+    cols: 1
+    items: [t_harness]
 flows:
   - [d1, d2]
   - [d2, d3]
@@ -236,3 +254,5 @@ flows:
   - [m5, o_eval]
   - [v5, o_eval]
   - [o_release, o_ops]
+  - [d2, d_extract]
+  - [d_extract, d3]

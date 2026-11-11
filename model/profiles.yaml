@@ -1,0 +1,9 @@
+# Параметры, от которых зависит маршрут процесса. / Options that select the route of a process.
+options:
+  placement:
+    name: [Размещение модели, Model placement]
+    values:
+      local: [В своём контуре, Within the boundary]
+      external: [Внешний API, External API]
+defaults:
+  placement: local

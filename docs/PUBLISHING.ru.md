@@ -4,7 +4,7 @@
 
 ## 1. Подготовка
 
-1. Установите git и GitHub CLI:
+1. Установите git, GitHub CLI и Python:
    ```bash
    sudo pacman -S --needed git github-cli python
    ```
@@ -32,21 +32,32 @@
    python tools/build.py
    xdg-open dist/index.html
    ```
-   Валидатор должен вывести `model OK: 99 classes…`. Папки `dist/` и `.venv/` не попадут в репозиторий, они перечислены в `.gitignore`.
+   Валидатор должен вывести `model OK: 106 classes…`. Папки `dist/` и `.venv/` не попадут в репозиторий, они перечислены в `.gitignore`.
 
-## 3. Первый коммит и создание репозитория
+   Если поставить Playwright (`pip install playwright && python -m playwright install chromium`), сборка встроит в карту геометрию линий, и карта будет открываться быстрее. На GitHub это делает workflow публикации.
 
-1. Создайте локальный репозиторий и первый коммит. Ключ `-s` добавляет подпись DCO, которую требует CONTRIBUTING.md:
+## 3. История и создание репозитория
+
+1. Архив уже содержит историю git. Ветка `main` указывает на последний коммит alpha 0.2, на нём стоит тег `v0.2.0-alpha`. Ниже лежат коммиты 0.2 и коммит alpha 0.1 с тегом `v0.1.0-alpha`. Проверьте историю:
    ```bash
-   git init -b main
-   git add .
-   git commit -s -m "AiNativeOps alpha 0.1"
+   git switch main
+   git log --oneline --decorate
    ```
-2. Создайте публичный репозиторий в организации и отправьте код одной командой:
+   Коммиты подписаны строкой DCO, которую требует CONTRIBUTING.md. Свои коммиты делайте с ключом `-s`.
+2. Создайте публичный репозиторий в организации и отправьте `main` одной командой, затем теги:
    ```bash
    gh repo create ainativeops/ainativeops --public --source=. --remote=origin --push \
      --description "Open reference model for AI-native operations. Community Interest Project." \
      --homepage "https://ainativeops.org"
+   git push origin --tags
+   ```
+   Если репозиторий уже создан и в нём лежит alpha 0.1, подключите его и отправьте 0.2 поверх. Вторая команда проверяет, что история на GitHub — начало локальной истории; при ошибке остановитесь и сравните `git log origin/main` с локальным `git log`:
+   ```bash
+   git remote add origin https://github.com/ainativeops/ainativeops.git
+   git fetch origin
+   git merge-base --is-ancestor origin/main main && echo "можно отправлять"
+   git push origin main
+   git push origin --tags
    ```
 3. Добавьте темы для поиска по GitHub:
    ```bash
@@ -112,15 +123,22 @@
 
 Пока вы единственный мейнтейнер, добавьте себя в **Bypass list**. Иначе вы не сможете слить собственный pull request без второго рецензента.
 
-## 8. Выпуск alpha 0.1
+## 8. Выпуск alpha 0.2
 
-Отметьте выпуск тегом и опубликуйте его как pre-release:
+Тег `v0.2.0-alpha` уже стоит на последнем коммите `main`. Отправьте его и опубликуйте выпуск как pre-release:
 
 ```bash
-git tag -a v0.1.0-alpha -m "AiNativeOps alpha 0.1"
-git push origin v0.1.0-alpha
-gh release create v0.1.0-alpha --repo ainativeops/ainativeops --prerelease \
-  --title "AiNativeOps alpha 0.1" --notes-file CHANGELOG.md
+git push origin v0.2.0-alpha
+gh release create v0.2.0-alpha --repo ainativeops/ainativeops --prerelease \
+  --title "AiNativeOps alpha 0.2" --notes-file docs/releases/v0.2.0-alpha.md
+```
+
+Карта 0.1 остаётся доступной по адресу ainativeops.org/0.1/: workflow публикации собирает её из тега `v0.1.0-alpha`, переключатель версий ведёт туда и обратно. Чтобы оставить на сайте и 0.2 после выхода 0.3, добавьте в `project.yaml` строку версии с её тегом и папкой:
+
+```yaml
+  - label: alpha 0.2
+    url: /0.2/
+    tag: v0.2.0-alpha
 ```
 
 ## 9. Как вносить изменения дальше
@@ -145,4 +163,4 @@ gh release create v0.1.0-alpha --repo ainativeops/ainativeops --prerelease \
 | Домен не проходит проверку DNS | Остались старые A-записи регистратора или записи ещё не разошлись. Сверьте `dig +short ainativeops.org` с таблицей шага 5.2. |
 | Нет галочки Enforce HTTPS | Сертификат ещё выпускается. Подождите до часа. Если не помогло, удалите домен в настройках Pages, сохраните и введите снова. |
 | Кнопка «Предложить правку» не видна | Карта собрана локально без адреса репозитория. На GitHub Pages адрес подставляет workflow. |
-| Проверка `layout` падает | Новая связь не нашла обход блоков или сценарий ссылается на элемент, которого нет в виде. Откройте лог задания, там названы элемент и вид. |
+| Проверка `layout` падает | Новая связь не нашла обход блоков, маршрут процесса рисуется не полностью или в английской версии остался русский текст. Откройте лог задания, там названы процесс, элемент и вид. |

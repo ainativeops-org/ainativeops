@@ -1,0 +1,210 @@
+# Процесс на карте / Process on the map: FLOW-ANALYTICS
+# workflow: узлы и переходы схемы; SVG схемы строит tools/build.py через Graphviz.
+# workflow: diagram nodes and edges; tools/build.py renders the SVG with Graphviz.
+name:
+  ru: Аналитическое исследование корпоративных данных
+  en: AI-assisted Enterprise Data Analysis
+group: DAT
+owner: [Владелец бизнес-метрики и данных, Business metric and data owner]
+start:
+  - Пользователь запросил расчёт показателя или аналитическую проверку по корпоративным данным.
+  - A user requests a metric calculation or analytical check using enterprise data.
+result:
+  - Выдан воспроизводимый вывод с источниками, версией расчёта и ограничениями либо сообщена причина отказа или эскалации.
+  - A reproducible result with sources, calculation version, and limitations is delivered, or the reason for denial or escalation is provided.
+check:
+  - Попытка прочесть недоступную строку или выполнить запись отклоняется у источника. Значение контрольной метрики воспроизводится по версии данных и запроса; вывод не раскрывает защищённые детали.
+  - Attempts to read an unauthorized row or write data are rejected at the source. A test metric is reproducible from the data and query versions, and the result reveals no restricted details.
+maturity: [Референсный маршрут, Reference workflow]
+calls: []
+order: 11
+protection:
+  - Каждый вызов модели проходит проверку идентичности и прав, защиту входа и выхода и аудит в разрешённом объёме. Вызовы инструментов допускаются отдельно; код исполняется в изолированной среде. Согласование и ограничения раскрытия задаются политикой.
+  - Every model call uses identity and authorization checks, input and output protections, and permitted audit retention. Tool calls are authorized separately; code runs in a sandbox. Approval and disclosure restrictions follow policy.
+parts:
+  - CORE-01
+  - FLOW-ANALYTICS--QUESTION
+  - FLOW-ANALYTICS--DATA
+  - FLOW-ANALYTICS--PLAN
+  - FLOW-ANALYTICS--ADMIT
+  - FLOW-ANALYTICS--EXECUTE
+  - FLOW-ANALYTICS--VALIDATE
+  - FLOW-ANALYTICS--PUBLISH
+tags: [AI-assisted Enterprise Data Analysis]
+option: placement
+paths:
+  local: process-flow-analytics-local
+  external: process-flow-analytics-external
+workflow:
+  summary:
+    - Пользователь запросил расчёт показателя или аналитическую проверку по корпоративным данным. Выдан воспроизводимый вывод с источниками, версией расчёта и ограничениями либо сообщена причина отказа или эскалации.
+    - A user requests a metric calculation or analytical check using enterprise data. A reproducible result with sources, calculation version, and limitations is delivered, or the reason for denial or escalation is provided.
+  synthesis:
+    - Последовательность, условия переходов и сопоставление компонентов — проектный синтез AiNativeOps. Источники подтверждают отдельные практики в указанной области, а не всю схему.
+    - The sequence, conditions and component mapping are AiNativeOps design synthesis. Sources support individual practices within their stated scope, not the entire diagram.
+  basis:
+    - source: DB
+      claim:
+        - Архитектуры классического ML и GenAI. Признаки, эксперименты, реестр, выдача моделей, RAG и управление данными.
+        - Covers classical ML and GenAI architectures. Includes features, experiments, the registry, model serving, RAG, and data governance.
+    - source: BOLA
+      claim:
+        - Проверка полномочий на конкретный объект, в том числе диалог по ID.
+        - Covers authorization checks on a specific object, including a conversation accessed by ID.
+    - source: ZT
+      claim:
+        - Логические компоненты и рисунок 1. PDP, Policy Engine, Policy Administrator и PEP.
+        - 'Covers the logical components and Figure 1: PDP, Policy Engine, Policy Administrator, and PEP.'
+    - source: OPEN-G
+      claim:
+        - Различает начальные, конечные и инструментальные проверки. Границы SDK не подтверждают проверку каждого промежуточного вызова.
+        - Distinguishes input, output, and tool guardrails. The SDK boundaries do not confirm that every intermediate call is checked.
+    - source: OWASP
+      claim:
+        - Проверка полномочий на стороне вызываемой системы и согласование значимых действий.
+        - Covers authorization checks on the side of the called system and approval of significant actions.
+  nodes:
+    - id: question
+      label: [Уточнить аналитическую задачу, Define the analytical question]
+      detail:
+        - Зафиксировать инициатора, период, метрику, назначение и критерий проверки. Различать установленный показатель и исследовательскую оценку.
+        - Record the requester, period, metric, purpose, and verification criterion. Distinguish an established metric from an exploratory estimate.
+      kind: step
+      components:
+        architecture: [b_goal, t_iam]
+        infrastructure: [business-apps, iam-sso]
+        stack: [RM-APP-01, RM-SEC-01]
+    - id: data
+      label: ['Данные и метрика допустимы?', 'Are data and metric suitable?']
+      detail:
+        - Выбрать допущенную версию источника, определение метрики и права на поля и строки. Недоступность данных не лечится запросом под общей привилегированной учётной записью.
+        - Select an admitted source version, metric definition, and row and column permissions. Do not compensate for missing access with a shared privileged identity.
+      kind: decision
+      components:
+        architecture: [d2, b_owndata, b_poldisc]
+        infrastructure: [data-catalog, data-access-proxy, dataset-versioning, pdp, semantic-layer]
+        stack: [RM-DAT-02, RM-DAT-03, RM-DAT-04, RM-DPR-04, RM-ACT-01]
+    - id: plan
+      label: [Подготовить план расчёта, Prepare the calculation plan]
+      detail:
+        - Сформировать параметры и запрос на чтение. Если план или код предлагает модель, провести каждый вызов через входной контроль, шлюз и выходную проверку; результат остаётся предложением.
+        - Prepare parameters and a read-only query. If a model proposes the plan or code, route each call through input checks, the gateway, and output checks; the result remains a proposal.
+      kind: step
+      components:
+        architecture: [t_input, t_infer, t_result]
+        infrastructure: [input-guardrails, llm-gateway, output-guardrails, context-manager, semantic-layer]
+        stack: [RM-AIC-01, RM-MOD-06, RM-AIC-02, RM-AGT-03, RM-DAT-03]
+    - id: admit
+      label: ['Расчёт допущен?', 'Is the calculation admitted?']
+      detail:
+        - Проверить точный запрос и параметры, разрешённые таблицы и действия, строковые и колоночные права, квоты. Запретить запись, произвольный экспорт и обход шлюза данных.
+        - Check the exact query and parameters, authorized tables and operations, row and column rights, and limits. Block writes, arbitrary exports, and bypasses of the data gateway.
+      kind: decision
+      components:
+        architecture: [t_gw, d2, b_polbudget]
+        infrastructure: [tool-router, pep, pdp, data-access-proxy, rate-limits-budgets]
+        stack: [RM-AGT-04, RM-ACT-02, RM-ACT-01, RM-DPR-04, RM-AGT-08]
+    - id: execute
+      label: [Выполнить расчёт, Run the calculation]
+      detail:
+        - Исполнить разрешённый запрос у источника с правами инициатора. Если нужен сгенерированный код, запускать только в изолированной среде с допущенными входами, лимитами и запретом произвольного сетевого вывода.
+        - Run the authorized query at the source under the requester's scope. If generated code is required, execute only in an isolated environment with admitted inputs, limits, and no arbitrary network output.
+      kind: step
+      components:
+        architecture: [t_gw, s_runtime]
+        infrastructure: [data-access-proxy, pep, job-sandbox, analytical-store]
+        stack: [RM-DPR-04, RM-ACT-02, RM-DAT-06, RM-ACT-03]
+    - id: validate
+      label: ['Расчёт проверен?', 'Is the calculation verified?']
+      detail:
+        - Сверить с определением метрики и контрольной выборкой, отметить пропуски и качество данных. Проверить результат инструмента до передачи модели и скрыть недопустимые малые группы или поля по политике.
+        - Compare against the metric definition and a reference sample; note missing values and data quality. Check tool output before passing it to a model and suppress prohibited small groups or fields per policy.
+      kind: decision
+      components:
+        architecture: [d4, t_result, mt_ev]
+        infrastructure: [rule-based-checks, output-guardrails, data-catalog, semantic-layer]
+        stack: [RM-DAT-03, RM-DAT-05, RM-AIC-02]
+    - id: publish
+      label: ['Вывод допустим к выдаче?', 'May the analysis be delivered?']
+      detail:
+        - Если модель формулирует вывод, применить входные и выходные проверки, затем сверить текст с рассчитанными числами. Проверить права на итог, ссылку и экспорт.
+        - If a model writes the summary, apply input and output checks, then reconcile the text with calculated numbers. Check permissions for the result, references, and export.
+      kind: decision
+      components:
+        architecture: [t_input, t_infer, t_result, b_poldisc]
+        infrastructure: [input-guardrails, llm-gateway, output-guardrails, audit-log]
+        stack: [RM-AIC-01, RM-MOD-06, RM-AIC-02, RM-TRS-04]
+    - id: report
+      label: [Выдать проверенный результат, Deliver the verified result]
+      detail:
+        - Вернуть значение или отчёт, версии данных и методики, ограничения и ссылку на доказательство расчёта. Записать решение без лишней копии исходных данных.
+        - Return the value or report, data and method versions, limitations, and a reference to calculation evidence. Record the decision without unnecessary copies of source data.
+      kind: outcome
+      components:
+        architecture: [t_result, t_audit]
+        infrastructure: [business-apps, audit-log]
+        stack: [RM-APP-01, RM-TRS-04, RM-OPS-02]
+    - id: denied
+      label: [Отказать в расчёте или выдаче, Deny calculation or delivery]
+      detail:
+        - Остановить запрещённый запрос либо выдачу. Записать причину и политику, не возвращая закрытые значения и сырые результаты.
+        - Stop the prohibited query or delivery. Record the reason and policy without returning restricted values or raw results.
+      kind: outcome
+      components:
+        architecture: [t_audit, b_poldisc]
+        infrastructure: [audit-log, pep]
+        stack: [RM-TRS-04, RM-ACT-02]
+    - id: expert
+      label: [Передать вопрос аналитику, Refer to an analyst]
+      detail:
+        - Сообщить о неоднозначной метрике, недостоверной выборке или сбое. Передать версии и допущенные свидетельства; неподтверждённое число не выдавать как показатель.
+        - Report an ambiguous metric, unreliable sample, or failure. Hand over versions and authorized evidence; do not report an unverified value as the metric.
+      kind: outcome
+      components:
+        architecture: [b_owndata, mt_ev, t_audit]
+        infrastructure: [business-apps, audit-log]
+        stack: [RM-APP-03, RM-TRS-04]
+  edges:
+    - from: question
+      to: data
+      label: [Вопрос определён, Question defined]
+    - from: data
+      to: plan
+      label: [Источник и метрика выбраны, Source and metric selected]
+    - from: data
+      to: denied
+      label: [Данные недоступны по правам, Data access denied]
+    - from: data
+      to: expert
+      label: [Метрика или данные непригодны, Metric or data unsuitable]
+    - from: plan
+      to: admit
+      label: [План готов к проверке, Plan ready for checks]
+    - from: admit
+      to: execute
+      label: [Операция чтения разрешена, Read operation permitted]
+    - from: admit
+      to: denied
+      label: [Запрос запрещён, Query prohibited]
+    - from: execute
+      to: validate
+      label: [Результат получен, Result received]
+    - from: execute
+      to: expert
+      label: [Расчёт недоступен, Calculation unavailable]
+    - from: validate
+      to: publish
+      label: [Расчёт воспроизводим, Calculation reproducible]
+    - from: validate
+      to: expert
+      label: [Расхождение или плохие данные, Discrepancy or poor data]
+    - from: publish
+      to: report
+      label: [Получатель и выдача допустимы, Recipient and delivery authorized]
+    - from: publish
+      to: denied
+      label: [Выдача запрещена, Delivery denied]
+    - from: publish
+      to: expert
+      label: [Вывод не подтверждён, Summary unsupported]
+  main: [question, data, plan, admit, execute, validate, publish, report]

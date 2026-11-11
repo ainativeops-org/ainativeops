@@ -1,0 +1,235 @@
+# Процесс на карте / Process on the map: AGT-ACTION
+# workflow: узлы и переходы схемы; SVG схемы строит tools/build.py через Graphviz.
+# workflow: diagram nodes and edges; tools/build.py renders the SVG with Graphviz.
+name:
+  ru: Выполнение корпоративной заявки агентом
+  en: Agentic Enterprise Request Fulfilment
+group: AGT
+owner:
+  - Владелец корпоративного процесса и изменяемой системы
+  - Business process and target system owner
+start:
+  - Поступила заявка на разрешённое действие в корпоративной системе; заявитель и тип операции известны.
+  - A request arrives for an authorized action in an enterprise system with a known requester and operation type.
+result:
+  - Подтверждено изменение по заявке либо зафиксирован отказ или неопределённый эффект с ответственным за сверку.
+  - The requested change is verified, or a denial or uncertain effect is recorded with a reconciliation owner.
+check:
+  - Замена адресата или аргументов после согласования блокируется. Сбой после записи и повтор той же операции не создают второй эффект; оператор видит исход и связанное свидетельство.
+  - Changing the target or arguments after approval is blocked. Failure after a write and retrying the same operation do not create a second effect; the operator can see the outcome and linked evidence.
+maturity: [Референсный маршрут, Reference workflow]
+calls:
+  - id: FLOW-INCIDENT
+    when:
+      - При свидетельстве обхода политики, несанкционированного изменения или раскрытия. Обычный таймаут ведёт к сверке, не к автоматическому объявлению инцидента.
+      - When evidence indicates policy bypass, unauthorized change, or disclosure. An ordinary timeout leads to reconciliation, not automatic incident declaration.
+order: 14
+protection:
+  - Каждый вызов модели проходит проверку идентичности и прав, защиту входа и выхода и аудит в разрешённом объёме. Вызовы инструментов допускаются отдельно; код исполняется в изолированной среде. Согласование и ограничения раскрытия задаются политикой.
+  - Every model call uses identity and authorization checks, input and output protections, and permitted audit retention. Tool calls are authorized separately; code runs in a sandbox. Approval and disclosure restrictions follow policy.
+parts:
+  - AGT-01
+  - FLOW-HYBRID
+  - CORE-01
+  - AGT-ACTION--REQUEST
+  - AGT-ACTION--PROPOSAL
+  - AGT-ACTION--POLICY
+  - AGT-ACTION--APPROVAL
+  - AGT-ACTION--ENFORCE
+  - AGT-ACTION--EXECUTE
+  - AGT-ACTION--EFFECT
+tags: [Agentic Enterprise Request Fulfilment]
+option: placement
+paths:
+  local: process-agt-action-local
+  external: process-agt-action-external
+workflow:
+  summary:
+    - Поступила заявка на разрешённое действие в корпоративной системе; заявитель и тип операции известны. Подтверждено изменение по заявке либо зафиксирован отказ или неопределённый эффект с ответственным за сверку.
+    - A request arrives for an authorized action in an enterprise system with a known requester and operation type. The requested change is verified, or a denial or uncertain effect is recorded with a reconciliation owner.
+  synthesis:
+    - Последовательность, условия переходов и сопоставление компонентов — проектный синтез AiNativeOps. Источники подтверждают отдельные практики в указанной области, а не всю схему.
+    - The sequence, conditions and component mapping are AiNativeOps design synthesis. Sources support individual practices within their stated scope, not the entire diagram.
+  basis:
+    - source: P20-SERVICE
+      claim:
+        - Приём и исполнение сервисных заявок, полномочия, эскалация и ответственность владельца.
+        - Covers intake and fulfillment of service requests, authority, escalation, and owner accountability.
+    - source: OWASP
+      claim:
+        - Проверка полномочий на стороне вызываемой системы и согласование значимых действий.
+        - Covers authorization checks on the side of the called system and approval of significant actions.
+    - source: OPEN-G
+      claim:
+        - Различает начальные, конечные и инструментальные проверки. Границы SDK не подтверждают проверку каждого промежуточного вызова.
+        - Distinguishes input, output, and tool guardrails. The SDK boundaries do not confirm that every intermediate call is checked.
+    - source: OPEN
+      claim:
+        - Разделяет управление циклом, состоянием и согласованиями и среду фактического исполнения с файлами, командами и сетью.
+        - Separates control of the loop, state, and approvals from the execution environment that handles files, commands, and network access.
+    - source: LANG-I
+      claim:
+        - При возобновлении исполнение узла может начаться заново. Внешние эффекты требуют защиты от повтора.
+        - On resume, node execution can start over from the beginning. External side effects require protection against repetition.
+    - source: ZT
+      claim:
+        - Логические компоненты и рисунок 1. PDP, Policy Engine, Policy Administrator и PEP.
+        - 'Covers the logical components and Figure 1: PDP, Policy Engine, Policy Administrator, and PEP.'
+    - source: MCP
+      claim:
+        - Схемы инструментов, discovery, вызов и результат; протокол не заменяет допуск.
+        - Covers tool schemas, discovery, invocation, and results; the protocol does not replace admission.
+  nodes:
+    - id: request
+      label: [Принять и ограничить заявку, Receive and scope the request]
+      detail:
+        - Установить заявителя и идентичность агента, допустимые ресурсы, действия, срок и бюджет. Зарегистрировать задачу; полномочия агента не шире делегированных.
+        - Establish the requester and agent identity, permitted resources and actions, deadline, and budget. Register the task; the agent's authority does not exceed delegation.
+      kind: step
+      components:
+        architecture: [t_harness, t_iam, b_polagent]
+        infrastructure: [business-apps, iam-sso, agent-iam, agent-runtime, rate-limits-budgets]
+        stack: [RM-APP-01, RM-SEC-01, RM-GOV-02, RM-AGT-02, RM-AGT-08]
+    - id: proposal
+      label: [Подготовить точное действие, Prepare exact action]
+      detail:
+        - Каждый модельный шаг проходит входную и выходную проверки через шлюз; чтение для уточнения заявки проходит допуск инструмента. Сформировать ресурс, операцию, канонические параметры и ID эффекта.
+        - Each model step passes input and output checks through the gateway; reads to clarify the request require tool admission. Prepare the resource, operation, canonical arguments, and effect ID.
+      kind: step
+      components:
+        architecture: [t_harness, t_input, t_infer, t_result, t_gw]
+        infrastructure:
+          - agent-runtime
+          - context-manager
+          - input-guardrails
+          - llm-gateway
+          - output-guardrails
+          - tool-router
+        stack: [RM-AGT-02, RM-AGT-03, RM-AIC-01, RM-MOD-06, RM-AIC-02, RM-AGT-04]
+    - id: policy
+      label: ['Действие в полномочиях?', 'Is the action within authority?']
+      detail:
+        - Проверить точный объект, метод, схему, допустимые значения, актуальные права и лимит. Определить, требуется ли согласование. При запрете или недоступном обязательном контроле не исполнять.
+        - Check the exact object, method, schema, permitted values, current authority, and budget. Determine whether approval is required. Do not execute after denial or if mandatory checks are unavailable.
+      kind: decision
+      components:
+        architecture: [t_gw, g7, b_polagent]
+        infrastructure: [tool-router, pdp, pep, audit-log]
+        stack: [RM-AGT-04, RM-ACT-01, RM-ACT-02, RM-TRS-04]
+    - id: approval
+      label: ['Операция согласована?', 'Is the operation approved?']
+      detail:
+        - Приостановить задачу и показать ответственному точное изменение, субъект, адресат и последствия. Решение привязать к параметрам, версии политики и сроку; отказ или истечение останавливают исполнение.
+        - Pause and show the accountable reviewer the exact change, actor, target, and consequences. Bind the decision to arguments, policy version, and expiry; rejection or expiry stops execution.
+      kind: decision
+      components:
+        architecture: [g7, t_audit]
+        infrastructure: [checkpoint-store, pep, audit-log]
+        stack: [RM-AIC-04, RM-APP-03, RM-AGT-05, RM-TRS-04]
+    - id: enforce
+      label: ['Повторный допуск пройден?', 'Did final admission pass?']
+      detail:
+        - У ресурса повторно проверить права, политику, параметры, согласование, ID эффекта и остаток бюджета; заранее сохранить состояние операции. Изменение параметров требует нового согласования.
+        - At the resource boundary recheck current permissions, policy, exact arguments, approval, effect ID, and remaining budget; persist operation state before execution. Changed arguments require fresh approval.
+      kind: decision
+      components:
+        architecture: [t_gw, s_runtime, t_audit]
+        infrastructure: [pep, pdp, checkpoint-store]
+        stack: [RM-ACT-02, RM-ACT-01, RM-AGT-05, RM-AIC-04]
+    - id: execute
+      label: [Выполнить допущенное изменение, Execute admitted change]
+      detail:
+        - Передать допущенный вызов адаптеру ERP/CRM с ограниченными полномочиями, без секретов в контексте. Код, если он нужен, запускать только в допущенной изолированной среде без прямого доступа к целевой системе.
+        - Send the admitted call to the ERP/CRM adapter under limited authority, with no secrets in model context. Run any required code only in an admitted sandbox without direct access to the target system.
+      kind: step
+      components:
+        architecture: [t_gw, s_runtime]
+        infrastructure: [pep, mcp-servers, erp-crm, secrets-manager, job-sandbox]
+        stack: [RM-ACT-02, RM-INT-02, RM-TRS-03, RM-ACT-03]
+    - id: effect
+      label: ['Эффект подтверждён?', 'Is the effect confirmed?']
+      detail:
+        - Проверить ответ инструмента до включения в контекст и сверить факт изменения у цели по ID операции. Повтор возможен в пределах срока и лимита попыток только при установленном отсутствии эффекта, повторном допуске и защите от дубля.
+        - Check tool output before adding it to context and reconcile the actual target state by operation ID. Retry within the deadline and attempt limit only when no effect is established, admission is repeated, and duplication is prevented.
+      kind: decision
+      components:
+        architecture: [t_result, t_gw, t_audit]
+        infrastructure: [output-guardrails, checkpoint-store, erp-crm, audit-log]
+        stack: [RM-AIC-02, RM-AGT-05, RM-ACT-02, RM-TRS-04]
+    - id: done
+      label: [Подтвердить исполнение, Confirm completion]
+      detail:
+        - Зафиксировать подтверждённый эффект и связать его с заявкой, допуском и согласованием. Выдать заявителю только разрешённое подтверждение после проверки.
+        - Record the verified effect and link it to the request, admission, and approval. Deliver only a permitted confirmation after checking it.
+      kind: outcome
+      components:
+        architecture: [t_result, t_audit]
+        infrastructure: [business-apps, output-guardrails, audit-log]
+        stack: [RM-APP-01, RM-AIC-02, RM-TRS-04]
+    - id: denied
+      label: [Закрыть без исполнения, Close without execution]
+      detail:
+        - До подтверждённого вызова остановить задачу и зафиксировать причину запрета, отказа человека или истечения срока. Изменение не производить.
+        - Before an admitted call, stop the task and record the policy denial, reviewer rejection, or expiry. Do not make the change.
+      kind: outcome
+      components:
+        architecture: [t_gw, t_audit]
+        infrastructure: [pep, business-apps, audit-log]
+        stack: [RM-ACT-02, RM-APP-01, RM-TRS-04]
+    - id: reconcile
+      label: [Передать эффект на сверку, Escalate effect for reconciliation]
+      detail:
+        - При неизвестном исходе остановить новые записи, сохранить ID эффекта и назначить сверку оператору. При признаках нарушения вызвать FLOW-INCIDENT; компенсация допустима только как отдельная разрешённая операция.
+        - When the outcome is unknown, stop new writes, preserve the effect ID, and assign reconciliation to an operator. Call FLOW-INCIDENT when violation indicators exist; compensation is a separately authorized operation.
+      kind: outcome
+      components:
+        architecture: [t_audit, s_resp, mt_ev]
+        infrastructure: [checkpoint-store, audit-log, kill-switch, siem-soc]
+        stack: [RM-AGT-05, RM-TRS-04, RM-TRS-07, RM-APP-03, RM-SEC-05]
+  edges:
+    - from: request
+      to: proposal
+      label: [Заявка в допустимой области, Request in scope]
+    - from: proposal
+      to: policy
+      label: [Точный вызов сформирован, Exact call prepared]
+    - from: proposal
+      to: denied
+      label: [Нет допустимого предложения, No admissible proposal]
+    - from: policy
+      to: approval
+      label: [Требуется решение человека, Human decision required]
+    - from: policy
+      to: enforce
+      label: [Согласование не требуется, Approval not required]
+    - from: policy
+      to: denied
+      label: [Политика или контроль блокирует, Policy or control blocks]
+    - from: approval
+      to: enforce
+      label: [Точное действие согласовано, Exact action approved]
+    - from: approval
+      to: denied
+      label: [Отклонено или истёк срок, Rejected or expired]
+    - from: enforce
+      to: execute
+      label: [Актуальный допуск подтверждён, Current admission confirmed]
+    - from: enforce
+      to: denied
+      label: ['Изменились права, параметры или срок', 'Rights, arguments, or validity changed']
+    - from: execute
+      to: effect
+      label: [Ответ или таймаут получен, Result or timeout received]
+    - from: effect
+      to: done
+      label: [Эффект подтверждён, Effect verified]
+    - from: effect
+      to: enforce
+      label: ['Эффекта нет, повтор допустим', No effect and retry is allowed]
+    - from: effect
+      to: reconcile
+      label: [Исход не подтверждён или есть нарушение, Outcome unverified or violation indicated]
+    - from: request
+      to: denied
+      label: [Заявка вне полномочий, Request outside authority]
+  main: [request, proposal, policy, approval, enforce, execute, effect, done]

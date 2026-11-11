@@ -1,0 +1,245 @@
+# Реестр процессов · Создание моделей / Process registry · Model development
+MOD-01:
+  name:
+    ru: Приём готовой модели и зависимостей
+    en: Model artifact intake
+  start:
+    - Поступили веса, адаптер, код или обязательные зависимости.
+    - Weights, an adapter, code or required dependencies arrive.
+  result:
+    - Запись кандидата в реестре с происхождением, версией и условиями использования.
+    - A candidate registry entry with provenance, version and terms of use.
+  check:
+    - Проверить формат, точную версию, целостность и допустимость исполнения. Отклонённое остаётся в карантине.
+    - Check the format, exact version, integrity and safety of execution. A rejected artifact stays in quarantine.
+  gates: G1 G3
+  classes: [RM-SEC-03, RM-MOD-05, RM-DEV-08, RM-GOV-01, RM-TRS-05]
+MOD-02:
+  name:
+    ru: Сравнение моделей и выбор кандидата
+    en: Model candidate selection
+  start:
+    - Нужно выбрать между несколькими моделями или модельными сервисами.
+    - A choice is needed between several models or model services.
+  result:
+    - Обоснованный выбор и условия, при которых он применим.
+    - A justified choice and the conditions under which it applies.
+  check:
+    - Сравнить одинаковые задачи, качество, затраты и ограничения размещения. Неизвестная версия внешней модели явно отмечается.
+    - Compare identical tasks, quality, costs and deployment constraints. An unknown external model version is explicitly flagged.
+  gates: G0 G4 И*
+  classes: [RM-MOD-03, RM-MOD-05, RM-DAT-05, RM-DEV-05, RM-DEV-07]
+MOD-03:
+  name:
+    ru: Обучение предиктивной модели
+    en: Predictive model training
+  start:
+    - Есть набор признаков или данных и определённая целевая задача.
+    - A feature set or dataset and a defined target task are available.
+  result: [Модель-кандидат и воспроизводимый запуск., A candidate model and a reproducible run.]
+  check:
+    - Проверить отложенную выборку и утечку признаков. Зафиксировать данные, код, параметры и метрики.
+    - Check the holdout set and feature leakage. Record the data, code, parameters and metrics.
+  gates: G2 G3
+  classes: [RM-MOD-04, RM-MOD-05, RM-DAT-04, RM-DAT-09, RM-DEV-04, RM-DEV-05]
+MOD-04:
+  name:
+    ru: Дообучение модели по примерам
+    en: Supervised model adaptation
+  start:
+    - Есть допущенная исходная модель и примеры ожидаемого поведения.
+    - An admitted base model and examples of expected behavior are available.
+  result:
+    - Версия изменённых весов или адаптера с привязкой к базовой модели.
+    - A version of modified weights or an adapter linked to the base model.
+  check:
+    - Восстановить состав кандидата. Отдельно проверить качество задачи и сохранение важных исходных свойств.
+    - Reconstruct the candidate's composition. Check task quality and retention of important base properties separately.
+  gates: G2 G3
+  classes: [RM-MOD-01, RM-MOD-02, RM-MOD-05, RM-DAT-04, RM-DEV-04, RM-DEV-05]
+MOD-05:
+  name:
+    ru: Настройка модели по предпочтениям
+    en: Offline preference optimization
+  start:
+    - Подготовлен набор сравнений или оценок ответов.
+    - A set of comparisons or response ratings has been prepared.
+  result:
+    - Кандидат с зафиксированной методикой использования предпочтений.
+    - A candidate with a recorded method for using preferences.
+  check:
+    - Проверить происхождение и независимость сравнений, отдельно проверить побочные изменения поведения.
+    - Check the provenance and independence of the comparisons, and separately check for side effects on behavior.
+  gates: G2 G3
+  classes: [RM-DAT-04, RM-DAT-05, RM-MOD-02, RM-DEV-04, RM-DEV-05, RM-DEV-07]
+MOD-06:
+  name:
+    ru: Обучение с подкреплением по результатам проб
+    en: Rollout-based reinforcement training
+  start:
+    - Заданы среда проб, функция награды, источники и бюджет.
+    - The trial environment, reward function, sources and budget are defined.
+  result:
+    - Версия модели или политики с версиями среды, награды и выполненных проб.
+    - A model or policy version with the versions of the environment, reward and completed trials.
+  check:
+    - Изолировать пробы, проверять ограничения действий и уязвимость критерия награды. Испытать кандидата независимо от награды обучения.
+    - Isolate trials, check action limits and the reward criterion's vulnerability to exploitation. Test the candidate independently of the training reward.
+  gates: G2 G3 И*
+  classes: [RM-DEV-04, RM-DEV-05, RM-DEV-07, RM-ACT-03, RM-DAT-05]
+MOD-07:
+  name:
+    ru: Дистилляция модели
+    en: Model distillation
+  start:
+    - Нужно передать поведение исходной модели другой модели.
+    - The behavior of a source model needs to be transferred to another model.
+  result:
+    - Обученный кандидат и допустимый набор результатов исходной модели.
+    - A trained candidate and the permitted set of source model outputs.
+  check:
+    - Проверить права на использование выходов учителя, связь с точной версией и сохранение требований безопасности и качества.
+    - Check the rights to use teacher outputs, the link to the exact version, and retention of safety and quality requirements.
+  gates: G1 G2 G3 И*
+  classes: [RM-DAT-04, RM-DAT-05, RM-MOD-05, RM-DEV-04, RM-DEV-07]
+MOD-08:
+  name:
+    ru: Продолженное предобучение
+    en: Continued pretraining
+  start:
+    - Есть исходная версия и новый допущенный корпус.
+    - A base version and a new admitted corpus are available.
+  result:
+    - Новый чекпоинт модели с указанием исходной версии, корпуса и токенизатора.
+    - A new model checkpoint that records the base version, corpus and tokenizer.
+  check:
+    - Проверить перекрытие с контролем, устойчивость общих способностей и условия восстановления длинного задания.
+    - Check overlap with test data, retention of general capabilities and resumption conditions for a long job.
+  gates: G2 G3
+  classes: [RM-MOD-01, RM-MOD-05, RM-DAT-04, RM-DEV-04, RM-DEV-05]
+MOD-09:
+  name:
+    ru: Предобучение модели с нуля
+    en: Training a base model from scratch
+  start:
+    - Утверждены архитектура, инициализация, корпус, среда и бюджет.
+    - The architecture, initialization, corpus, environment and budget are approved.
+  result:
+    - Версия базовой модели с воспроизводимым планом и свидетельствами запуска.
+    - A base model version with a reproducible plan and run evidence.
+  check:
+    - Для многоузлового режима проверить распределённое исполнение и возобновление весов, оптимизатора и чтения корпуса.
+    - For multi-node runs, check distributed execution and resumption of weights, optimizer state and corpus reading.
+  gates: G2 G3
+  classes:
+    - RM-DAT-04
+    - RM-MOD-05
+    - RM-DEV-01
+    - RM-DEV-04
+    - RM-DEV-05
+    - RM-PLT-02
+    - RM-HW-04
+    - RM-HW-05
+MOD-10:
+  name:
+    ru: Переобучение по обновлённым данным
+    en: Controlled model retraining
+  start:
+    - Появилась новая версия допустимых данных или повод для переоценки.
+    - A new version of permitted data or a reason for re-evaluation appears.
+  result:
+    - Кандидат для сравнения с текущей рабочей версией.
+    - A candidate for comparison with the current production version.
+  check:
+    - Триггер запускает подготовку кандидата. Обратная связь, оценка и допуск выпуска проходят свои рубежи.
+    - The trigger starts candidate preparation. Feedback, evaluation and release admission pass their own gates.
+  gates: G2 G3 G8
+  classes: [RM-DAT-04, RM-DEV-03, RM-DEV-04, RM-DEV-07, RM-OPS-05, RM-OPS-07]
+MOD-11:
+  name:
+    ru: Оптимизация артефакта модели
+    en: Model artifact optimization
+  start:
+    - Модель нужно исполнить в заданной среде при ограничениях качества и ресурсов.
+    - A model must run in a specified environment under quality and resource constraints.
+  result:
+    - Производный артефакт с параметрами преобразования и целевой средой.
+    - A derived artifact with transformation parameters and the target environment.
+  check:
+    - Измерить изменение качества, задержки и ресурса. Привязать производный артефакт к точному оригиналу.
+    - Measure the change in quality, latency and resource use. Link the derived artifact to the exact original.
+  gates: G3 G4
+  classes: [RM-MOD-05, RM-MOD-07, RM-DEV-05, RM-DEV-07, RM-DEV-08]
+MOD-12:
+  name:
+    ru: Исследование новой архитектуры модели
+    en: Novel model architecture research
+  start:
+    - Сформулирована гипотеза о новой структуре, обучении или представлении.
+    - A hypothesis about a new structure, training method or representation is formulated.
+  result:
+    - Спецификация архитектуры, прототип и воспроизводимые сравнительные эксперименты.
+    - An architecture specification, a prototype and reproducible comparative experiments.
+  check:
+    - Сравнить с базовой архитектурой при явных условиях. Отдельно квалифицировать результат перед промышленным применением.
+    - Compare with the baseline architecture under explicit conditions. Qualify the result separately before production use.
+  gates: G0 G2 G3 G4
+  classes: [RM-DEV-01, RM-DEV-02, RM-DEV-04, RM-DEV-05, RM-DEV-07, RM-MOD-05]
+MOD-13:
+  name:
+    ru: Поиск параметров и конфигураций
+    en: Hyperparameter and architecture search
+  start:
+    - Заданы пространство вариантов, метрика и бюджет испытаний.
+    - The search space, metric and trial budget are defined.
+  result: [История испытаний и отобранная конфигурация., Trial history and the selected configuration.]
+  check:
+    - Разделить данные поиска и независимой проверки, соблюсти условия остановки. Поиск в заданном пространстве не подменяет исследование новой архитектуры.
+    - Separate search data from independent validation data and respect the stopping conditions. Search within a defined space does not replace research into a new architecture.
+  gates: G2 G4
+  classes: [RM-DEV-03, RM-DEV-04, RM-DEV-05, RM-OPS-06]
+MOD-14:
+  name:
+    ru: Разработка токенизатора или входного представления
+    en: Tokenizer or input representation development
+  start:
+    - Заданы корпус и требования к представлению входов модели.
+    - A corpus and requirements for model input representation are defined.
+  result:
+    - Версионированный токенизатор или преобразователь входных данных.
+    - A versioned tokenizer or input data transformer.
+  check:
+    - Проверить воспроизводимость преобразования и совместимость версий с обучением, инференсом и политикой обработки данных.
+    - Check that the transformation is reproducible and that versions are compatible with training, inference and the data handling policy.
+  gates: G2 G3
+  classes: [RM-DAT-04, RM-DEV-01, RM-DEV-04, RM-MOD-05, RM-TRS-05]
+MOD-15:
+  name:
+    ru: Обучение между владельцами данных
+    en: Cross-owner collaborative training
+  start:
+    - Несколько владельцев согласовали общий эксперимент и ограничения передачи.
+    - Several owners have agreed on a joint experiment and transfer restrictions.
+  result:
+    - Модель-кандидат и протокол участия и обмена.
+    - A candidate model and a participation and exchange protocol.
+  check:
+    - Указать, какие обновления пересекают границу; отдельно проверять допустимость раскрытия через обновления, право участия и отзыв.
+    - State which updates cross the boundary; separately check disclosure risk through updates, participation rights and revocation.
+  gates: G1 G2 G3
+  classes: [RM-GOV-04, RM-DPR-04, RM-SEC-02, RM-DEV-04, RM-TRS-05]
+MOD-16:
+  name:
+    ru: Возобновление задания обучения
+    en: Training job recovery
+  start:
+    - Обучение прервано либо перенесено при наличии допущенного состояния.
+    - Training was interrupted or moved, and an admitted state exists.
+  result:
+    - Продолжение с подтверждённого шага или решение начать заново.
+    - Resumption from a confirmed step or a decision to restart.
+  check:
+    - Проверить согласованность весов, оптимизатора, шага, чтения данных и допустимой топологии. Чекпоинт агента не заменяет состояние обучения.
+    - Check the consistency of weights, optimizer state, step, data reading and permitted topology. An agent checkpoint does not replace training state.
+  gates: G2 G3
+  classes: [RM-DEV-04, RM-DEV-05, RM-MOD-05, RM-HW-04, RM-TRS-05]

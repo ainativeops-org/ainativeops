@@ -1,0 +1,320 @@
+# Процесс на карте / Process on the map: FLOW-AGENT-BUILD
+# workflow: узлы и переходы схемы; SVG схемы строит tools/build.py через Graphviz.
+# workflow: diagram nodes and edges; tools/build.py renders the SVG with Graphviz.
+name:
+  ru: Создание и ввод в эксплуатацию корпоративного агента
+  en: Enterprise Agent Development and Deployment
+group: AGT
+owner:
+  - Владелец агентного продукта и владельцы систем, где агент может действовать.
+  - Agent product owner and owners of the systems where the agent may act.
+start:
+  - Определены делегируемая задача, ожидаемый результат, пределы самостоятельности и недопустимые эффекты.
+  - The delegated task, desired outcome, autonomy boundaries and prohibited effects are defined.
+result:
+  - Выпущена конкретная версия агента с проверенными инструментами, правилами, полномочиями и наблюдением.
+  - An exact agent version is released with tested tools, policies, authority and monitoring.
+check:
+  - Негативный тест доказывает, что запрещённый вызов не дошёл до ресурса. Отказ модели, остановка и повтор разрешённого действия дают прослеживаемый результат без дублирования эффекта.
+  - A negative test proves the prohibited call did not reach the resource. Model denial, stop and replay of an authorized action are traceable without duplicating the effect.
+maturity:
+  - Применим при управляемом исполнении и испытании действий; независимость от агента проверяется отдельно.
+  - Applicable when execution and action testing are governed; independence from the agent is verified separately.
+calls:
+  - id: FLOW-ADMISSION
+    when:
+      - Перед подключением агента к согласованной группе и реальным ресурсам.
+      - Before connecting the agent to an approved cohort and real resources.
+order: 3
+protection:
+  - Каждый вызов модели проходит проверку идентичности и прав, защиту входа и выхода и аудит в разрешённом объёме. Вызовы инструментов допускаются отдельно; код исполняется в изолированной среде. Согласование и ограничения раскрытия задаются политикой.
+  - Every model call uses identity and authorization checks, input and output protections, and permitted audit retention. Tool calls are authorized separately; code runs in a sandbox. Approval and disclosure restrictions follow policy.
+parts:
+  - CORE-01
+  - FLOW-AGENT-BUILD--MISSION
+  - FLOW-AGENT-BUILD--AUTHORITY
+  - FLOW-AGENT-BUILD--DESIGN
+  - FLOW-AGENT-BUILD--IMPLEMENT
+  - FLOW-AGENT-BUILD--SIMULATE
+  - FLOW-AGENT-BUILD--EVALUATE
+  - FLOW-AGENT-BUILD--ADMIT
+  - FLOW-AGENT-BUILD--PILOT
+tags: [Enterprise Agent Development and Deployment]
+path: process-flow-agent-build
+workflow:
+  summary:
+    - Определены делегируемая задача, ожидаемый результат, пределы самостоятельности и недопустимые эффекты. Выпущена конкретная версия агента с проверенными инструментами, правилами, полномочиями и наблюдением.
+    - The delegated task, desired outcome, autonomy boundaries and prohibited effects are defined. An exact agent version is released with tested tools, policies, authority and monitoring.
+  synthesis:
+    - Последовательность, условия переходов и сопоставление компонентов — проектный синтез AiNativeOps. Источники подтверждают отдельные практики в указанной области, а не всю схему.
+    - The sequence, conditions and component mapping are AiNativeOps design synthesis. Sources support individual practices within their stated scope, not the entire diagram.
+  basis:
+    - source: P20-LIFECYCLE
+      claim:
+        - Владение агентом, этапы создания, допуска, наблюдения, улучшения и вывода.
+        - Covers agent ownership and the stages of creation, admission, monitoring, improvement, and retirement.
+    - source: P20-HARNESS
+      claim:
+        - Разделение планирования, генерации и оценки, длительное исполнение с передачей состояния; не подтверждает весь предлагаемый корпоративный цикл.
+        - Separates planning, generation, and evaluation, and covers long-running execution with state handoff; does not confirm the whole proposed enterprise cycle.
+    - source: GCP-T
+      claim:
+        - Референс общей агентной системы с разделением арендаторов и их ресурсов.
+        - Provides a reference for a shared agentic system that separates tenants and their resources.
+    - source: OPEN-G
+      claim:
+        - Различает начальные, конечные и инструментальные проверки. Границы SDK не подтверждают проверку каждого промежуточного вызова.
+        - Distinguishes input, output, and tool guardrails. The SDK boundaries do not confirm that every intermediate call is checked.
+    - source: OWASP
+      claim:
+        - Проверка полномочий на стороне вызываемой системы и согласование значимых действий.
+        - Covers authorization checks on the side of the called system and approval of significant actions.
+    - source: INTUIT-GENOS
+      claim:
+        - Каталог моделей, версии промптов, автоматическая и ручная оценка качества, задержки и стоимости.
+        - Covers a model catalog, prompt versions, and automated and manual evaluation of quality, latency, and cost.
+    - source: AZURE-SAFE-ROLLOUT
+      claim:
+        - Изолированная проверка новой версии, shadow-трафик и постепенное переключение production-трафика. Критерии отката задаёт организация.
+        - Covers isolated testing of a new version, shadow traffic, and gradual shifting of production traffic. The organization defines the rollback criteria.
+  nodes:
+    - id: mission
+      label: [Миссия и критерии задачи, Mission and task criteria]
+      detail:
+        - Задать пользователям понятную цель, качественный результат, условия отказа и перечень недопустимых эффектов. Разделить совет, чтение и изменение системы.
+        - Define the user-facing purpose, successful outcome, refusal conditions and prohibited effects. Distinguish advice, reads and system changes.
+      kind: step
+      components:
+        architecture: [g0, b_goal, b_np, b_polagent]
+        infrastructure: [business-apps, audit-log]
+        stack: [RM-APP-01, RM-GOV-03, RM-GOV-04]
+    - id: authority
+      label: ['Полномочия заданы для операций?', 'Is authority defined per operation?']
+      detail:
+        - Зафиксировать субъект, действие, ресурс, цель, срок, право делегирования и условие согласования. Владелец ресурса утверждает минимальные полномочия; при отсутствии владельца или правила — отказ.
+        - Record identity, action, resource, purpose, expiry, delegation and approval conditions. The resource owner approves least authority; deny operations without an owner or rule.
+      kind: decision
+      components:
+        architecture: [b_polagent, mt_tb, s_prep, g2]
+        infrastructure: [agent-iam, pdp, pep, job-sandbox]
+        stack: [RM-GOV-02, RM-ACT-01, RM-ACT-02, RM-ACT-03, RM-AIC-04]
+    - id: design
+      label: [Контракты Harness и инструментов, Harness and tool contracts]
+      detail:
+        - Спроектировать планирование, контекст, состояние задачи, память по необходимости, схемы инструментов и границы чтения. Для изменений определить проверку результата, ключ идемпотентности, согласование и компенсацию. Каждый модельный вызов получает входные и выходные guardrails до передачи результата дальше.
+        - Design planning, context, task state, optional memory, tool schemas and read boundaries. Define effect verification, idempotency, approval and compensation for mutations. Every model call uses input and output guardrails before its result proceeds.
+      kind: step
+      components:
+        architecture: [t_harness, t_gw, mt_tb, s_runtime, t_input, t_infer, t_result]
+        infrastructure:
+          - agent-orchestrator
+          - context-manager
+          - prompt-skill-registry
+          - tool-router
+          - checkpoint-store
+          - pep
+          - input-guardrails
+          - llm-gateway
+          - output-guardrails
+        stack:
+          - RM-AGT-01
+          - RM-AGT-03
+          - RM-AGT-07
+          - RM-AGT-04
+          - RM-AGT-05
+          - RM-ACT-02
+          - RM-AIC-01
+          - RM-MOD-06
+          - RM-AIC-02
+    - id: implement
+      label: [Сборка ограниченного агента, Build the constrained agent]
+      detail:
+        - Версионировать агент, инструкции, модельные маршруты и схемы инструментов. Реализовать допуск PEP перед каждым инструментом и проверку результата до добавления в контекст. Вызовы модели реализации и самого кандидата проходят входные и выходные guardrails.
+        - Version the agent, instructions, model routes and tool schemas. Enforce PEP before each tool call and check tool results before adding them to context. Apply input and output guardrails to implementation and candidate model calls.
+      kind: step
+      components:
+        architecture: [v2, v3, t_harness, t_gw, t_input, t_infer, t_result]
+        infrastructure:
+          - agent-runtime
+          - mcp-servers
+          - job-sandbox
+          - pep
+          - ci-runner
+          - artifact-registry
+          - input-guardrails
+          - llm-gateway
+          - output-guardrails
+        stack:
+          - RM-AGT-02
+          - RM-INT-02
+          - RM-ACT-03
+          - RM-ACT-02
+          - RM-DEV-06
+          - RM-DEV-08
+          - RM-AIC-01
+          - RM-MOD-06
+          - RM-AIC-02
+    - id: simulate
+      label: [Симуляция действий и отказов, Simulate actions and failures]
+      detail:
+        - 'Прогнать агента на подменённых ресурсах: внедрённые инструкции, чужая запись, отказ инструмента, отмена, повтор и выход за бюджет. Все модельные вызовы проходят входные и выходные guardrails, реальные внешние действия отключены.'
+        - 'Run the agent against simulated resources: injected instructions, unauthorized records, tool failure, cancellation, replay and budget exhaustion. Every model call passes input and output guardrails; real external effects are disabled.'
+      kind: step
+      components:
+        architecture: [g7, o_eval, t_harness, s_runtime, t_input, t_infer, t_result]
+        infrastructure:
+          - job-sandbox
+          - eval-red-teaming
+          - pep
+          - rule-based-checks
+          - rate-limits-budgets
+          - checkpoint-store
+          - input-guardrails
+          - llm-gateway
+          - output-guardrails
+        stack:
+          - RM-ACT-03
+          - RM-DEV-07
+          - RM-ACT-02
+          - RM-AGT-08
+          - RM-AGT-05
+          - RM-AIC-01
+          - RM-MOD-06
+          - RM-AIC-02
+    - id: evaluate
+      label: ['Границы подтверждены независимо?', 'Are boundaries independently verified?']
+      detail:
+        - Проверить полезность, запреты, результат действия и отказоустойчивость по закреплённому набору и журналам ресурсов. Вызов кандидата или ИИ-контролёра всегда проходит входные и выходные guardrails. Судья не изменяет политику и не допускает выпуск.
+        - Check usefulness, denials, effects and resilience against pinned tests and resource logs. Candidate and AI controller invocations always pass input and output guardrails. The AI controller cannot change policy or admit release.
+      kind: decision
+      components:
+        architecture: [o_eval, g4, mt_indep, mt_ev, t_ctl, t_input, t_infer, t_result]
+        infrastructure:
+          - eval-red-teaming
+          - eval-datasets
+          - llm-as-a-judge
+          - rule-based-checks
+          - audit-log
+          - input-guardrails
+          - llm-gateway
+          - output-guardrails
+        stack: [RM-DEV-07, RM-DAT-05, RM-AIC-03, RM-TRS-04, RM-AIC-01, RM-MOD-06, RM-AIC-02]
+    - id: rework
+      label: ['Что требуется изменить?', 'What needs to change?']
+      detail:
+        - Различить дефект реализации, ошибку контракта и превышение полномочий. Разрешить ограниченное число исправлений; изменение области требует повторного решения владельца и повторной оценки.
+        - Distinguish an implementation defect, contract error and authority expansion. Bound fixes; a scope change requires fresh owner approval and evaluation.
+      kind: decision
+      components:
+        architecture: [mt_review, s_change, b_polbudget]
+        infrastructure: [git-repository, rate-limits-budgets, audit-log]
+        stack: [RM-OPS-07, RM-AGT-08, RM-DEV-01, RM-TRS-04]
+    - id: admit
+      label: ['Точная конфигурация допущена?', 'Is the exact configuration admitted?']
+      detail:
+        - Владелец утверждает версии артефакта, инструкции, модель, набор инструментов, политики, права, лимиты и условия остановки. Допуск связывается с хешем; изменение связанного элемента требует оценки влияния.
+        - The owner approves versions of the artifact, instructions, model, tools, policies, permissions, limits and stop criteria. Admission binds to a digest; changes to bound elements require impact assessment.
+      kind: decision
+      components:
+        architecture: [o_pack, o_release, g6, b_ownrisk]
+        infrastructure: [release-gate, provenance-registry, artifact-registry, integrity-monitoring]
+        stack: [RM-DEV-09, RM-TRS-05, RM-DEV-08, RM-TRS-06, RM-AIC-04]
+    - id: pilot
+      label: ['Пилот работает в заданных пределах?', 'Does the pilot stay within bounds?']
+      detail:
+        - Проверить ограниченную группу, лимиты, разрешённые операции и отзыв. Каждый модельный вызов идёт через входные и выходные guardrails, каждое действие — через PEP. При нарушении закрыть маршрут и сверить эффекты до повтора.
+        - Check a bounded cohort, limits, allowed operations and revocation. Every model call uses input and output guardrails; every action uses PEP. On a violation, close the route and reconcile effects before any replay.
+      kind: decision
+      components:
+        architecture: [o_ops, g7, s_runtime, s_detect, t_gw, t_input, t_infer, t_result]
+        infrastructure:
+          - cd-deployment
+          - pep
+          - metrics-alerts
+          - kill-switch
+          - audit-log
+          - input-guardrails
+          - llm-gateway
+          - output-guardrails
+        stack:
+          - RM-DEV-10
+          - RM-ACT-02
+          - RM-OPS-01
+          - RM-TRS-07
+          - RM-TRS-04
+          - RM-AIC-01
+          - RM-MOD-06
+          - RM-AIC-02
+    - id: ready
+      label: [Агент доступен по допуску, Agent available within its authorization]
+      detail:
+        - Агенту выдана только допущенная версия и минимальные права. Владельцы получают маршруты мониторинга, порядок остановки и запись о проверке побочных эффектов.
+        - The agent runs only its approved version with least authority. Owners receive monitoring routes, stop procedures and evidence of effect checks.
+      kind: outcome
+      components:
+        architecture: [o_ops, b_ownproc, t_audit]
+        infrastructure: [agent-runtime, agent-iam, metrics-alerts, audit-log]
+        stack: [RM-AGT-02, RM-GOV-02, RM-OPS-01, RM-TRS-04]
+    - id: hold
+      label: [Агент остановлен или не выпущен, Agent stopped or held from release]
+      detail:
+        - Заблокировать новые действия и зафиксировать причину, версию и состояние внешних эффектов; открытие маршрута требует нового решения.
+        - Block new actions and record reason, version and external effect state; reopening the route requires a new decision.
+      kind: outcome
+      components:
+        architecture: [s_resp, t_audit, mt_residual]
+        infrastructure: [kill-switch, audit-log, release-gate]
+        stack: [RM-TRS-07, RM-TRS-04, RM-DEV-09]
+  edges:
+    - from: mission
+      to: authority
+      label: [Задача ограничена, Task bounded]
+    - from: authority
+      to: design
+      label: [Права закреплены, Authority pinned]
+    - from: authority
+      to: hold
+      label: [Нет допустимых полномочий, No permitted authority]
+    - from: design
+      to: implement
+      label: [Контракты зафиксированы, Contracts pinned]
+    - from: implement
+      to: simulate
+      label: [Кандидат собран, Candidate built]
+    - from: implement
+      to: hold
+      label: [Нарушена граница задания, Task boundary violated]
+    - from: simulate
+      to: evaluate
+      label: [Собраны тестовые свидетельства, Test evidence collected]
+    - from: evaluate
+      to: admit
+      label: [Порог и запреты подтверждены, Thresholds and denials verified]
+    - from: evaluate
+      to: rework
+      label: [Нужна исправимая доработка, Fixable issue found]
+    - from: evaluate
+      to: hold
+      label: [Критичный отказ контроля, Critical control failure]
+    - from: rework
+      to: implement
+      label: [Дефект реализации, Implementation defect]
+    - from: rework
+      to: authority
+      label: [Меняются права или контракты, Authority or contracts change]
+    - from: rework
+      to: hold
+      label: [Лимит исчерпан, Rework limit reached]
+    - from: admit
+      to: pilot
+      label: [Утверждён манифест, Manifest approved]
+    - from: admit
+      to: hold
+      label: [Выпуск не допущен, Release not admitted]
+    - from: pilot
+      to: ready
+      label: [Пилот в пределах, Pilot within bounds]
+    - from: pilot
+      to: hold
+      label: [Стоп или отзыв, Stop or revoke]
+  main: [mission, authority, design, implement, simulate, evaluate, admit, pilot, ready]

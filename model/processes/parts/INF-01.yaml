@@ -1,0 +1,109 @@
+# Этапы и варианты процессов. Ключ этапа процесса: <процесс>--<этап>.
+# Stages and variants of processes. A process stage key is <process>--<stage>.
+INF-01--REQUEST:
+  kind: operation
+  name:
+    ru: Принять сообщение
+    en: Receive message
+  description:
+    - Установить идентичность сотрудника, организацию, назначение чата и ID запроса. Не раскрывать существование чужих диалогов.
+    - Establish employee identity, organization, chat purpose, and request ID. Do not reveal whether another user's conversation exists.
+  classes: [RM-APP-02, RM-SEC-01]
+  architectureSteps: [t_chat, t_iam]
+  workflowNode: request
+INF-01--SESSION:
+  kind: operation
+  name:
+    ru: Диалог доступен?
+    en: Is the conversation accessible?
+  description:
+    - Проверить права на текущий диалог или создание нового. Загружать только историю разрешённого диалога.
+    - Check access to the current conversation or permission to create a new one. Load only authorized conversation history.
+  classes: [RM-PLT-03, RM-SEC-01, RM-ACT-01]
+  architectureSteps: [t_history, t_iam]
+  workflowNode: session
+INF-01--CONTEXT:
+  kind: operation
+  name:
+    ru: Подготовить контекст
+    en: Prepare context
+  description:
+    - Собрать текущий запрос и разрешённую часть истории. Развести системные инструкции и пользовательские данные; применить ограничения объёма и назначения.
+    - Assemble the current request and permitted history. Keep system instructions separate from user data and apply size and purpose limits.
+  classes: [RM-APP-02, RM-PLT-03, RM-AIC-01]
+  architectureSteps: [t_chat, t_history, t_input]
+  workflowNode: context
+INF-01--INPUT:
+  kind: operation
+  name:
+    ru: Вход допущен?
+    en: Is input admitted?
+  description:
+    - 'Проверить весь сформированный контекст по версии политики: чувствительность, формат, допустимое представление. Не отправлять ввод при отказе или недоступности обязательной проверки.'
+    - Check the entire assembled context against the policy version for sensitivity, format, and permitted representation. Do not send it after a denial or if a mandatory check is unavailable.
+  classes: [RM-AIC-01, RM-GOV-03, RM-ACT-01, RM-TRS-04]
+  architectureSteps: [t_input, b_poldisc, s_runtime]
+  workflowNode: input
+INF-01--CLASSIFY:
+  kind: operation
+  name:
+    ru: Запрос составной?
+    en: Is the request composite?
+  description:
+    - Классификатор оценивает сложность запроса и длительность рассуждения по запросу, контексту и предыдущим ходам. Модель выбирается только среди разрешённых политикой раскрытия; категорию данных задаёт классификация данных.
+    - The classifier estimates request complexity and reasoning length from the request, the context and earlier turns. The model is chosen only among those the disclosure policy permits; the data category comes from data classification.
+  classes: [RM-MOD-12, RM-ACT-01, RM-DPR-01]
+  architectureSteps: [t_route, b_poldisc]
+  workflowNode: classify
+INF-01--PLAN:
+  kind: operation
+  name:
+    ru: Разбить на подзадачи
+    en: Split into subtasks
+  description:
+    - Планировщик строит граф подзадач и назначает каждой самую дешёвую достаточную модель. Готовые результаты берутся из кеша, каждая подзадача проходит шлюз с проверками, квотой и учётом, ответ собирается из результатов.
+    - The planner builds a subtask graph and assigns each the cheapest sufficient model. Finished results come from the cache, every subtask passes the gateway with checks, quota and metering, and the answer is assembled from the results.
+  classes: [RM-MOD-13, RM-MOD-10, RM-MOD-06, RM-AIC-05, RM-OPS-06]
+  architectureSteps: [t_plan, t_infer]
+  workflowNode: plan
+INF-01--INVOKE:
+  kind: operation
+  name:
+    ru: Допущенный вызов выполнен?
+    en: Did the admitted invocation complete?
+  description:
+    - Шлюз проверяет модель, маршрут и бюджет. Для внешнего размещения отдельно разрешает получателя и раскрытие. Ограниченный повтор возможен при техническом отказе после повторной проверки маршрута.
+    - The gateway checks model, route, and budget. External placement separately requires recipient and disclosure approval. A technical failure may be retried within limits after rechecking the route.
+  classes:
+    - RM-AIC-05
+    - RM-MOD-12
+    - RM-MOD-13
+    - RM-MOD-06
+    - RM-MOD-05
+    - RM-MOD-07
+    - RM-AGT-08
+    - RM-ACT-01
+  architectureSteps: [t_infer, b_polext, b_polbudget]
+  workflowNode: invoke
+INF-01--OUTPUT:
+  kind: operation
+  name:
+    ru: Ответ можно выдать?
+    en: Can the reply be delivered?
+  description:
+    - До выдачи и записи проверить содержимое, формат и права получателя. Передавать в чат только проверенное представление, без исходного ответа при блокировке.
+    - Check content, format, and recipient permissions before delivery and storage. Give the chat only the checked representation; never return the raw reply after a block.
+  classes: [RM-AIC-02, RM-APP-02]
+  architectureSteps: [t_result, b_poldisc]
+  workflowNode: output
+INF-01--RECORD:
+  kind: operation
+  name:
+    ru: Проверки зафиксированы?
+    en: Are checks recorded?
+  description:
+    - Зафиксировать ID запроса, маршрут, доступный идентификатор версии модели и решения входного и выходного контроля. При отсутствии обязательного свидетельства не выдавать ответ.
+    - Record the request ID, route, available model version identifier, and input and output decisions. Withhold the reply if required evidence cannot be recorded.
+  classes: [RM-TRS-04, RM-OPS-02]
+  architectureSteps: [t_audit, mt_ev]
+  workflowNode: record

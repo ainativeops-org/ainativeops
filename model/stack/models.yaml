@@ -2,65 +2,65 @@
 # Ключ RM-… после версии 1.0 не меняется и не переиспользуется. / An RM-… key is frozen after 1.0 and never reused.
 RM-MOD-01:
   name:
-    ru: Foundation-модели · LLM
-    en: Foundation models · LLM
+    ru: Базовые модели
+    en: Base models
   desc:
-    ru: Предобученные модели поставщиков и открытые веса. Их принимают через входной контроль артефактов с проверкой происхождения и формата весов.
-    en: Providers' pretrained models and open weights. They are accepted through artifact intake with provenance and weight format checks.
+    ru: Хранит или учитывает предобученные модели как исходные артефакты для применения либо адаптации. Фиксирует архитектуру, версию весов, происхождение и условия использования; внешние артефакты проходят входной контроль.
+    en: Holds or tracks pretrained models as input artifacts for serving or adaptation. Records architecture, weight version, provenance and terms of use; external artifacts pass intake controls.
 RM-MOD-02:
   name:
-    ru: Fine-tuned модели и LoRA
-    en: Fine-tuned models and LoRA
+    ru: Адаптированные модели и адаптеры
+    en: Adapted models and adapters
   desc:
-    ru: Модели, дообученные под продукт. Версия модели связана с набором данных, параметрами и заданием обучения.
-    en: Models fine-tuned for the product. The model version is linked to the dataset, parameters and the training job.
+    ru: Учитывает дообученные модели и отдельные адаптеры. Связывает результат с версией базы, выборками, способом адаптации и заданием обучения. Для адаптеров фиксирует совместимость с базовой моделью и конфигурацией исполнения.
+    en: Tracks fine-tuned models and separate adapters. Links each result to the base version, datasets, adaptation method and training run. Records adapter compatibility with the base model and serving configuration.
 RM-MOD-03:
   name:
-    ru: Внешние LLM API
-    en: External LLM APIs
+    ru: Внешние сервисы инференса
+    en: External inference services
   desc:
-    ru: Модели поставщиков по API за пределами контура. Поставщик может сменить модель без уведомления, поэтому LLM Gateway фиксирует фактическую версию ответа.
-    en: Providers' models behind an API outside the perimeter. The provider can change the model without notice, so the LLM Gateway records the actual version of each response.
+    ru: Модельные сервисы поставщиков за границей платформы. Шлюз фиксирует идентификатор и версию в объёме, доступном от поставщика. При отсутствии подтверждённой версии применяет решение профиля о допустимости такого вызова.
+    en: Providers' model services outside the platform boundary. The gateway records the identifier and version to the extent exposed by the provider. The profile determines whether calls without a verified version are permitted.
   optional: true
 RM-MOD-04:
   name:
-    ru: Классические ML-модели
-    en: Classic ML models
+    ru: Предиктивные модели
+    en: Predictive models
   desc:
-    ru: Модели классификации, прогноза и ранжирования без генерации текста. Они проходят те же рубежи выпуска, что и языковые модели.
-    en: Classification, forecasting and ranking models without text generation. They pass the same release gates as language models.
+    ru: Версионируемые модели классификации, прогноза и ранжирования. Профиль задаёт метрики качества, проверку входных признаков и допустимую выдачу результатов. Рубежи выпуска применяются по назначению модели и риску.
+    en: Versioned classification, forecasting and ranking models. The profile defines quality measures, input feature checks and permitted result disclosure. Release controls apply according to intended use and risk.
   optional: true
 RM-MOD-05:
   name:
-    ru: Model Registry
-    en: Model Registry
+    ru: Реестр моделей
+    en: Model registry
   desc:
-    ru: Единый каталог моделей и реестр версий весов, адаптеров и метаданных. Фиксирует происхождение, условия использования и результаты испытаний. Статус допуска задаётся контроллером выпуска.
-    en: A single catalogue of models and a registry of weight, adapter and metadata versions. Records provenance, terms of use and test results. The release gate sets the admission status.
+    ru: Связывает версии моделей и адаптеров со ссылками на артефакты, происхождение, условия использования и результаты испытаний. Решение о допуске поступает из контроля выпуска RM-DEV-09.
+    en: Links model and adapter versions to artifact references, provenance, terms of use and evaluation results. Admission decisions come from the release control in RM-DEV-09.
 RM-MOD-06:
   name:
-    ru: LLM Gateway
-    en: LLM Gateway
+    ru: Шлюз инференса
+    en: Inference gateway
   desc:
-    ru: Маршрутизирует запросы к разрешённой внутренней модели или внешнему провайдеру через адаптеры API. При резервном выборе сохраняет ограничения раскрытия и фиксирует фактическую модель. Правила сети и бюджета проверяются для выбранного маршрута.
-    en: Routes requests to an allowed internal model or an external provider through API adapters. On fallback it keeps disclosure limits and records the actual model. Network and budget rules are checked for the chosen route.
+    ru: Маршрутизирует допущенные запросы к внутренним или внешним модельным сервисам. Обеспечивает обязательный входной и выходной контроль для каждого рабочего инференса. При смене маршрута применяет те же ограничения раскрытия, бюджета и доступности версии модели.
+    en: Routes admitted requests to internal or external model services. Enforces mandatory input and output controls for every operational inference path. On fallback it reapplies disclosure, budget and model-version constraints.
 RM-MOD-07:
   name:
-    ru: Inference-серверы
-    en: Inference servers
+    ru: Сервис инференса
+    en: Inference service
   desc:
-    ru: Исполнение допущенных моделей с управлением загрузкой и версиями. EXP, EVAL и PROD используют раздельные доступы и конфигурации; внутренний ИИ-контролёр получает собственный сервис. Кеширование промежуточного KV-состояния относится к внутренней реализации сервиса; его области доверия и очистка определяются профилем.
-    en: Serve admitted models and manage loading and versions. EXP, EVAL and PROD use separate access and configurations; the internal AI controller gets its own service. KV cache is an internal detail of the service; its trust scopes and purging are defined by the profile.
+    ru: Загружает допущенные версии моделей, исполняет запросы и сообщает фактическую версию. Конфигурации, доступы и промежуточное состояние разделяются по профилям среды. Граница и очистка кеша промежуточных вычислений задаются при размещении.
+    en: Loads admitted model versions, serves requests and reports the actual version. Configurations, access and intermediate state are scoped to environment profiles. Deployment specifies intermediate cache isolation and purging.
 RM-MOD-08:
   name:
-    ru: Очередь и батчинг запросов
-    en: Request queue and batching
+    ru: Очередь и группировка запросов
+    en: Inference request queue and batching
   desc:
     ru: Ограничивает параллельность и размер модельных запросов, ведёт очередь и приоритеты. Использует выделенный задаче лимит; общий бюджет всей задачи учитывает Rate limits Harness.
     en: Limits concurrency and size of model requests and manages the queue and priorities. Uses the limit allocated to the task; the Harness rate limits account for the budget of the whole task.
 RM-MOD-09:
   name:
-    ru: Embedding-сервис
+    ru: Сервис векторных представлений
     en: Embedding service
   desc:
     ru: Вычисляет векторные представления документов и запросов. Версия модели связана с индексом; повторное ранжирование выполняется в цепочке извлечения контекста по потребности.
@@ -68,9 +68,31 @@ RM-MOD-09:
   optional: true
 RM-MOD-10:
   name:
-    ru: Семантический кеш
-    en: Semantic cache
+    ru: Кеш ответов моделей
+    en: Model response cache
   desc:
-    ru: Сохраняет готовые ответы для повторного использования. Ключ учитывает запрос, разрешённую область данных и версии конфигурации; определены срок хранения и инвалидирование.
-    en: Stores ready answers for reuse. The key covers the query, the permitted data scope and configuration versions; retention and invalidation are defined.
+    ru: Переиспользует ответы по точному ключу или по семантической близости. Изолирует области данных и учитывает версии модели, контекста и правил. При выдаче проверяет актуальные права и выходные ограничения, соблюдает сроки хранения и инвалидирование.
+    en: Reuses responses by exact key or semantic similarity. Isolates data scopes and accounts for model, context and policy versions. Rechecks current permissions and output constraints on reuse and enforces retention and invalidation.
   optional: true
+RM-MOD-11:
+  name:
+    ru: Среда исполнения инференса
+    en: Inference runtime
+  optional: true
+  desc:
+    ru: Загружает совместимые версии весов и адаптеров и исполняет модель на выделенных CPU или GPU. Отделена от API сервиса, реестра моделей и аппаратных ресурсов. Нужна при собственном размещении; для внешнего API находится за границей поставщика.
+    en: Loads compatible weights and adapters and executes the model on allocated CPU or GPU resources. Distinct from the service API, model registry and hardware. Required for self-hosting; an external API provider operates its own runtime beyond the boundary.
+RM-MOD-12:
+  name:
+    ru: Классификатор запросов
+    en: Request classifier
+  desc:
+    ru: Оценивает по запросу, контексту и предыдущим ходам диалога сложность задачи и ожидаемую длительность рассуждения. Определяет предметную область и нужные возможности модели и выдаёт профиль маршрута. Выбирает только среди моделей, которые разрешает политика раскрытия; категорию данных задаёт классификация данных.
+    en: Estimates task complexity and the expected length of reasoning from the request, the context and earlier turns of the conversation. Determines the subject area and the model capabilities needed and issues a route profile. Chooses only among models the disclosure policy permits; the data category comes from data classification.
+RM-MOD-13:
+  name:
+    ru: Планировщик вызовов моделей
+    en: Model call planner
+  desc:
+    ru: Разбивает составной запрос на граф подзадач и назначает каждой самую дешёвую модель, которая покрывает её сложность. Готовые результаты подзадач берёт из кеша ответов, независимые подзадачи выполняет параллельно через шлюз и собирает итоговый ответ. Подзадачу, которой нужен инструмент или действие, передаёт оркестратору агентов.
+    en: Splits a composite request into a graph of subtasks and assigns each the cheapest model that covers its complexity. Takes finished subtask results from the response cache, runs independent subtasks in parallel through the gateway and assembles the final answer. Hands a subtask that needs a tool or an action to the agent orchestrator.

@@ -1,0 +1,12 @@
+# Группы процессов в порядке показа: код и название [ru, en].
+# Process groups in display order: code and name [ru, en].
+INF: [Инференс и применение, Inference and use]
+KNW: [Знания и поиск, Knowledge and retrieval]
+AGT: [Агенты и действия, Agents and actions]
+DAT: [Данные и признаки, Data and features]
+MOD: [Создание моделей, Model development]
+DEV: [Инженерия ИИ-систем, AI systems engineering]
+RUN: [Эксплуатация, Operation]
+SEC: [Защита и реагирование, Security and response]
+EVA: [Оценка и допуск, Evaluation and admission]
+RET: [Вывод из эксплуатации, Retirement]

@@ -1,0 +1,266 @@
+# Процесс на карте / Process on the map: FLOW-MODEL
+# workflow: узлы и переходы схемы; SVG схемы строит tools/build.py через Graphviz.
+# workflow: diagram nodes and edges; tools/build.py renders the SVG with Graphviz.
+name:
+  ru: Адаптация модели под корпоративную задачу
+  en: Enterprise Model Adaptation
+group: MOD
+owner:
+  - Владелец модели; независимый владелец оценки и владелец рубежа выпуска.
+  - Model owner, independent evaluation owner and release gate owner.
+start:
+  - Для задачи выбрана или ищется готовая базовая модель, а критерии улучшения и допустимых регрессий определены.
+  - A pretrained base model is selected or sought for a task with defined improvement and regression criteria.
+result:
+  - Допущенная конфигурация адаптированной модели или адаптера введена в эксплуатацию с проверенным путём отката.
+  - An admitted adapted-model or adapter configuration is in operation with a verified rollback path.
+check:
+  - Версию можно связать с базовыми весами, данными и рецептом. Независимая оценка и испытание маршрута подтверждают качество, ограничения и обратимость выпуска.
+  - The version is traceable to base weights, data and recipe. Independent evaluation and route tests verify quality, constraints and release reversibility.
+maturity:
+  - Промышленная практика адаптации; выбор метода и ресурсов зависит от задачи.
+  - Established adaptation practice; method and resource selection depend on the task.
+calls:
+  - id: FLOW-DATA
+    when:
+      - Если нет допущенного версионированного набора адаптации.
+      - When no admitted versioned adaptation dataset is available.
+  - id: FLOW-ADMISSION
+    when:
+      - Обязательно перед выдачей новой конфигурации потребителям.
+      - Required before serving a new configuration to consumers.
+order: 6
+protection:
+  - Каждый вызов модели проходит проверку идентичности и прав, защиту входа и выхода и аудит в разрешённом объёме. Вызовы инструментов допускаются отдельно; код исполняется в изолированной среде. Согласование и ограничения раскрытия задаются политикой.
+  - Every model call uses identity and authorization checks, input and output protections, and permitted audit retention. Tool calls are authorized separately; code runs in a sandbox. Approval and disclosure restrictions follow policy.
+parts:
+  - TRAIN-DISTRIBUTED
+  - CORE-01
+  - FLOW-MODEL--OBJECTIVE
+  - FLOW-MODEL--INTAKE
+  - FLOW-MODEL--RECIPE
+  - FLOW-MODEL--ADAPT
+  - FLOW-MODEL--REGISTER
+  - FLOW-MODEL--EVALUATE
+  - FLOW-MODEL--ADMIT
+  - FLOW-MODEL--ROLLOUT
+tags: [Enterprise Model Adaptation]
+path: process-flow-model
+workflow:
+  summary:
+    - Для задачи выбрана или ищется готовая базовая модель, а критерии улучшения и допустимых регрессий определены. Допущенная конфигурация адаптированной модели или адаптера введена в эксплуатацию с проверенным путём отката.
+    - A pretrained base model is selected or sought for a task with defined improvement and regression criteria. An admitted adapted-model or adapter configuration is in operation with a verified rollback path.
+  synthesis:
+    - Последовательность, условия переходов и сопоставление компонентов — проектный синтез AiNativeOps. Источники подтверждают отдельные практики в указанной области, а не всю схему.
+    - The sequence, conditions and component mapping are AiNativeOps design synthesis. Sources support individual practices within their stated scope, not the entire diagram.
+  basis:
+    - source: P20-NEMO
+      claim:
+        - Предобучение и адаптация генеративных моделей, распределённые вычисления и контрольные точки.
+        - Covers pretraining and adaptation of generative models, distributed computing, and checkpoints.
+    - source: UBER-LLMOPS
+      claim:
+        - Подготовка данных, дообучение, оценка и размещение LLM; хранение модели и метаданных для serving.
+        - Covers data preparation, fine-tuning, evaluation, and deployment of LLMs, and storage of the model and metadata for serving.
+    - source: INTUIT-GENOS
+      claim:
+        - Каталог моделей, версии промптов, автоматическая и ручная оценка качества, задержки и стоимости.
+        - Covers a model catalog, prompt versions, and automated and manual evaluation of quality, latency, and cost.
+    - source: DEP-LORA
+      claim:
+        - Исполнение отдельного LoRA-адаптера поверх совместимой базовой модели. Эта зависимость не переносится автоматически на полный checkpoint.
+        - Covers serving a separate LoRA adapter on top of a compatible base model. This dependency does not automatically carry over to a full checkpoint.
+    - source: AZURE-SAFE-ROLLOUT
+      claim:
+        - Изолированная проверка новой версии, shadow-трафик и постепенное переключение production-трафика. Критерии отката задаёт организация.
+        - Covers isolated testing of a new version, shadow traffic, and gradual shifting of production traffic. The organization defines the rollback criteria.
+  nodes:
+    - id: objective
+      label: ['Задача, эталон и допуски', 'Task, baseline and tolerances']
+      detail:
+        - Зафиксировать поведение базовой модели, целевую метрику, пороги общих задач, безопасности, задержки и стоимости. Определить условия, при которых настройка оправдана.
+        - Pin base behavior, target metric and thresholds for general tasks, safety, latency and cost. Define when adaptation is justified.
+      kind: step
+      components:
+        architecture: [m2, b_goal, b_np, b_polbudget]
+        infrastructure: [experiment-tracking, eval-datasets]
+        stack: [RM-DEV-05, RM-DAT-05, RM-OPS-06]
+    - id: intake
+      label: ['Базовые веса и данные допустимы?', 'Are base weights and data approved?']
+      detail:
+        - Проверить происхождение, хеши, формат загрузки и условия использования весов, токенизатора и данных. Отделить защищённую контрольную выборку от разработки; непроверенный код загрузки не выполнять.
+        - Check provenance, digests, loading format and use terms for weights, tokenizer and data. Keep the protected evaluation split separate; do not execute unverified loading code.
+      kind: decision
+      components:
+        architecture: [m1, s_src, g1, b_poldisc]
+        infrastructure: [artifact-intake, eval-base-artifact, dataset-versioning, data-access-proxy]
+        stack: [RM-SEC-03, RM-MOD-01, RM-DAT-04, RM-DAT-05, RM-DPR-04]
+    - id: recipe
+      label: [Рецепт адаптации и бюджет, Adaptation recipe and budget]
+      detail:
+        - Выбрать адаптер, дообучение на примерах или оптимизацию на закреплённых предпочтениях. Задать совместимость базовых весов, форматы, вычислительный бюджет, критерии остановки и правила повтора.
+        - Select an adapter, supervised tuning or optimization on pinned preferences. Define base-weight compatibility, formats, compute budget, stopping criteria and retry rules.
+      kind: step
+      components:
+        architecture: [m2, s_prep, g2, b_polbudget]
+        infrastructure: [experiment-tracking, git-repository, rate-limits-budgets, model-training-service]
+        stack: [RM-DEV-01, RM-DEV-05, RM-DEV-04, RM-OPS-06]
+    - id: adapt
+      label: [Запуск адаптации, Run adaptation]
+      detail:
+        - Обучить в допущенной среде и сохранить состояние, если это требуется для возобновления. Офлайн-вычисления обучения контролируются как задание; каждый вызов отдельного сервиса модели для разметки, попыток или ИИ-контролёра проходит входные и выходные guardrails.
+        - Train in an approved environment and retain state when restart is needed. Offline training computations are governed as a job; every separate model service call for labels, rollouts or the AI controller passes input and output guardrails.
+      kind: step
+      components:
+        architecture: [m3, t_gpu, t_target, s_prep, t_input, t_infer, t_result]
+        infrastructure:
+          - model-training-service
+          - experiment-tracking
+          - input-guardrails
+          - llm-gateway
+          - output-guardrails
+        stack: [RM-DEV-04, RM-DEV-05, RM-PLT-02, RM-AIC-01, RM-MOD-06, RM-AIC-02]
+    - id: register
+      label: [Кандидат и его зависимости, Candidate and dependencies]
+      detail:
+        - Зафиксировать веса или пару базовых весов и адаптера, токенизатор, код, параметры, данные и ожидаемую среду исполнения. Зарегистрировать хеш кандидата и ссылки на эксперимент.
+        - Pin weights or the base-and-adapter pair, tokenizer, code, parameters, data and serving expectations. Register the candidate digest and run references.
+      kind: step
+      components:
+        architecture: [m5, g3, o_pack, t_reg]
+        infrastructure: [eval-adapted-artifact, model-registry, artifact-registry, provenance-registry]
+        stack: [RM-MOD-02, RM-MOD-05, RM-DEV-08, RM-TRS-05]
+    - id: evaluate
+      label: ['Улучшение и границы подтверждены?', 'Are improvement and limits verified?']
+      detail:
+        - Проверить кандидата и базу на независимом наборе, включая сегменты, нежелательные ответы, устойчивость и целевую нагрузку. Каждый модельный вызов кандидата, базы и ИИ-контролёра проходит входные и выходные guardrails; ИИ-контролёр не решает вопрос выпуска.
+        - Compare candidate and baseline on independent cases, including slices, unwanted outputs, robustness and target load. Every candidate, baseline and AI controller call passes input and output guardrails; the AI controller does not decide release.
+      kind: decision
+      components:
+        architecture: [m4, o_eval, mt_indep, g4, t_ctl, t_input, t_infer, t_result, t_eval]
+        infrastructure:
+          - eval-red-teaming
+          - eval-datasets
+          - rule-based-checks
+          - llm-as-a-judge
+          - eval-inference-runtime
+          - input-guardrails
+          - llm-gateway
+          - output-guardrails
+          - eval-inference-service
+        stack: [RM-DEV-07, RM-DAT-05, RM-AIC-03, RM-MOD-11, RM-AIC-01, RM-MOD-06, RM-AIC-02]
+    - id: diagnose
+      label: ['Можно исправить без смены цели?', 'Can this be fixed within the objective?']
+      detail:
+        - Различить дефект данных или рецепта, ошибку совместимости и неприемлемую регрессию. Разрешить ограниченный повтор с новой версией; не менять закреплённый критерий ради допуска.
+        - Distinguish a data or recipe defect, compatibility issue and unacceptable regression. Allow bounded rework under a new version; do not move pinned criteria to secure approval.
+      kind: decision
+      components:
+        architecture: [m2, s_change, mt_review, b_polbudget]
+        infrastructure: [experiment-tracking, eval-datasets, audit-log]
+        stack: [RM-DEV-05, RM-DAT-05, RM-OPS-07, RM-TRS-04]
+    - id: admit
+      label: ['Пара модели и среды допущена?', 'Is the model and runtime configuration admitted?']
+      detail:
+        - Подтвердить пригодность точной версии и совместимость инференса. Зафиксировать политику маршрута, ограничения входов и выходов, план переключения и версию возврата.
+        - Verify the exact version and serving compatibility. Pin routing policy, input and output controls, rollout plan and fallback version.
+      kind: decision
+      components:
+        architecture: [o_release, g6, mt_ev, b_ownrisk]
+        infrastructure: [release-gate, model-registry, eval-inference-runtime, integrity-monitoring]
+        stack: [RM-DEV-09, RM-MOD-05, RM-MOD-11, RM-TRS-06]
+    - id: rollout
+      label: ['Ограниченная выдача стабильна?', 'Is limited serving stable?']
+      detail:
+        - Проверить допущенную версию на разрешённой части трафика с входными и выходными guardrails для каждого вызова. При нарушении качества, задержки или политики закрыть маршрут и вернуть только разрешённую совместимую версию.
+        - Check the admitted version on an authorized traffic slice with input and output guardrails on every call. On quality, latency or policy breaches, close the route and restore only an authorized compatible version.
+      kind: decision
+      components:
+        architecture: [o_ops, s_runtime, g7, s_detect, t_input, t_infer, t_result]
+        infrastructure:
+          - cd-deployment
+          - inference-servers
+          - metrics-alerts
+          - model-registry
+          - input-guardrails
+          - llm-gateway
+          - output-guardrails
+        stack:
+          - RM-DEV-10
+          - RM-MOD-07
+          - RM-OPS-01
+          - RM-OPS-05
+          - RM-MOD-05
+          - RM-AIC-01
+          - RM-MOD-06
+          - RM-AIC-02
+    - id: live
+      label: [Адаптированная версия работает, Adapted version in operation]
+      detail:
+        - Публикуется идентификатор допущенной конфигурации. Владелец получает наблюдение за качеством, стоимостью, маршрутом и критерии возврата.
+        - Publish the admitted configuration identifier. Hand quality, cost and routing monitoring and rollback criteria to the owner.
+      kind: outcome
+      components:
+        architecture: [o_ops, t_prod, t_audit]
+        infrastructure: [model-registry, inference-servers, metrics-alerts, audit-log]
+        stack: [RM-MOD-05, RM-MOD-07, RM-OPS-05, RM-TRS-04]
+    - id: hold
+      label: [Кандидат удержан или откачен, Candidate held or rolled back]
+      detail:
+        - Исключить кандидата из рабочих маршрутов. Сохранить диагностику и решение о пересмотре; прошлую версию использовать только при сохранении допуска.
+        - Remove the candidate from live routes. Retain diagnostics and the review decision; use a prior version only if still authorized.
+      kind: outcome
+      components:
+        architecture: [s_resp, mt_review, t_audit]
+        infrastructure: [cd-deployment, model-registry, audit-log]
+        stack: [RM-DEV-10, RM-MOD-05, RM-TRS-04]
+  edges:
+    - from: objective
+      to: intake
+      label: [Цели и пороги заданы, Objectives and thresholds set]
+    - from: intake
+      to: recipe
+      label: [Базовые веса и данные допущены, Base weights and data admitted]
+    - from: intake
+      to: hold
+      label: [Артефакт или данные запрещены, Artifact or data prohibited]
+    - from: recipe
+      to: adapt
+      label: [Рецепт закреплён, Recipe pinned]
+    - from: adapt
+      to: register
+      label: [Получены веса или адаптер, Weights or adapter produced]
+    - from: adapt
+      to: diagnose
+      label: [Сбой или неустойчивый запуск, Job failed or unstable]
+    - from: register
+      to: evaluate
+      label: [Хеш и происхождение подтверждены, Digest and provenance verified]
+    - from: evaluate
+      to: admit
+      label: [Пороги выдержаны, Thresholds met]
+    - from: evaluate
+      to: diagnose
+      label: [Не подтверждены критерии, Criteria not met]
+    - from: diagnose
+      to: recipe
+      label: [Новая версия рецепта в лимите, Bounded new recipe version]
+    - from: diagnose
+      to: intake
+      label: [Нужна проверка другого набора или базы, Different dataset or base needs verification]
+    - from: diagnose
+      to: hold
+      label: [Нет допустимого исправления, No permitted fix]
+    - from: admit
+      to: rollout
+      label: [Разрешено постепенное включение, Progressive rollout authorized]
+    - from: admit
+      to: hold
+      label: [Допуск не получен, Admission denied]
+    - from: rollout
+      to: live
+      label: [Стабильность подтверждена, Stability verified]
+    - from: rollout
+      to: hold
+      label: ['Порог нарушен: остановка или откат', 'Threshold breach: stop or rollback']
+  main: [objective, intake, recipe, adapt, register, evaluate, admit, rollout, live]

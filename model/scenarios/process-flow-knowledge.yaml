@@ -1,0 +1,31 @@
+# Маршрут / Route: Создание и сопровождение корпоративной базы знаний для ИИ / Enterprise AI Knowledge Base Lifecycle
+# Шаг = [элемент, [участники]] / Step = [element, [participants]]
+order: 5
+name:
+  ru: Создание и сопровождение корпоративной базы знаний для ИИ
+  en: Enterprise AI Knowledge Base Lifecycle
+routes:
+  stack:
+    - [RM-DAT-02, [RM-APP-01, RM-GOV-03]]
+    - [RM-DAT-01, [RM-MOD-12, RM-MOD-13, RM-DAT-02, RM-DPR-04, RM-TRS-05, RM-DAT-04, RM-DPR-01, RM-AIC-01, RM-MOD-06, RM-AIC-02, RM-TRS-04, RM-MOD-07, RM-AIC-05, RM-OPS-06]]
+    - [RM-DAT-07, [RM-MOD-09, RM-DAT-08, RM-TRS-05, RM-DAT-04, RM-AIC-01, RM-MOD-06, RM-AIC-02, RM-OPS-01, RM-OPS-05, RM-TRS-04]]
+    - [RM-SEC-01, [RM-DPR-06, RM-DPR-04, RM-DAT-07, RM-MOD-10]]
+    - [RM-DAT-05, [RM-DEV-07, RM-DPR-06, RM-AIC-01, RM-MOD-06, RM-AIC-02]]
+    - [RM-DEV-09, [RM-DEV-10, RM-DAT-07, RM-TRS-05]]
+  infrastructure:
+    - [data-catalog, [business-apps]]
+    - [landing-zone, [data-catalog, data-access-proxy]]
+    - [dataset-store, [request-classifier, model-call-planner, dataset-versioning, data-discovery, input-guardrails, llm-gateway, output-guardrails, audit-log, inference-servers, inference-quotas, usage-billing]]
+    - [vector-db, [provenance-registry, dataset-versioning, input-guardrails, llm-gateway, output-guardrails, metrics-alerts, audit-log]]
+    - [iam-sso, [rag-access-filter, data-access-proxy, vector-db]]
+    - [eval-datasets, [eval-red-teaming, rule-based-checks, rag-access-filter, input-guardrails, llm-gateway, output-guardrails]]
+    - [release-gate, [cd-deployment, vector-db, provenance-registry]]
+  architecture:
+    - [g0, [b_goal, b_owndata, b_poldisc]]
+    - [d1, [d2, s_src, g1]]
+    - [d3, [t_route, t_plan, d5, b_poldisc, t_store, t_input, t_infer, t_result, t_audit, t_base]]
+    - [d5, [t_vec, b_poldisc, t_input, t_infer, t_result]]
+    - [t_iam, [mt_tb, b_poldisc, s_runtime]]
+    - [o_eval, [g4, mt_indep, g7, t_input, t_infer, t_result]]
+    - [o_pack, [o_release, g6, mt_ev]]
+    - [o_ops, [s_detect, t_audit]]

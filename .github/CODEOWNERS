@@ -26,6 +26,12 @@
 # /model/architecture/                         @maintainers
 # /model/scenarios/                            @maintainers
 #
+# Processes, sources and dependencies
+# /model/processes/                            @maintainers
+# /model/sources/                              @maintainers
+# /model/dependencies/                         @maintainers
+# /model/profiles.yaml                         @maintainers
+#
 # Code
 # /site/                                       @maintainers
 # /tools/                                      @maintainers

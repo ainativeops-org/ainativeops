@@ -9,22 +9,22 @@ RM-APP-01:
     en: Applied products use data and models for search, analysis and actions. Each product has a purpose, an owner and result criteria.
 RM-APP-02:
   name:
-    ru: UI и чат-интерфейсы
-    en: UI and chat interfaces
+    ru: Пользовательские интерфейсы
+    en: User interfaces
   desc:
-    ru: Веб-интерфейсы, чаты и рабочие места разработчиков. Пользовательская сессия сохраняет идентичность инициатора до конкретного действия агента.
-    en: Web interfaces, chats and developer workplaces. The user session keeps the initiator identity down to a specific agent action.
+    ru: Предоставляет интерфейс сотрудника или клиента. Перед чтением истории проверяет доступ к разговору. Запрос и разрешённый контекст проходят входную проверку; допущенный ответ можно выдать и сохранить.
+    en: Provides the employee or customer interface. Authorizes access to a conversation before reading it. The request and allowed context pass input checks; only an admitted response can be delivered and saved.
 RM-APP-03:
   name:
-    ru: Консоль оператора · HITL
-    en: Operator console · HITL
+    ru: Консоль оператора
+    en: Operator console
   desc:
-    ru: Постановка цели и приёмка результата; просмотр точного действия перед согласованием. Решение человека связано с задачей, аргументами и сроком действия.
-    en: Setting goals and accepting results; reviewing the exact action before approval. The human decision is bound to the task, the arguments and a validity period.
+    ru: Показывает оператору задачу, точную операцию и её параметры, ожидаемый эффект и сведения для проверки. Передаёт аутентифицированное решение механизму согласования RM-AIC-04.
+    en: Presents the task, exact action and arguments, expected effect and review information. Sends the authenticated decision to the approval control in RM-AIC-04.
 RM-APP-04:
   name:
-    ru: BPM-движок
-    en: BPM engine
+    ru: Движок бизнес-процессов
+    en: Business workflow engine
   desc:
     ru: Исполняет заданные бизнес-процессы, состояния и правила переходов. Вызывает агентные задачи там, где это предусмотрено сценарием; оркестратор агентов управляет внутренним делегированием.
     en: Executes defined business processes, states and transition rules. Calls agent tasks where the process provides for it; the agent orchestrator manages internal delegation.

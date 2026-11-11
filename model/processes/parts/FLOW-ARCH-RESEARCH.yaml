@@ -1,0 +1,110 @@
+# Этапы и варианты процессов. Ключ этапа процесса: <процесс>--<этап>.
+# Stages and variants of processes. A process stage key is <process>--<stage>.
+FLOW-ARCH-RESEARCH--QUESTION:
+  kind: operation
+  name:
+    ru: Ограничение и проверяемая гипотеза
+    en: Limitation and testable hypothesis
+  description:
+    - Описать предполагаемое изменение топологии, вычислительной операции или функции обучения. Указать ожидаемый эффект, наблюдаемую метрику и условие, которое опровергнет гипотезу.
+    - Describe a proposed change to topology, an operator or learning objective. Specify the predicted effect, observable metric and a falsification condition.
+  classes: [RM-DEV-01, RM-DEV-05]
+  architectureSteps: [g0, b_goal, m2]
+  workflowNode: question
+FLOW-ARCH-RESEARCH--PROTOCOL:
+  kind: operation
+  name:
+    ru: Протокол и сопоставимый эталон
+    en: Protocol and comparable baseline
+  description:
+    - До прогона зафиксировать варианты, данные, условия сравнения, случайные инициализации, допуски и бюджет. Указать, что сравнивается при одинаковом объёме вычислений, времени или данных и где сравнение ограничено.
+    - Before running, pin variants, data, comparison conditions, seeds, tolerances and budget. State what is matched by compute, time or data and where comparisons are limited.
+  classes: [RM-DAT-05, RM-DAT-04, RM-DEV-05, RM-OPS-06]
+  architectureSteps: [m2, b_polbudget, mt_indep, b_owndata]
+  workflowNode: protocol
+FLOW-ARCH-RESEARCH--PROTOTYPE:
+  kind: operation
+  name:
+    ru: Прототип и эталонная реализация
+    en: Prototype and reference implementation
+  description:
+    - Реализовать минимальный код и эталон в изолированном окружении. Закрепить версии операторов и зависимостей. Если ИИ помогает проектировать или писать код, каждый вызов проходит входные и выходные guardrails, а доступ к инструментам проверяет PEP.
+    - Implement minimal code and the reference in an isolated environment. Pin operator and dependency versions. If AI assists design or coding, each invocation passes input and output guardrails and PEP checks tool access.
+  classes:
+    - RM-DEV-01
+    - RM-DEV-06
+    - RM-ACT-03
+    - RM-ACT-02
+    - RM-PLT-01
+    - RM-AIC-01
+    - RM-AIC-05
+    - RM-MOD-12
+    - RM-MOD-13
+    - RM-MOD-06
+    - RM-AIC-02
+  architectureSteps: [v2, v3, t_repo, t_eng, mt_tb, t_input, t_infer, t_result]
+  workflowNode: prototype
+FLOW-ARCH-RESEARCH--VERIFY:
+  kind: operation
+  name:
+    ru: Прототип корректен на малом масштабе?
+    en: Is the prototype correct at small scale?
+  description:
+    - Проверить размерности, численные допуски, градиенты, устойчивость и воспроизведение базовой реализации. Остановить дорогие эксперименты, если малый контрольный прогон не прошёл.
+    - Verify shapes, numerical tolerances, gradients, stability and baseline reproduction. Do not start expensive trials when a small validation run fails.
+  classes: [RM-DEV-06, RM-DEV-07, RM-DEV-05]
+  architectureSteps: [v3, m4, g2, s_prep]
+  workflowNode: verify
+FLOW-ARCH-RESEARCH--RUN:
+  kind: operation
+  name:
+    ru: Серия контролируемых испытаний
+    en: Controlled trial series
+  description:
+    - Выполнить эталон, вариант и абляции в согласованном бюджете. Распределение и контрольные точки подключаются по масштабу. Тензорные расчёты идут внутри задания; любые внешние или локальные вызовы модельного сервиса проходят входные и выходные guardrails.
+    - Run the baseline, variant and ablations under the agreed budget. Use distribution and checkpoints as scale requires. Tensor computation stays within the job; all local or external model service calls pass input and output guardrails.
+  classes:
+    - RM-DEV-04
+    - RM-DEV-05
+    - RM-OPS-06
+    - RM-AIC-01
+    - RM-AIC-05
+    - RM-MOD-12
+    - RM-MOD-13
+    - RM-MOD-06
+    - RM-AIC-02
+  architectureSteps: [m3, t_gpu, b_polbudget, mt_ev, t_input, t_infer, t_result]
+  workflowNode: run
+FLOW-ARCH-RESEARCH--COMPARE:
+  kind: operation
+  name:
+    ru: Сравнение пригодно для вывода?
+    en: Is the comparison valid for a conclusion?
+  description:
+    - Проверить полноту испытаний, вариативность результатов, расход ресурсов и отсутствие утечки между наборами. Если вывод опирается на вызовы кандидата или ИИ-контролёра, каждый проходит входные и выходные guardrails; блокировки и конфигурации фиксируются.
+    - Check trial completeness, variability, resource cost and cross-split leakage. When candidate or AI controller calls support a conclusion, each passes input and output guardrails; record denials and configurations.
+  classes:
+    - RM-DAT-05
+    - RM-DEV-07
+    - RM-DEV-05
+    - RM-AIC-03
+    - RM-OPS-06
+    - RM-AIC-01
+    - RM-AIC-05
+    - RM-MOD-12
+    - RM-MOD-13
+    - RM-MOD-06
+    - RM-AIC-02
+  architectureSteps: [m4, o_eval, g4, mt_indep, t_input, t_infer, t_result, t_eval]
+  workflowNode: compare
+FLOW-ARCH-RESEARCH--REVIEW:
+  kind: operation
+  name:
+    ru: Что подтверждает независимая проверка?
+    en: What does independent review establish?
+  description:
+    - Рецензент проверяет сопоставимость, повторяет ключевой опыт, фиксирует ограничения и исключает неподтверждённые выводы. При повторе каждый вызов модельного сервиса проходит те же входные и выходные guardrails. Протокол хранит результаты всех существенных попыток, включая отрицательные.
+    - The reviewer checks comparability, repeats a key trial, records limitations and excludes unsupported conclusions. Any model service call in the rerun passes the same input and output guardrails. Retain results of meaningful attempts, including negative ones.
+  classes: [RM-DEV-07, RM-DAT-05, RM-TRS-05]
+  architectureSteps: [o_eval, mt_indep, mt_ev, g4, t_eval]
+  workflowNode: review

@@ -2,29 +2,29 @@
 # Ключ RM-… после версии 1.0 не меняется и не переиспользуется. / An RM-… key is frozen after 1.0 and never reused.
 RM-OPS-01:
   name:
-    ru: Метрики и алерты
+    ru: Метрики и оповещения
     en: Metrics and alerts
   desc:
     ru: Доступность, задержки и ошибки сервисов, использование CPU/GPU. Пороговые значения связаны с требованиями продукта.
     en: Availability, latency and errors of services, CPU and GPU usage. Thresholds are linked to product requirements.
 RM-OPS-02:
   name:
-    ru: Трассировка · OpenTelemetry
-    en: Tracing · OpenTelemetry
+    ru: Распределённая трассировка
+    en: Distributed tracing
   desc:
     ru: Связывает шаги задачи, делегирование, модельные запросы и вызовы инструментов. В трассе фиксируются версии контекста и решений контроля; содержимое очищается по политике.
     en: Links task steps, delegation, model requests and tool calls. The trace records context versions and control decisions; content is redacted by policy.
 RM-OPS-03:
   name:
-    ru: Сбор логов
-    en: Log collection
+    ru: Сбор и обработка телеметрии
+    en: Telemetry collection and processing
   desc:
-    ru: Коллекторы принимают журналы, метрики и трассы. Процессоры событий выполняют нормализацию и маршрутизацию по контрактам потребителей. Эти роли могут обслуживаться одним продуктом; обязательность каждого этапа определяется источником.
-    en: Collectors receive logs, metrics and traces. Event processors normalise and route them by consumer contract. One product can serve both roles; the source defines which stages are mandatory.
+    ru: Принимает, обрабатывает и передаёт журналы, метрики и трассы. Vector и Logstash — примеры отдельных ролей в конвейере телеметрии.
+    en: Collects, processes, and forwards logs, metrics, and traces. Vector and Logstash are examples of implementations for individual telemetry pipeline roles.
 RM-OPS-04:
   name:
-    ru: Хранилище логов и метрик
-    en: Log and metric store
+    ru: Хранилище телеметрии
+    en: Telemetry store
   desc:
     ru: Хранилища метрик, трасс и событий выбираются по типу запросов. Объектный архив обслуживает длительное хранение файлов; аналитические запросы выполняются специализированным сервисом. Политики доступа и сроков хранения задаются для каждого класса.
     en: Stores for metrics, traces and events are chosen by query type. The object archive handles long-term file retention; a specialised service runs analytical queries. Access and retention policies are set per class.
@@ -37,11 +37,11 @@ RM-OPS-05:
     en: Tracks answer quality, retrieval accuracy and task success. Degradation triggers a change assessment; production feedback goes through quarantine.
 RM-OPS-06:
   name:
-    ru: FinOps · токены и GPU
-    en: FinOps · tokens and GPU
+    ru: Учёт потребления и биллинг ИИ
+    en: AI usage metering and billing
   desc:
-    ru: Учёт затрат по задаче и проекту, эффективность кеша и загрузка вычислений. Планирование бюджета и ресурсов опирается на фактические метрики.
-    en: Accounts costs per task and project, cache efficiency and compute utilisation. Budget and capacity planning rely on actual metrics.
+    ru: Получает запись о каждом вызове модели от шлюза инференса и о каждом действии агента от PEP, изолированной среды и контроля доступа к знаниям. Считает токены, время GPU и вызовы внешних сервисов по потребителю, проекту, процессу и модели, применяет тарифы и перевыставляет затраты. Квоты и бюджеты задач сверяются с этим учётом.
+    en: Receives a record of every model call from the inference gateway and of every agent action from the PEP, the isolated environment and knowledge access control. Counts tokens, GPU time and external service calls per consumer, project, process and model, applies tariffs and charges costs back. Quotas and task budgets are checked against this metering.
 RM-OPS-07:
   name:
     ru: Управление изменениями
@@ -51,8 +51,8 @@ RM-OPS-07:
     en: Links a complaint or failure to the configuration and a reproducible case. Changes to memory, data and models repeat the affected admission checks.
 RM-OPS-08:
   name:
-    ru: Backup и DR
-    en: Backup and DR
+    ru: Резервное копирование и восстановление
+    en: Backup and recovery
   desc:
     ru: Создаёт согласованные резервные копии и выполняет проверяемое восстановление с целевыми RPO/RTO. После восстановления учитываются актуальные политики и отозванные полномочия.
     en: Creates consistent backups and runs verifiable recovery with target RPO and RTO. After recovery the current policies and revoked authorities apply.

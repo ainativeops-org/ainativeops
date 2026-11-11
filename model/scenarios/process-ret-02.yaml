@@ -1,0 +1,29 @@
+# Маршрут / Route: Вывод ИИ-системы из эксплуатации / AI System Retirement
+# Шаг = [элемент, [участники]] / Step = [element, [participants]]
+order: 26
+name:
+  ru: Вывод ИИ-системы из эксплуатации
+  en: AI System Retirement
+routes:
+  stack:
+    - [RM-GOV-01, [RM-GOV-04, RM-OPS-07, RM-TRS-04, RM-MOD-05, RM-DAT-02, RM-TRS-05, RM-GOV-02]]
+    - [RM-MOD-06, [RM-MOD-12, RM-MOD-13, RM-DEV-10, RM-TRS-07, RM-INT-02, RM-INT-03, RM-AIC-01, RM-AIC-02, RM-TRS-04, RM-MOD-07, RM-AIC-05, RM-OPS-06]]
+    - [RM-AGT-05, [RM-INT-02, RM-ACT-02, RM-TRS-04, RM-TRS-07]]
+    - [RM-SEC-01, [RM-GOV-02, RM-TRS-03, RM-TRS-07, RM-ACT-02]]
+    - [RM-DAT-02, [RM-DAT-04, RM-MOD-10, RM-AGT-06, RM-OPS-08, RM-SEC-07]]
+    - [RM-GOV-04, [RM-TRS-07, RM-OPS-08, RM-SEC-07, RM-TRS-06]]
+    - [RM-GOV-01, [RM-GOV-04, RM-SEC-07, RM-TRS-04, RM-TRS-05]]
+  infrastructure:
+    - [provenance-registry, [audit-log, evidence-store, data-catalog]]
+    - [llm-gateway, [request-classifier, model-call-planner, model-registry, provenance-registry, data-catalog, agent-iam, input-guardrails, output-guardrails, audit-log, inference-servers, inference-quotas, usage-billing, cd-deployment, kill-switch, mcp-servers, archive-backup, integrity-monitoring]]
+    - [checkpoint-store, [mcp-servers, erp-crm, audit-log]]
+    - [iam-sso, [agent-iam, secrets-manager, kill-switch, pep]]
+    - [data-catalog, [dataset-store, vector-db, agent-memory, archive-backup]]
+    - [provenance-registry, [audit-log, archive-backup]]
+  architecture:
+    - [b_regretire, [b_ownproc, g9]]
+    - [s_retire, [mt_profile, mt_tb, t_route, t_plan, o_ops, t_infer, s_runtime, t_gw, t_input, t_result, t_audit, t_base]]
+    - [b_ownproc, [b_owndata, b_regretire, g9]]
+    - [t_iam, [s_retire, s_runtime]]
+    - [b_owndata, [b_law, s_retire]]
+    - [g9, [s_retire, mt_ev, t_audit]]

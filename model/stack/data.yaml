@@ -2,15 +2,15 @@
 # Ключ RM-… после версии 1.0 не меняется и не переиспользуется. / An RM-… key is frozen after 1.0 and never reused.
 RM-DAT-01:
   name:
-    ru: Ingestion · ETL / ELT
-    en: Ingestion · ETL / ELT
+    ru: Приём и загрузка данных
+    en: Data ingestion
   desc:
-    ru: Коннекторы к исходным системам, разбор документов и извлечение текста; при необходимости OCR. Новые материалы проходят карантин, классификацию и проверку допустимой цели обработки.
-    en: Connectors to source systems, document parsing and text extraction, with OCR when needed. New material passes quarantine, classification and a check of the permitted processing purpose.
+    ru: Принимает данные из разрешённых источников, фиксирует происхождение и передаёт новый материал на входной контроль. Коннекторы, разбор документов, извлечение текста и загрузка выбираются по формату источника. Подготовкой по зависимостям управляет оркестратор конвейеров.
+    en: Receives data from authorised sources, records provenance and sends new material through intake checks. Connectors, parsing, extraction and loading depend on the source format. The pipeline orchestrator manages dependency-aware preparation.
 RM-DAT-02:
   name:
-    ru: Data Catalog
-    en: Data Catalog
+    ru: Каталог данных
+    en: Data catalogue
   desc:
     ru: Хранит описания источников и наборов, владельцев и правила использования. Указывает происхождение и доступные версии; содержимое хранится в специализированных хранилищах.
     en: Holds descriptions of sources and datasets, owners and usage rules. Shows provenance and available versions; content lives in specialised stores.
@@ -23,32 +23,32 @@ RM-DAT-03:
     en: Agreed definitions of metrics and entities, calculation rules and links to sources. Gives applications and agent context one interpretation of the data.
 RM-DAT-04:
   name:
-    ru: Версионирование датасетов
+    ru: Версионирование наборов данных
     en: Dataset versioning
   desc:
     ru: Хранит версии и манифесты наборов, ссылки на содержимое и результаты проверок качества. Связывает выборки с источниками и преобразованиями.
     en: Stores dataset versions and manifests, content references and quality check results. Links samples to sources and transformations.
 RM-DAT-05:
   name:
-    ru: Eval-датасеты
-    en: Eval datasets
+    ru: Контрольные наборы и критерии
+    en: Evaluation datasets and criteria
   desc:
-    ru: Хранит контрольные наборы и критерии допуска с версиями. ИИ-инженер не имеет права записи в реестр.
-    en: Stores control sets and admission criteria with versions. The AI engineer has no write access to this registry.
+    ru: Хранит версионированные контрольные наборы, ожидаемые результаты и критерии приёмки. Управление версиями и правами отделено от проверяемого исполнителя. Оценка ссылается на точные версии набора и критерия.
+    en: Holds versioned evaluation datasets, expected results and acceptance criteria. Version management and write access are independent of the executor under evaluation. Each evaluation refers to the exact dataset and criterion versions.
 RM-DAT-06:
   name:
-    ru: DWH / Data Lake
-    en: DWH / Data Lake
+    ru: Аналитические хранилища данных
+    en: Analytical data stores
   desc:
-    ru: Хранение и обработка корпоративных данных; допустимые зоны доступа, версии и сроки хранения. Представление данных выбирается по требованиям конкретной задачи.
-    en: Stores and processes enterprise data with access zones, versions and retention. The data representation is chosen by the requirements of the specific task.
+    ru: Хранят и предоставляют данные для аналитической обработки. Архитектура хранилища, интерфейсы, изоляция областей доступа, версионирование и сроки хранения выбираются по требованиям задачи.
+    en: Store and expose data for analytical processing. Storage architecture, interfaces, access isolation, versioning and retention are selected according to workload requirements.
 RM-DAT-07:
   name:
-    ru: Vector DB · retrieval
-    en: Vector DB · retrieval
+    ru: Сервис извлечения знаний
+    en: Knowledge retrieval service
   desc:
-    ru: Индексирует допущенные знания, ищет релевантные фрагменты и возвращает их с источниками. Поддерживает полнотекстовый, векторный или гибридный поиск по потребности. RAG использует этот сервис при подготовке контекста.
-    en: Indexes admitted knowledge, finds relevant fragments and returns them with sources. Supports full-text, vector or hybrid search as needed. RAG uses this service to prepare context.
+    ru: Возвращает релевантные фрагменты разрешённых знаний со ссылками на источники. Использует лексический, векторный или гибридный индекс по профилю. Права на источник и фрагмент проверяются в RM-DPR-06 до передачи содержимого в контекст.
+    en: Returns relevant permitted knowledge fragments with source references. Uses a lexical, vector or hybrid index as required by the profile. RM-DPR-06 checks access to sources and fragments before the content enters context.
 RM-DAT-08:
   name:
     ru: Граф знаний
@@ -59,9 +59,16 @@ RM-DAT-08:
   optional: true
 RM-DAT-09:
   name:
-    ru: Feature Store
-    en: Feature Store
+    ru: Хранилище признаков
+    en: Feature store
   desc:
     ru: Версионирует признаки и преобразования для обучения и применения предиктивных моделей. Временная согласованность выборок проверяется до обучения; актуальность значений контролируется при выдаче.
     en: Versions features and transformations for training and serving predictive models. Temporal consistency of samples is checked before training; value freshness is checked at serving.
   optional: true
+RM-DAT-10:
+  name:
+    ru: Извлечение мультимодальных данных
+    en: Multimodal data extraction
+  desc:
+    ru: Разбирает документы, изображения, аудио и видео по допущенному профилю. Сохраняет ссылки на страницы, области и временные интервалы, оценку уверенности и исходную структуру. OCR, ASR и модельное извлечение выбираются по модальности; модельные вызовы проходят защитный контур.
+    en: Parses documents, images, audio and video under an admitted profile. Retains page, region and timestamp references, confidence and source structure. OCR, ASR and model extraction depend on modality; model calls use the guarded invocation boundary.

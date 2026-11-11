@@ -1,0 +1,39 @@
+# Маршрут / Route: Гибридный инференс · внешняя ветвь / Hybrid inference · external branch
+# Шаг = [элемент, [участники]] / Step = [element, [participants]]
+order: 30
+name:
+  ru: Гибридный инференс · внешняя ветвь
+  en: Hybrid inference · external branch
+routes:
+  architecture:
+    - [t_iam, [b_goal]]
+    - [t_input, [b_poldisc]]
+    - [t_route, []]
+    - [t_infer, [t_plan, b_polext, b_polbudget]]
+    - [t_ext, []]
+    - [t_result, []]
+    - [t_audit, []]
+  infrastructure:
+    - [business-apps, [users, iam-sso]]
+    - [data-discovery, []]
+    - [input-guardrails, []]
+    - [request-classifier, []]
+    - [llm-gateway, [model-call-planner, pdp, rate-limits-budgets, inference-quotas, usage-billing]]
+    - [tokenization, [token-vault]]
+    - [egress-proxy, []]
+    - [external-llm-api, [secrets-manager]]
+    - [output-guardrails, []]
+    - [role-based-detokenization, []]
+    - [business-apps, [audit-log, metrics-alerts]]
+  stack:
+    - [RM-APP-01, [RM-SEC-01]]
+    - [RM-DPR-01, []]
+    - [RM-AIC-01, [RM-GOV-03]]
+    - [RM-MOD-12, []]
+    - [RM-MOD-06, [RM-MOD-13, RM-ACT-01, RM-AGT-08, RM-AIC-05, RM-OPS-06]]
+    - [RM-DPR-02, [RM-TRS-02]]
+    - [RM-SEC-02, []]
+    - [RM-MOD-03, [RM-TRS-03]]
+    - [RM-AIC-02, []]
+    - [RM-DPR-03, []]
+    - [RM-TRS-04, [RM-OPS-01, RM-OPS-06]]

@@ -1,9 +1,9 @@
-# Сценарий / Scenario: Разработка ИТ-продукта с агентами / IT product with agents
+# Маршрут / Route: Исправление дефекта или сбоя CI / Defect or CI repair
 # Шаг = [элемент, [участники]] / Step = [element, [participants]]
-order: 3
+order: 38
 name:
-  ru: Разработка ИТ-продукта с агентами
-  en: IT product with agents
+  ru: Исправление дефекта или сбоя CI
+  en: Defect or CI repair
 routes:
   architecture:
     - [b_reqprod, [b_goal]]
@@ -29,8 +29,9 @@ routes:
     - [job-sandbox, [zero-trust-git]]
     - [agent-runtime, [context-manager, prompt-skill-registry]]
     - [input-guardrails, []]
-    - [llm-gateway, [egress-proxy, external-llm-api]]
-    - [output-guardrails, []]
+    - [request-classifier, []]
+    - [llm-gateway, [egress-proxy, external-llm-api, inference-quotas, usage-billing]]
+    - [output-guardrails, [audit-log]]
     - [git-repository, [zero-trust-git]]
     - [ci-runner, []]
     - [sast-sca-secrets, []]
@@ -42,13 +43,13 @@ routes:
     - [tool-router, [checkpoint-store]]
     - [pep, [pdp, rate-limits-budgets]]
     - [mcp-servers, [secrets-manager, erp-crm]]
-    - [output-guardrails, [audit-log]]
   stack:
     - [RM-APP-03, []]
     - [RM-AGT-01, [RM-AGT-08, RM-GOV-02]]
     - [RM-AGT-03, [RM-AGT-07, RM-DPR-06]]
     - [RM-AGT-02, [RM-AGT-05]]
-    - [RM-ACT-03, [RM-MOD-06, RM-AIC-01, RM-AGT-04, RM-ACT-02]]
+    - [RM-ACT-03, [RM-MOD-12, RM-MOD-06, RM-AIC-01, RM-AGT-04, RM-ACT-02, RM-AIC-05, RM-OPS-06]]
+    - [RM-AIC-02, [RM-TRS-04]]
     - [RM-DEV-01, [RM-ACT-04]]
     - [RM-DEV-06, [RM-SEC-04]]
     - [RM-DEV-08, []]

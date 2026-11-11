@@ -1,0 +1,151 @@
+# Реестр процессов · Эксплуатация / Process registry · Operation
+RUN-01:
+  name:
+    ru: Контроль доступности и задержек
+    en: Service health and latency monitoring
+  start:
+    - Рабочий контур обрабатывает запросы и публикует телеметрию.
+    - The production environment processes requests and publishes telemetry.
+  result:
+    - Состояние сервиса, сигнал отклонения и запись для разбора.
+    - Service status, a deviation signal and a record for analysis.
+  check:
+    - Раздельно наблюдать очередь, время модели и проверок. Событие можно связать с запросом без лишних данных.
+    - Observe queue time, model time and check time separately. An event can be linked to a request without excess data.
+  gates: —
+  classes: [RM-OPS-01, RM-OPS-02, RM-OPS-03, RM-OPS-04]
+RUN-02:
+  name:
+    ru: Контроль качества и дрейфа
+    en: Production quality and drift monitoring
+  start:
+    - Появляются рабочие входы, результаты и оценки качества.
+    - Production inputs, results and quality ratings arrive.
+  result:
+    - Сигнал изменения с указанием версии, выборки и границы уверенности.
+    - A change signal with the version, sample and confidence bound.
+  check:
+    - Развести изменения входов, прогнозов и качества. Сигнал запускает разбор и не выпускает новую модель.
+    - Distinguish changes in inputs, predictions and quality. The signal triggers analysis and does not release a new model.
+  gates: G8*
+  classes: [RM-OPS-05, RM-OPS-02, RM-OPS-07, RM-DAT-05]
+RUN-03:
+  name:
+    ru: Повторная квалификация рабочего контура
+    en: Deployed system requalification
+  start:
+    - Настал срок проверки, изменился риск или сработал сигнал качества.
+    - A review date arrives, the risk changes or a quality signal fires.
+  result:
+    - Продлённый, ограниченный или отозванный допуск текущей конфигурации.
+    - An extended, restricted or revoked admission of the current configuration.
+  check:
+    - Тестировать наблюдаемую рабочую версию. Проверки и владелец решения остаются независимыми от исполнителя.
+    - Test the observed production version. Checks and the decision owner remain independent of the executor.
+  gates: G4 G8 И*
+  classes: [RM-DAT-05, RM-DEV-07, RM-OPS-05, RM-OPS-07, RM-GOV-04]
+RUN-04:
+  name:
+    ru: Резервное переключение инференса
+    en: Inference failover
+  start:
+    - Основная модель или среда инференса недоступна.
+    - The primary model or inference environment is unavailable.
+  result:
+    - Разрешённый резервный маршрут или безопасный отказ.
+    - A permitted fallback route or a safe denial.
+  check:
+    - Смена маршрута сохраняет обязательные проверки, правила раскрытия и требования к размещению.
+    - Route switching preserves mandatory checks, disclosure rules and placement requirements.
+  gates: И
+  classes: [RM-MOD-06, RM-MOD-07, RM-SEC-02, RM-AIC-01, RM-AIC-02, RM-OPS-01]
+RUN-05:
+  name:
+    ru: Управление вычислительной ёмкостью
+    en: AI workload capacity management
+  start:
+    - Меняется спрос, ресурсы или целевые показатели сервиса.
+    - Demand, resources or service targets change.
+  result:
+    - План ёмкости, квоты и проверенное изменение размещения.
+    - A capacity plan, quotas and a verified placement change.
+  check:
+    - Масштабирование и вытеснение не ослабляют изоляцию. Нагрузка соответствует измеренной ёмкости.
+    - Scaling and preemption do not weaken isolation. Load matches measured capacity.
+  gates: G8*
+  classes: [RM-PLT-02, RM-HW-02, RM-HW-05, RM-MOD-08, RM-OPS-01, RM-OPS-06]
+RUN-06:
+  name:
+    ru: Учёт потребления и ограничение затрат
+    en: Usage accounting and cost control
+  start:
+    - Проекты потребляют запросы, токены, время вычислений и инструменты.
+    - Projects consume requests, tokens, compute time and tools.
+  result:
+    - Распределённое потребление, лимиты и реакции на превышение.
+    - Allocated consumption, limits and responses to overruns.
+  check:
+    - Отдельно измерять расходы и принудительно ограничивать их. Проверить обычный чат и вложенное делегирование.
+    - Measure costs and enforce limits separately. Check regular chat and nested delegation.
+  gates: G0 G7*
+  classes: [RM-OPS-06, RM-AGT-08, RM-INT-01, RM-GOV-03]
+RUN-07:
+  name:
+    ru: Разбор обратной связи эксплуатации
+    en: Production feedback triage
+  start:
+    - Пользователь, оператор или автоматическая оценка сообщил о проблеме.
+    - A user, operator or automated evaluation reports a problem.
+  result:
+    - Разобранное обращение, задача проверки или предложение исправления.
+    - A triaged report, a check task or a proposed fix.
+  check:
+    - Связать обращение с фактической версией и результатом. Обратная связь поступает в обучение только после отдельного допуска.
+    - Link the report to the actual version and result. Feedback enters training only after separate admission.
+  gates: G8*
+  classes: [RM-OPS-07, RM-OPS-05, RM-APP-03, RM-TRS-04]
+RUN-08:
+  name:
+    ru: Рассмотрение оспоренного решения
+    en: Outcome appeal and correction
+  start:
+    - Пользователь оспорил значимый для него результат.
+    - A user contests a result that is significant to them.
+  result:
+    - Объяснённое решение ответственного и при необходимости исправление исхода.
+    - An explained decision by the responsible person and, if needed, a corrected outcome.
+  check:
+    - Ответственный видит основания в разрешённом объёме и может изменить результат. Исправление и сроки отслеживаются.
+    - The responsible person sees the grounds within the permitted scope and can change the result. The correction and deadlines are tracked.
+  gates: G8*
+  classes: [RM-APP-03, RM-GOV-04, RM-OPS-07, RM-TRS-04]
+RUN-09:
+  name:
+    ru: Смена внешней модели или поставщика
+    en: External model provider migration
+  start:
+    - Поставщик меняет версию, условия обработки или прекращает сервис.
+    - A provider changes the version or processing terms, or discontinues the service.
+  result:
+    - Квалифицированный новый маршрут и план прекращения старого.
+    - A qualified new route and a plan to retire the old one.
+  check:
+    - Повторить оценку качества, передачи данных и хранения. Проверить поведение при неизвестной версии и остановке старого маршрута.
+    - Repeat the evaluation of quality, data transfer and retention. Check behavior with an unknown version and when the old route stops.
+  gates: G1 G4 G8
+  classes: [RM-MOD-03, RM-MOD-06, RM-GOV-01, RM-GOV-04, RM-OPS-07, RM-SEC-02]
+RUN-10:
+  name:
+    ru: Резервирование и восстановление платформы
+    en: Platform backup and recovery
+  start:
+    - Запланирована копия или произошёл отказ платформы.
+    - A backup is scheduled or a platform failure occurs.
+  result:
+    - Проверенная восстановленная конфигурация и отчёт о пределах восстановления.
+    - A verified restored configuration and a report on recovery limits.
+  check:
+    - После восстановления актуальны права, политика, версии и записи фактических эффектов. Старые полномочия не возвращаются.
+    - After recovery, permissions, policy, versions and records of actual effects are current. Old permissions are not restored.
+  gates: G8*
+  classes: [RM-OPS-08, RM-TRS-05, RM-TRS-06, RM-TRS-04, RM-GOV-03]

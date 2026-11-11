@@ -1,0 +1,98 @@
+# Этапы и варианты процессов. Ключ этапа процесса: <процесс>--<этап>.
+# Stages and variants of processes. A process stage key is <process>--<stage>.
+RET-02--DECISION:
+  kind: operation
+  name:
+    ru: Оформить решение о выводе
+    en: Record the retirement decision
+  description:
+    - Указать выводимую систему, версии, владельца, причину и окно выключения. Зафиксировать требования к доступности потребителей, хранению и уничтожению данных.
+    - Identify the retiring system, versions, owner, reason and shutdown window. Record consumer continuity and data retention or deletion requirements.
+  classes: [RM-GOV-01, RM-GOV-04, RM-OPS-07, RM-TRS-04]
+  architectureSteps: [b_regretire, b_ownproc, g9]
+  workflowNode: decision
+RET-02--INVENTORY:
+  kind: operation
+  name:
+    ru: Найти маршруты и зависимости
+    en: Find paths and dependencies
+  description:
+    - Инвентаризировать точки входа, резервы, задания, интеграции, права, артефакты, данные, индексы, кэш, память и резервные копии. Для общих ресурсов определить остающихся владельцев.
+    - Inventory entry points, fallbacks, jobs, integrations, authority, artifacts, data, indexes, caches, memory and backups. Identify remaining owners of shared resources.
+  classes: [RM-GOV-01, RM-MOD-05, RM-DAT-02, RM-TRS-05, RM-GOV-02]
+  architectureSteps: [s_retire, mt_profile, mt_tb]
+  workflowNode: inventory
+RET-02--READY:
+  kind: operation
+  name:
+    ru: Потребители готовы к выключению?
+    en: Are consumers ready for shutdown?
+  description:
+    - Подтвердить перенос на допущенную замену либо согласованное прекращение, план сверки операций и решения по данным и свидетельствам. При критической зависимости без плана не подтверждать вывод.
+    - Confirm migration to an admitted replacement or agreed cessation, the reconciliation plan, and data and evidence disposition. Do not confirm retirement if a critical dependency has no plan.
+  classes: [RM-GOV-01, RM-GOV-04, RM-OPS-07, RM-TRS-04]
+  architectureSteps: [b_ownproc, b_owndata, b_regretire, g9]
+  workflowNode: ready
+RET-02--DISABLE:
+  kind: operation
+  name:
+    ru: Закрыть новые операции
+    en: Close new operations
+  description:
+    - Снять регистрацию маршрутов, резервов, подписок и расписаний; остановить новые задания и интеграции в выводимой области. Совместно используемый сервис не выключать целиком.
+    - Remove paths, fallbacks, subscriptions and schedules; stop new jobs and integrations in the retiring scope. Keep unrelated consumers of shared services operational.
+  classes:
+    - RM-AIC-05
+    - RM-MOD-12
+    - RM-MOD-13
+    - RM-MOD-06
+    - RM-DEV-10
+    - RM-TRS-07
+    - RM-INT-02
+    - RM-INT-03
+  architectureSteps: [s_retire, o_ops, t_infer]
+  workflowNode: disable
+RET-02--SETTLE:
+  kind: operation
+  name:
+    ru: Завершить ожидающие операции
+    en: Settle pending operations
+  description:
+    - Отменить неисполненное; сверить известные внешние эффекты и неизвестные состояния с целевой системой без повторной записи. Если эффект требует дальнейшего решения, передать его именованному владельцу и исключить автоматическое возобновление.
+    - Cancel unexecuted work; reconcile known external effects and unknown outcomes with target systems without repeating writes. Assign unresolved effects to a named owner and prevent automatic resumption.
+  classes: [RM-AGT-05, RM-INT-02, RM-ACT-02, RM-TRS-04, RM-TRS-07]
+  architectureSteps: [s_retire, s_runtime, t_gw]
+  workflowNode: settle
+RET-02--REVOKE:
+  kind: operation
+  name:
+    ru: Права и секреты отозваны?
+    en: Are grants and secrets revoked?
+  description:
+    - Вызвать FLOW-ACCESS для отзыва делегирования, машинных удостоверений и секретов выводимой области. Проверить действующих пользователей общих ключей и интеграций. При неподтверждённом отзыве не закрывать G9.
+    - Use FLOW-ACCESS to revoke delegation, workload credentials and secrets in the retiring scope. Verify remaining users of shared keys and integrations. An unverified revocation leaves G9 open.
+  classes: [RM-SEC-01, RM-GOV-02, RM-TRS-03, RM-TRS-07, RM-ACT-02]
+  architectureSteps: [t_iam, s_retire, s_runtime]
+  workflowNode: revoke
+RET-02--DISPOSE:
+  kind: operation
+  name:
+    ru: Обработать данные и артефакты
+    en: Dispose of data and artifacts
+  description:
+    - 'Применить решение к каждому набору и производной копии: удалить, передать владельцу или оставить на ограниченном хранении до срока. Для архивов и резервных копий исключить повторную публикацию; общие артефакты сохранить только для оставшихся потребителей.'
+    - For each dataset and derivative, delete it, transfer it to its owner or retain it under access restrictions until expiry. Prevent archives and backups from republishing retired data; retain shared artifacts only for remaining consumers.
+  classes: [RM-DAT-02, RM-DAT-04, RM-MOD-10, RM-AGT-06, RM-OPS-08, RM-SEC-07]
+  architectureSteps: [b_owndata, b_law, s_retire]
+  workflowNode: dispose
+RET-02--VERIFY:
+  kind: operation
+  name:
+    ru: Все условия G9 выполнены?
+    en: Are all G9 conditions met?
+  description:
+    - Протестировать прямой, резервный и отложенный пути, отказ по старым правам и невозможность возобновления после восстановления. Сверить остатки, допустимое хранение и целостность свидетельств.
+    - Test direct, fallback and scheduled paths, denial of old authority and no restart after recovery. Reconcile remaining material, permitted retention and evidence integrity.
+  classes: [RM-GOV-04, RM-TRS-07, RM-OPS-08, RM-SEC-07, RM-TRS-06]
+  architectureSteps: [g9, s_retire, mt_ev, t_audit]
+  workflowNode: verify

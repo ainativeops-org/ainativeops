@@ -2,16 +2,16 @@
 # Ключ RM-… после версии 1.0 не меняется и не переиспользуется. / An RM-… key is frozen after 1.0 and never reused.
 RM-CMP-01:
   name:
-    ru: Confidential Computing · TEE
-    en: Confidential Computing · TEE
+    ru: Аттестованная среда исполнения (TEE)
+    en: Attested trusted execution environment (TEE)
   desc:
     ru: Обучение и инференс выполняются внутри TEE. Оператор платформы не читает данные и веса во время обработки.
     en: Training and inference run inside a TEE. The platform operator cannot read data and weights during processing.
   optional: true
 RM-CMP-02:
   name:
-    ru: Remote Attestation · KBS
-    en: Remote Attestation · KBS
+    ru: Удалённая аттестация и выдача ключей
+    en: Remote attestation and key release
   desc:
     ru: Ключ к модели или данным получает только среда, прошедшая аттестацию. Отчёт об аттестации сохраняется как свидетельство допуска.
     en: Only an environment that passed attestation gets the key to a model or data. The attestation report is kept as admission evidence.

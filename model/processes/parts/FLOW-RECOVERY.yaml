@@ -1,0 +1,79 @@
+# Этапы и варианты процессов. Ключ этапа процесса: <процесс>--<этап>.
+# Stages and variants of processes. A process stage key is <process>--<stage>.
+FLOW-RECOVERY--ALERT:
+  kind: operation
+  name:
+    ru: Зарегистрировать сбой сервиса
+    en: Record the service disruption
+  description:
+    - Сохранить время, симптом, затронутый маршрут и версию, контрольные показатели и ожидаемое время восстановления. Назначить руководителя и определить приоритет по влиянию на потребителей.
+    - Record time, symptom, affected path and version, service targets and expected recovery time. Assign a recovery lead and prioritize by consumer impact.
+  classes: [RM-OPS-01, RM-OPS-02, RM-OPS-04, RM-TRS-04]
+  architectureSteps: [s_detect, o_ops, b_ownproc]
+  workflowNode: alert
+FLOW-RECOVERY--TRIAGE:
+  kind: operation
+  name:
+    ru: Есть признаки нарушения ИБ?
+    en: Are there security indicators?
+  description:
+    - Сопоставить ошибки и трассы с последними изменениями. Деградация без признаков нарушения допускает эксплуатационное восстановление; при подозрении на раскрытие, компрометацию или недопустимый эффект не расширять доступ.
+    - Correlate errors and traces with recent changes. Degradation without signs of a breach permits operational recovery; suspected disclosure, compromise or a prohibited effect rules out access expansion.
+  classes: [RM-OPS-01, RM-OPS-02, RM-SEC-05]
+  architectureSteps: [s_detect, b_regincident, mt_tb]
+  workflowNode: triage
+FLOW-RECOVERY--LIMIT:
+  kind: operation
+  name:
+    ru: Стабилизировать нагрузку
+    en: Stabilize the workload
+  description:
+    - Ограничить новые запросы, поставить очередь в безопасное состояние и отметить незавершённые операции. Не повторять вызовы с неизвестным результатом до сверки с целевой системой.
+    - Restrict new requests, put queues in a safe state and identify unfinished work. Do not repeat a call with an unknown outcome before reconciling with the target system.
+  classes: [RM-AIC-05, RM-MOD-12, RM-MOD-13, RM-MOD-06, RM-MOD-08, RM-PLT-04, RM-AGT-05]
+  architectureSteps: [o_ops, s_runtime, t_prod]
+  workflowNode: limit
+FLOW-RECOVERY--CHOOSE:
+  kind: operation
+  name:
+    ru: Какой путь восстановления допустим?
+    en: Which recovery path is eligible?
+  description:
+    - Выбрать заранее допущенный запасной маршрут или возврат совместимой версии, если состояние согласовано. При потере состояния использовать проверяемую резервную копию. Если условий нет, оставить сервис ограниченным.
+    - Choose a pre-admitted fallback path or return to a compatible version if state is consistent. If state was lost, use a verifiable backup. If no option meets the conditions, keep the service restricted.
+  classes: [RM-AIC-05, RM-MOD-12, RM-MOD-13, RM-MOD-06, RM-DEV-10, RM-OPS-08, RM-GOV-04]
+  architectureSteps: [o_ops, g6, mt_tb]
+  workflowNode: choose
+FLOW-RECOVERY--SWITCH:
+  kind: operation
+  name:
+    ru: Переключить на допущенный резерв
+    en: Switch to an admitted fallback
+  description:
+    - Проверить действующий допуск, совместимость, местонахождение обработки и прежние ограничения раскрытия. Переключить маршрут без расширения доступа; внешний маршрут не разрешается самим фактом отказа.
+    - Verify current admission, compatibility, processing location and existing disclosure restrictions. Switch without expanding access; a failure does not authorize an external path.
+  classes: [RM-AIC-05, RM-MOD-12, RM-MOD-13, RM-MOD-06, RM-MOD-07, RM-DEV-10, RM-GOV-03]
+  architectureSteps: [o_ops, t_infer, b_poldisc, b_polext]
+  workflowNode: switch
+FLOW-RECOVERY--VALIDATE:
+  kind: operation
+  name:
+    ru: Восстановление подтверждено?
+    en: Is recovery verified?
+  description:
+    - Проверить целостность и версию, отказ по старым полномочиям, защиту запросов и ответов, отсутствие повторных эффектов, доступность и задержку. Сравнить фактическое время и потерю данных с целями восстановления.
+    - Check integrity and version, old-authority denials, input and output controls, no duplicate effects, availability and latency. Compare actual time and data loss with recovery objectives.
+  classes: [RM-AIC-01, RM-AIC-02, RM-ACT-02, RM-OPS-01, RM-OPS-08]
+  architectureSteps: [o_ops, s_runtime, t_result, mt_ev]
+  workflowNode: validate
+FLOW-RECOVERY--RESUME:
+  kind: operation
+  name:
+    ru: Возврат нагрузки устойчив?
+    en: Is traffic resumption stable?
+  description:
+    - По решению владельца открыть ограниченную долю трафика и наблюдать в установленный срок. При повторном отказе остановить расширение и вернуть ограничение; при признаках нарушения ИБ немедленно передать сигнал.
+    - With owner approval, resume a limited traffic cohort and monitor for the defined interval. On recurrent failure, stop expansion and restore restrictions; transfer security indicators immediately.
+  classes: [RM-DEV-10, RM-AIC-05, RM-MOD-12, RM-MOD-13, RM-MOD-06, RM-OPS-01, RM-OPS-07]
+  architectureSteps: [o_ops, s_detect, b_ownproc]
+  workflowNode: resume

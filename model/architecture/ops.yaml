@@ -43,7 +43,7 @@ m1:
   type: process
   name:
     ru: Приём базовой модели
-    en: Foundation model intake
+    en: Base model intake
   desc:
     ru: Базовая модель принимается с проверкой происхождения и формата.
     en: A foundation model is accepted after provenance and format checks.
@@ -223,3 +223,11 @@ s_retire:
   desc:
     ru: Отзываются полномочия и интеграции, обрабатываются остаточные данные. Исполняет рубеж G9.
     en: Authorities and integrations are revoked, residual data is processed. Enforces gate G9.
+d_extract:
+  type: process
+  name:
+    ru: Извлечение мультимодальных данных
+    en: Multimodal extraction
+  desc:
+    ru: Допущенные материалы разбираются с привязкой извлечённых сведений к фрагментам источника. Неуверенные и противоречивые результаты передаются на проверку.
+    en: Admitted materials are parsed with extracted facts linked to source fragments. Uncertain or contradictory results are handed over for review.

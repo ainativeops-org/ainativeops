@@ -1,0 +1,108 @@
+# Этапы и варианты процессов. Ключ этапа процесса: <процесс>--<этап>.
+# Stages and variants of processes. A process stage key is <process>--<stage>.
+FLOW-KNOWLEDGE--SCOPE:
+  kind: operation
+  name:
+    ru: Назначение и границы знаний
+    en: Knowledge purpose and boundaries
+  description:
+    - Согласовать источники, владельцев, группы пользователей, сроки актуальности, отзыв и ожидаемые сценарии поиска с проверяемыми ссылками.
+    - Agree on sources, owners, audiences, freshness, revocation and search scenarios with verifiable citations.
+  classes: [RM-DAT-02, RM-APP-01, RM-GOV-03]
+  architectureSteps: [g0, b_goal, b_owndata, b_poldisc]
+  workflowNode: scope
+FLOW-KNOWLEDGE--SOURCE:
+  kind: operation
+  name:
+    ru: Источник и права подтверждены?
+    en: Are source and access verified?
+  description:
+    - Установить каноническую версию источника и авторитетную систему прав. Связать документ с владельцем и правилами раскрытия; не индексировать материалы с неподтверждённым происхождением или правами.
+    - Identify the canonical source version and authority for access. Bind documents to owners and disclosure rules; exclude sources with unverified provenance or permissions.
+  classes: [RM-DAT-01, RM-DAT-02, RM-DPR-04, RM-TRS-05]
+  architectureSteps: [d1, d2, s_src, g1]
+  workflowNode: source
+FLOW-KNOWLEDGE--NORMALIZE:
+  kind: operation
+  name:
+    ru: Документы, фрагменты и происхождение
+    en: Documents, fragments and provenance
+  description:
+    - Разобрать документы, удалить ненужные данные, стабилизировать идентификаторы фрагментов и привязать их к версии источника и области доступа. При модельном разборе или OCR каждый вызов сервиса проверяется guardrails на входе и выходе.
+    - Parse documents, remove unnecessary data, assign stable fragment IDs and bind them to source versions and access scope. For model-based parsing or OCR, check each service call with input and output guardrails.
+  classes:
+    - RM-DAT-01
+    - RM-DAT-04
+    - RM-DPR-01
+    - RM-AIC-01
+    - RM-AIC-05
+    - RM-MOD-12
+    - RM-MOD-13
+    - RM-MOD-06
+    - RM-AIC-02
+  architectureSteps: [d3, d5, b_poldisc, t_store, t_input, t_infer, t_result]
+  workflowNode: normalize
+FLOW-KNOWLEDGE--INDEX:
+  kind: operation
+  name:
+    ru: Построение версии индекса
+    en: Build the index version
+  description:
+    - Выбрать полнотекстовый, векторный, графовый или гибридный способ. При эмбеддингах или модельном ранжировании закрепить версии модели, фрагментов и индекса; каждый сервисный вызов проходит входные и выходные guardrails.
+    - Select full-text, vector, graph or hybrid retrieval. For embeddings or model reranking, pin model, fragment and index versions; every model service call passes input and output guardrails.
+  classes:
+    - RM-DAT-07
+    - RM-MOD-09
+    - RM-DAT-08
+    - RM-TRS-05
+    - RM-DAT-04
+    - RM-AIC-01
+    - RM-AIC-05
+    - RM-MOD-12
+    - RM-MOD-13
+    - RM-MOD-06
+    - RM-AIC-02
+  architectureSteps: [d5, t_vec, b_poldisc, t_input, t_infer, t_result]
+  workflowNode: index
+FLOW-KNOWLEDGE--SYNCHRONIZE:
+  kind: operation
+  name:
+    ru: Синхронизация прав и удаления
+    en: Synchronize access and deletion
+  description:
+    - Связать проверку доступа при запросе с актуальным субъектом и ACL источника. При изменении прав аннулировать выдачу и связанные кеши; при пропаже актуальных правил закрыть затронутую область.
+    - Bind query-time authorization to the current caller and source ACL. On access change, invalidate retrieval and related caches; close the affected scope when current policy is unavailable.
+  classes: [RM-SEC-01, RM-DPR-06, RM-DPR-04, RM-DAT-07, RM-MOD-10]
+  architectureSteps: [t_iam, mt_tb, b_poldisc, s_runtime]
+  workflowNode: synchronize
+FLOW-KNOWLEDGE--VERIFY:
+  kind: operation
+  name:
+    ru: Доступ и качество выдачи подтверждены?
+    en: Are access and retrieval quality verified?
+  description:
+    - Проверить покрытие, точность ссылок и результаты для разных прав. Отдельно испытать удаление, отзыв и внедрённую инструкцию в документе. Если проверка вызывает модель, контекст проходит входные guardrails, результат — выходные.
+    - Test coverage, citation accuracy and results across access scopes. Exercise deletion, revocation and injected instructions in a document. If a test invokes a model, apply input guardrails to context and output guardrails to the result.
+  classes:
+    - RM-DAT-05
+    - RM-DEV-07
+    - RM-DPR-06
+    - RM-AIC-01
+    - RM-AIC-05
+    - RM-MOD-12
+    - RM-MOD-13
+    - RM-MOD-06
+    - RM-AIC-02
+  architectureSteps: [o_eval, g4, mt_indep, g7, t_input, t_infer, t_result]
+  workflowNode: verify
+FLOW-KNOWLEDGE--SWITCH:
+  kind: operation
+  name:
+    ru: Безопасно переключить индекс?
+    en: Is the index safe to switch?
+  description:
+    - Сопоставить манифесты источников, правил и индекса. Выпустить версию с записью переключения. Предыдущий индекс можно вернуть лишь при действующих правах и актуальных удалениях.
+    - Reconcile source, policy and index manifests. Release the version with a cutover record. Restore a prior index only if permissions and deletions are current.
+  classes: [RM-DEV-09, RM-DEV-10, RM-DAT-07, RM-TRS-05]
+  architectureSteps: [o_pack, o_release, g6, mt_ev]
+  workflowNode: switch

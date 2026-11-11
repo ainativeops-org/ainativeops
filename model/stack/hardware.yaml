@@ -2,37 +2,37 @@
 # Ключ RM-… после версии 1.0 не меняется и не переиспользуется. / An RM-… key is frozen after 1.0 and never reused.
 RM-HW-01:
   name:
-    ru: CPU-серверы
-    en: CPU servers
+    ru: Вычислительные узлы с CPU
+    en: CPU compute nodes
   desc:
     ru: Физические и виртуальные вычислительные ресурсы. Задания размещает планировщик; фактическая ёмкость и ограничения изоляции учитываются при допуске нагрузки.
     en: Physical and virtual compute resources. The scheduler places jobs; actual capacity and isolation limits are considered at workload admission.
 RM-HW-02:
   name:
-    ru: GPU-серверы и кластеры
-    en: GPU servers and clusters
+    ru: Вычислительные узлы с ускорителями
+    en: Accelerated compute nodes
   desc:
-    ru: Серверы с GPU для обучения и инференса. Планировщик выделяет ускорители заданиям по квотам и изолирует задания разных владельцев.
-    en: GPU servers for training and inference. The scheduler allocates accelerators to jobs by quota and isolates jobs of different owners.
+    ru: Узлы с ускорителями для обучения и инференса. Профиль фиксирует совместимые устройства, ёмкость памяти и межсоединения. Размещение выполняет планировщик; изоляцию проверяют по возможностям устройства и конфигурации среды.
+    en: Nodes with accelerators for training and inference. The profile specifies compatible devices, memory capacity and interconnects. The scheduler places workloads; isolation is verified against hardware capabilities and environment configuration.
 RM-HW-03:
   name:
-    ru: GPU и CPU с TEE
-    en: GPU and CPU with TEE
+    ru: Узлы с аппаратной поддержкой TEE
+    en: Hardware TEE-capable nodes
   desc:
-    ru: CPU и GPU с аппаратной доверенной средой исполнения (TEE). Данные и веса остаются зашифрованными в памяти и на шине.
-    en: CPUs and GPUs with a hardware trusted execution environment (TEE). Data and weights stay encrypted in memory and on the bus.
+    ru: Вычислительные узлы с аппаратной поддержкой доверенной среды исполнения (TEE). Защищаемая память, устройства, каналы ввода-вывода и граница доверия определяются конкретной реализацией и проверяемым профилем.
+    en: Compute nodes with hardware support for trusted execution environments (TEEs). Protected memory, devices, I/O channels and trust boundaries depend on the implementation and the verified profile.
   optional: true
 RM-HW-04:
   name:
-    ru: СХД · объектное хранилище
-    en: Storage · object store
+    ru: Инфраструктура хранения
+    en: Storage infrastructure
   desc:
     ru: Предоставляют файловое, объектное или блочное хранение по требованиям нагрузки. Интерфейсы и гарантии этих классов различаются; состав выбирается для конкретных потребителей.
     en: File, object or block storage by workload requirements. These classes differ in interfaces and guarantees; the set is chosen per consumer.
 RM-HW-05:
   name:
-    ru: Сеть и балансировщики
-    en: Network and load balancers
+    ru: Сетевая инфраструктура
+    en: Network infrastructure
   desc:
-    ru: Связность сервисов, раздельные сегменты и управляемые входы и выходы. Политики исключают прямой путь в обход обязательных точек контроля.
-    en: Service connectivity, separate segments and controlled ingress and egress. Policies exclude a direct path that bypasses mandatory control points.
+    ru: Предоставляет связность, сегменты и балансировку нагрузки. Профиль указывает доверенные маршруты и точки контроля; отсутствие пути обхода проверяется на фактической сетевой конфигурации.
+    en: Provides connectivity, network segments and load balancing. The profile specifies trusted routes and enforcement points; bypass resistance is tested against the actual network configuration.

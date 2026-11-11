@@ -9,50 +9,50 @@ RM-AGT-01:
     en: 'Decomposes the goal and assigns functional roles: analysis, artifact creation and review. Subtasks inherit the constraints of the original task; delegation keeps the initiator accountable.'
 RM-AGT-02:
   name:
-    ru: Agent Runtime
-    en: Agent Runtime
+    ru: Среда исполнения агентов
+    en: Agent runtime
   desc:
-    ru: Исполняет цикл сборки контекста, вызова модели и обработки результата. Предложенные действия передаёт Tool Router; завершает или приостанавливает задачу по правилам.
-    en: Runs the loop of building context, calling the model and processing the result. Passes proposed actions to the Tool Router; completes or suspends the task by rule.
+    ru: Исполняет цикл агента, сохраняя состояние задачи. Вызывает модель через маршрут с входным и выходным контролем. Предложенные операции передаёт диспетчеру инструментов. Приостанавливает, возобновляет или завершает задачу по правилам.
+    en: Runs the agent loop and maintains task state. Calls the model through a route with input and output controls. Sends proposed operations to the tool dispatcher. Suspends, resumes or terminates the task according to policy.
 RM-AGT-03:
   name:
-    ru: Context Manager
-    en: Context Manager
+    ru: Управление контекстом
+    en: Context management
   desc:
-    ru: Собирает инструкции, разрешённые знания и результаты инструментов для текущего шага. Управляет объёмом и приоритетами с сохранением происхождения сведений.
-    en: Assembles instructions, permitted knowledge and tool results for the current step. Manages volume and priority and keeps the provenance of information.
+    ru: Собирает инструкции, разрешённые фрагменты знаний и результаты инструментов для текущего шага. Соблюдает лимиты контекста и сохраняет происхождение. Извлечённое содержимое и ответы инструментов сохраняют свою категорию доверия при включении в контекст.
+    en: Assembles instructions, authorised knowledge fragments and tool results for the current step. Enforces context limits and preserves provenance. Retrieved content and tool responses retain their trust classification when included in context.
 RM-AGT-04:
   name:
-    ru: Tool Router
-    en: Tool Router
+    ru: Диспетчер вызовов инструментов
+    en: Tool dispatcher
   desc:
-    ru: Проверяет схему предложенного вызова, запрашивает допуск PEP и направляет разрешённое действие исполнителю. Результат проходит контроль до возврата в контекст. Проверками охватываются MCP, shell и файловые операции.
-    en: Checks the schema of a proposed call, requests admission from the PEP and routes the allowed action to its executor. The result is checked before it returns to context. Checks cover MCP, shell and file operations.
+    ru: Проверяет схему предложения, находит инструмент по разрешённому идентификатору и передаёт точные аргументы в PEP. Направляет допущенный вызов адаптеру. Результат инструмента проходит проверку до возврата в контекст.
+    en: Validates the proposed call schema, resolves the authorised tool identifier and submits exact arguments to the PEP. Dispatches the admitted call to the adapter. Tool results are checked before being returned to context.
 RM-AGT-05:
   name:
-    ru: Хранилище чекпоинтов
-    en: Checkpoint store
+    ru: Хранилище состояния задач
+    en: Task state store
   desc:
-    ru: Сохраняет контрольные точки, ожидаемые согласования и завершённые шаги. При восстановлении исполнитель сверяет внешние эффекты перед повтором операции.
-    en: Stores checkpoints, pending approvals and completed steps. On recovery the runtime reconciles external effects before repeating an operation.
+    ru: Хранит состояние шагов, ожидаемые согласования и контрольные точки возобновления. Перед повтором внешнего действия сверяет его идентификатор и эффект с ресурсом; восстановление не восстанавливает отозванные полномочия.
+    en: Stores step state, pending approvals and recovery checkpoints. Before retrying an external action, reconciles its identifier and effect with the resource; restoration does not reinstate revoked authority.
 RM-AGT-06:
   name:
-    ru: Agent Memory
-    en: Agent Memory
+    ru: Долговременная память агентов
+    en: Long-term agent memory
   desc:
     ru: Хранит сведения для повторного использования между задачами. Области доступа, происхождение и сроки хранения задаются отдельно от состояния текущего исполнения.
     en: Stores information for reuse across tasks. Access scopes, provenance and retention are set separately from the state of the current run.
 RM-AGT-07:
   name:
-    ru: Реестр промптов и Skills
-    en: Prompt and Skills registry
+    ru: Реестр инструкций и навыков
+    en: Instruction and skill registry
   desc:
     ru: Версии системных инструкций, skills и схем инструментов связаны с манифестом. Изменения проходят ревью и регрессионные проверки; права изменения политик выделены отдельно.
     en: Versions of system instructions, skills and tool schemas are linked to the manifest. Changes go through review and regression checks; the right to change policies is separate.
 RM-AGT-08:
   name:
-    ru: Rate limits и бюджеты
-    en: Rate limits and budgets
+    ru: Лимиты и бюджеты задач
+    en: Task limits and budgets
   desc:
     ru: Учитывает время, стоимость и число шагов всей задачи, включая делегирование. Резервирует лимит до платной операции; при исчерпании останавливает выполнение или запрашивает решение.
     en: Accounts for time, cost and number of steps of the whole task, including delegation. Reserves the limit before a paid operation; when exhausted it stops execution or asks for a decision.

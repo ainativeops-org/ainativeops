@@ -1,0 +1,222 @@
+# Процесс на карте / Process on the map: FLOW-ACCESS
+# workflow: узлы и переходы схемы; SVG схемы строит tools/build.py через Graphviz.
+# workflow: diagram nodes and edges; tools/build.py renders the SVG with Graphviz.
+name:
+  ru: Предоставление и пересмотр полномочий сотрудников и агентов
+  en: Human and Agent Access Lifecycle
+group: SEC
+owner:
+  - Владелец ресурса утверждает область; администратор доступа применяет и проверяет решение.
+  - The resource owner approves scope; the access administrator applies and verifies the decision.
+start:
+  - Поступил запрос на выдачу или изменение полномочия, наступил срок пересмотра либо появился сигнал отзыва.
+  - A grant or change is requested, a review falls due or revocation is triggered.
+result:
+  - Выдано проверенное полномочие с ограниченным сроком, записан отказ либо подтверждён отзыв. Непроверенное применение изолируется.
+  - A verified time-bound grant, a recorded denial or a confirmed revocation. An unverified change is isolated.
+check:
+  - Новая роль работает только на утверждённых объектах и операциях. Старые токены, просроченные делегирования и ожидающие задачи не проходят после отзыва.
+  - The new role works only for approved objects and actions. Old tokens, expired delegations and pending work are rejected after revocation.
+maturity:
+  - 'Проверяемый доступ: раздельные идентичности, минимальные права, срок и принудительный отзыв.'
+  - 'Verified access: distinct identities, least privilege, expiry and enforced revocation.'
+calls: []
+order: 17
+protection:
+  - Каждый вызов модели проходит проверку идентичности и прав, защиту входа и выхода и аудит в разрешённом объёме. Вызовы инструментов допускаются отдельно; код исполняется в изолированной среде. Согласование и ограничения раскрытия задаются политикой.
+  - Every model call uses identity and authorization checks, input and output protections, and permitted audit retention. Tool calls are authorized separately; code runs in a sandbox. Approval and disclosure restrictions follow policy.
+parts:
+  - FLOW-ACCESS--REQUEST
+  - FLOW-ACCESS--ASSESS
+  - FLOW-ACCESS--SCOPE
+  - FLOW-ACCESS--APPROVE
+  - FLOW-ACCESS--APPLY
+  - FLOW-ACCESS--TEST
+tags: [Human and Agent Access Lifecycle]
+path: process-flow-access
+workflow:
+  summary:
+    - Поступил запрос на выдачу или изменение полномочия, наступил срок пересмотра либо появился сигнал отзыва. Выдано проверенное полномочие с ограниченным сроком, записан отказ либо подтверждён отзыв. Непроверенное применение изолируется.
+    - A grant or change is requested, a review falls due or revocation is triggered. A verified time-bound grant, a recorded denial or a confirmed revocation. An unverified change is isolated.
+  synthesis:
+    - Последовательность, условия переходов и сопоставление компонентов — проектный синтез AiNativeOps. Источники подтверждают отдельные практики в указанной области, а не всю схему.
+    - The sequence, conditions and component mapping are AiNativeOps design synthesis. Sources support individual practices within their stated scope, not the entire diagram.
+  basis:
+    - source: ZT
+      claim:
+        - Логические компоненты и рисунок 1. PDP, Policy Engine, Policy Administrator и PEP.
+        - 'Covers the logical components and Figure 1: PDP, Policy Engine, Policy Administrator, and PEP.'
+    - source: SECRETS
+      claim:
+        - Доступ, ротация, отзыв и журналирование рабочих секретов.
+        - Covers access, rotation, revocation, and logging of operational secrets.
+    - source: OWASP
+      claim:
+        - Проверка полномочий на стороне вызываемой системы и согласование значимых действий.
+        - Covers authorization checks on the side of the called system and approval of significant actions.
+    - source: BOLA
+      claim:
+        - Проверка полномочий на конкретный объект, в том числе диалог по ID.
+        - Covers authorization checks on a specific object, including a conversation accessed by ID.
+  nodes:
+    - id: request
+      label: [Зафиксировать запрос или отзыв, Record a grant or revocation request]
+      detail:
+        - Указать инициатора, эффективного субъекта, владельца ресурса, назначение, среду, объекты, операции и срок. Плановый пересмотр указывает действующее полномочие, его использование и дату окончания.
+        - Record the initiator, effective subject, resource owner, purpose, environment, objects, operations and expiry. A scheduled review identifies the grant in force, its use and end date.
+      kind: step
+      components:
+        architecture: [b_polagent, t_iam, g0]
+        infrastructure: [iam-sso, agent-iam, audit-log]
+        stack: [RM-SEC-01, RM-GOV-02, RM-TRS-04]
+    - id: assess
+      label: ['Выдача, отказ или отзыв?', 'Grant, deny or revoke?']
+      detail:
+        - Сверить заявленную цель и субъект с областью ресурса. Утрата необходимости, смена роли, истечение срока или сигнал отзыва запускают отмену; отсутствие основания для нового права ведёт к отказу.
+        - Reconcile the declared purpose and subject with resource scope. Loss of need, role change, expiry or a revocation signal triggers withdrawal; a new grant without justification is denied.
+      kind: decision
+      components:
+        architecture: [b_ownproc, b_polagent, t_iam]
+        infrastructure: [iam-sso, agent-iam, pdp]
+        stack: [RM-SEC-01, RM-GOV-02, RM-GOV-03, RM-ACT-01]
+    - id: scope
+      label: [Ограничить права и срок, Scope authority and expiry]
+      detail:
+        - Развести права пользователя, агента и сервиса. Явное делегирование содержит получателя, ресурс, операции и срок; полномочие сервиса задаётся отдельно. Согласование отдельного действия не заменяется общей ролью.
+        - Separate user, agent and service authority. Explicit delegation includes grantee, resource, actions and expiry; service authority is defined separately. A broad role does not replace approval of a specific action.
+      kind: step
+      components:
+        architecture: [b_polagent, mt_tb, s_runtime]
+        infrastructure: [iam-sso, agent-iam, pdp]
+        stack: [RM-SEC-01, RM-GOV-02, RM-GOV-03, RM-AIC-04]
+    - id: approve
+      label: ['Владелец согласовал?', 'Did the owner approve?']
+      detail:
+        - Владелец ресурса проверяет минимальность, разделение обязанностей, условия раскрытия и срок; субъект не одобряет себе расширение. Запрет политики и отсутствие согласования закрывают выдачу.
+        - The resource owner checks least privilege, separation of duties, disclosure terms and expiry; the subject cannot approve their own elevation. Policy denial or missing approval prevents issuance.
+      kind: decision
+      components:
+        architecture: [b_ownproc, b_owndata, b_polagent, mt_indep]
+        infrastructure: [pdp, audit-log]
+        stack: [RM-GOV-03, RM-GOV-04, RM-ACT-01, RM-TRS-04]
+    - id: apply
+      label: [Подготовить доступ без активации, Stage access without activation]
+      detail:
+        - Применить согласованную роль в приостановленном состоянии. Не выдавать рабочие удостоверения и не открывать очередь агента до успешных положительных и отрицательных проб.
+        - Stage the approved role in a suspended state. Do not issue production credentials or enable the agent queue before positive and negative probes pass.
+      kind: step
+      components:
+        architecture: [t_iam, t_gw, s_runtime]
+        infrastructure: [iam-sso, agent-iam, pdp, pep, secrets-manager]
+        stack: [RM-SEC-01, RM-GOV-02, RM-ACT-01, RM-ACT-02, RM-TRS-03]
+    - id: test
+      label: ['Область доступа верна?', 'Is access correctly scoped?']
+      detail:
+        - В изолированном проверочном контексте подтвердить разрешённые операции и отказ во всех проверяемых запрещённых операциях. Ошибка оставляет выдачу заблокированной.
+        - Use an isolated test context to verify permitted operations and denial of tested forbidden operations. Any failure keeps issuance blocked.
+      kind: decision
+      components:
+        architecture: [t_iam, s_runtime, g7]
+        infrastructure: [pdp, pep, audit-log]
+        stack: [RM-ACT-01, RM-ACT-02, RM-SEC-01, RM-TRS-04]
+    - id: granted
+      label: [Полномочие подтверждено, Grant verified]
+      detail:
+        - После успешных проб выдать рабочее удостоверение или активировать очередь. Зафиксировать владельца, срок и область полномочий; назначить пересмотр и автоматический отзыв по истечении срока.
+        - After successful probes, issue the production credential or activate the queue. Record owner, expiry and scope; schedule review and expiry revocation.
+      kind: outcome
+      components:
+        architecture: [t_audit, t_iam, mt_review]
+        infrastructure: [iam-sso, agent-iam, audit-log]
+        stack: [RM-GOV-02, RM-SEC-01, RM-TRS-04]
+    - id: withdraw
+      label: [Прекратить доступ, Withdraw access]
+      detail:
+        - Отозвать назначение и заменённые полномочия, закрыть связанные с ним токены, секреты и сессии. На точках исполнения блокировать старое делегирование и переоценить ожидающие операции.
+        - Remove the grant and superseded authority; invalidate its tokens, secrets and sessions. Block stale delegation at enforcement points and re-evaluate queued operations.
+      kind: step
+      components:
+        architecture: [t_iam, s_runtime, t_gw]
+        infrastructure: [iam-sso, agent-iam, secrets-manager, kill-switch, pep]
+        stack: [RM-SEC-01, RM-GOV-02, RM-TRS-03, RM-TRS-07, RM-ACT-02]
+    - id: verify-revocation
+      label: ['Отзыв действует на всех путях?', 'Is revocation effective on every path?']
+      detail:
+        - Повторить запрос со старым полномочием на действующих путях, включая отложенное задание и повтор после восстановления. Подтвердить отказ в целевой системе и журнале.
+        - Retry with old authority on active paths, including queued work and retry after recovery. Confirm denial at the target and in the audit log.
+      kind: decision
+      components:
+        architecture: [t_iam, s_runtime, t_audit]
+        infrastructure: [agent-iam, pep, audit-log]
+        stack: [RM-GOV-02, RM-ACT-02, RM-TRS-04, RM-TRS-07]
+    - id: revoked
+      label: [Отзыв подтверждён, Revocation verified]
+      detail:
+        - Записать время последнего успешного обращения, время блокировки и охваченные пути. Доступ можно восстановить только новым оформленным решением.
+        - Record last successful access, block time and covered paths. Access can return only through a new documented decision.
+      kind: outcome
+      components:
+        architecture: [t_iam, t_audit, mt_review]
+        infrastructure: [iam-sso, agent-iam, audit-log]
+        stack: [RM-SEC-01, RM-TRS-04, RM-TRS-07]
+    - id: isolated
+      label: [Доступ изолирован для разбора, Access isolated for review]
+      detail:
+        - Ограничить путь на точке исполнения или сети, пока отзыв нельзя доказать. Передать владельцу сигнал с конкретным маршрутом и свидетельством; не отмечать отзыв как завершённый.
+        - Restrict the path at enforcement or network level while revocation cannot be proven. Give the owner the path and evidence; do not mark revocation complete.
+      kind: outcome
+      components:
+        architecture: [s_runtime, mt_tb, t_audit]
+        infrastructure: [pep, egress-proxy, kill-switch, audit-log]
+        stack: [RM-ACT-02, RM-SEC-02, RM-TRS-04, RM-TRS-07]
+    - id: denied
+      label: [Запрос отклонён, Request denied]
+      detail:
+        - Не выдавать и не расширять полномочие. Зафиксировать основание и область отказа, не раскрывая служебные секреты; истёкшие права не продлеваются.
+        - Do not issue or expand authority. Record the basis and scope of the denial without exposing service secrets; expired rights are not renewed.
+      kind: outcome
+      components:
+        architecture: [t_iam, t_audit, b_polagent]
+        infrastructure: [iam-sso, audit-log]
+        stack: [RM-SEC-01, RM-GOV-02, RM-TRS-04]
+  edges:
+    - from: request
+      to: assess
+      label: [Запрос или событие, Request or event]
+    - from: assess
+      to: scope
+      label: [Обоснована выдача, Grant justified]
+    - from: assess
+      to: withdraw
+      label: [Нужен отзыв, Revocation required]
+    - from: assess
+      to: denied
+      label: [Нет основания, No justification]
+    - from: scope
+      to: approve
+      label: [Права ограничены, Authority scoped]
+    - from: approve
+      to: apply
+      label: [Согласовано, Approved]
+    - from: approve
+      to: denied
+      label: [Не согласовано, Not approved]
+    - from: apply
+      to: test
+      label: [Правила применены, Rules applied]
+    - from: test
+      to: granted
+      label: [Границы подтверждены, Scope verified]
+    - from: test
+      to: withdraw
+      label: [Область нарушена, Scope incorrect]
+    - from: withdraw
+      to: verify-revocation
+      label: [Отзыв применён, Revocation applied]
+    - from: verify-revocation
+      to: revoked
+      label: [Доступ закрыт, Access denied]
+    - from: verify-revocation
+      to: isolated
+      label: [Отказ не доказан, Denial not verified]
+  main: [request, assess, scope, approve, apply, test, granted]

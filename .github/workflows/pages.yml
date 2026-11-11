@@ -19,11 +19,19 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # earlier releases are built from their tags
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - run: pip install -r requirements.txt
-      - run: python tools/build.py
+      - run: pip install -r requirements.txt playwright
+      - run: python -m playwright install --with-deps chromium
+      - name: Build map with embedded line geometry
+        run: python tools/build.py
+        env:
+          AINO_REPOSITORY: ${{ github.server_url }}/${{ github.repository }}
+      - name: Build earlier releases for the version switcher
+        run: python tools/build_versions.py
         env:
           AINO_REPOSITORY: ${{ github.server_url }}/${{ github.repository }}
       - uses: actions/configure-pages@v5

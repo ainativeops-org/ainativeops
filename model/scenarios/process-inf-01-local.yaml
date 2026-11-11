@@ -1,0 +1,31 @@
+# Маршрут / Route: Защищённая работа сотрудника с ИИ-помощником · в своём контуре / Protected Employee AI Assistance · local
+# Шаг = [элемент, [участники]] / Step = [element, [participants]]
+order: 9
+name:
+  ru: Защищённая работа сотрудника с ИИ-помощником · в своём контуре
+  en: Protected Employee AI Assistance · local
+routes:
+  stack:
+    - [RM-APP-02, [RM-SEC-01, RM-PLT-03, RM-ACT-01, RM-AIC-01]]
+    - [RM-AIC-01, [RM-GOV-03, RM-ACT-01, RM-TRS-04]]
+    - [RM-MOD-12, []]
+    - [RM-MOD-06, [RM-MOD-13, RM-MOD-05, RM-MOD-07, RM-AGT-08, RM-ACT-01, RM-AIC-01, RM-AIC-02, RM-TRS-04, RM-AIC-05, RM-OPS-06]]
+    - [RM-AIC-02, [RM-APP-02]]
+    - [RM-TRS-04, [RM-OPS-02]]
+    - [RM-APP-02, [RM-PLT-03]]
+  infrastructure:
+    - [chat-app, [iam-sso, conversation-store, pdp, input-guardrails]]
+    - [input-guardrails, [pdp, audit-log]]
+    - [request-classifier, []]
+    - [llm-gateway, [model-call-planner, model-registry, inference-servers, input-guardrails, output-guardrails, audit-log, inference-quotas, usage-billing]]
+    - [output-guardrails, [chat-app]]
+    - [audit-log, []]
+    - [chat-app, [conversation-store]]
+  architecture:
+    - [t_chat, [t_iam, t_history, t_input]]
+    - [t_input, [b_poldisc, s_runtime]]
+    - [t_route, []]
+    - [t_infer, [t_plan, b_polext, b_polbudget, t_input, t_result, t_audit, t_base]]
+    - [t_result, [b_poldisc]]
+    - [t_audit, [mt_ev]]
+    - [t_chat, [t_history]]

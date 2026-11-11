@@ -1,0 +1,28 @@
+# Маршрут / Route: Получение обоснованного ответа по корпоративным знаниям · в своём контуре / Grounded Enterprise Question Answering · local
+# Шаг = [элемент, [участники]] / Step = [element, [participants]]
+order: 11
+name:
+  ru: Получение обоснованного ответа по корпоративным знаниям · в своём контуре
+  en: Grounded Enterprise Question Answering · local
+routes:
+  stack:
+    - [RM-APP-01, [RM-SEC-01]]
+    - [RM-DPR-06, [RM-DPR-04, RM-ACT-01, RM-AIC-01]]
+    - [RM-DAT-07, [RM-MOD-12, RM-MOD-13, RM-DPR-06, RM-DAT-02, RM-MOD-09, RM-MOD-06, RM-AIC-01, RM-AIC-02, RM-AGT-08, RM-TRS-04, RM-MOD-07, RM-AIC-05, RM-OPS-06]]
+    - [RM-AGT-03, [RM-DPR-06, RM-AIC-01]]
+    - [RM-AIC-01, [RM-MOD-06, RM-AIC-02, RM-ACT-01]]
+    - [RM-AIC-02, [RM-DPR-06, RM-TRS-04]]
+    - [RM-APP-01, [RM-TRS-04]]
+  infrastructure:
+    - [business-apps, [iam-sso]]
+    - [rag-access-filter, [data-access-proxy, pdp, input-guardrails]]
+    - [vector-db, [request-classifier, model-call-planner, rag-access-filter, data-catalog, llm-gateway, rate-limits-budgets, input-guardrails, output-guardrails, audit-log, inference-servers, inference-quotas, usage-billing]]
+    - [context-manager, [rag-access-filter, input-guardrails]]
+    - [input-guardrails, [llm-gateway, output-guardrails]]
+    - [output-guardrails, [rag-access-filter, audit-log]]
+    - [business-apps, [audit-log]]
+  architecture:
+    - [t_iam, [t_input, b_poldisc]]
+    - [t_vec, [t_route, t_plan, t_infer, t_input, t_result, mt_ev, b_polbudget, t_audit, t_base]]
+    - [t_input, [t_infer, t_result, b_polext]]
+    - [t_result, [b_poldisc, mt_ev, t_audit]]

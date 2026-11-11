@@ -1,0 +1,30 @@
+# Маршрут / Route: Исследование и создание новой архитектуры модели / Model Architecture Research
+# Шаг = [элемент, [участники]] / Step = [element, [participants]]
+order: 8
+name:
+  ru: Исследование и создание новой архитектуры модели
+  en: Model Architecture Research
+routes:
+  stack:
+    - [RM-DEV-01, [RM-DEV-05, RM-MOD-12, RM-MOD-13, RM-DEV-06, RM-ACT-03, RM-ACT-02, RM-PLT-01, RM-AIC-01, RM-MOD-06, RM-AIC-02, RM-TRS-04, RM-MOD-07, RM-AIC-05, RM-OPS-06]]
+    - [RM-DAT-05, [RM-DAT-04, RM-DEV-05, RM-OPS-06, RM-DEV-07, RM-AIC-03, RM-AIC-01, RM-MOD-06, RM-AIC-02]]
+    - [RM-DEV-06, [RM-DEV-07, RM-DEV-05]]
+    - [RM-DEV-04, [RM-DEV-05, RM-OPS-06, RM-AIC-01, RM-MOD-06, RM-AIC-02]]
+    - [RM-DEV-07, [RM-DAT-05, RM-TRS-05]]
+    - [RM-DEV-08, [RM-DEV-05, RM-TRS-05]]
+  infrastructure:
+    - [git-repository, [experiment-tracking, model-training-service, request-classifier, model-call-planner, ci-runner, job-sandbox, pep, input-guardrails, llm-gateway, output-guardrails, audit-log, eval-inference-service, inference-quotas, usage-billing]]
+    - [eval-datasets, [dataset-versioning, experiment-tracking, eval-red-teaming, llm-as-a-judge, input-guardrails, llm-gateway, output-guardrails]]
+    - [ci-runner, [eval-red-teaming, rule-based-checks, experiment-tracking]]
+    - [experiment-tracking, [metrics-alerts, input-guardrails, llm-gateway, output-guardrails]]
+    - [eval-red-teaming, [eval-datasets, provenance-registry]]
+    - [artifact-registry, [experiment-tracking, provenance-registry]]
+  architecture:
+    - [g0, [b_goal, m2, t_eval]]
+    - [m2, [b_polbudget, mt_indep, b_owndata]]
+    - [v2, [t_route, t_plan, v3, t_repo, t_eng, mt_tb, t_input, t_infer, t_result, t_audit, t_base]]
+    - [v3, [m4, g2, s_prep]]
+    - [m3, [t_gpu, b_polbudget, mt_ev, t_input, t_infer, t_result]]
+    - [m4, [o_eval, g4, mt_indep, t_input, t_infer, t_result]]
+    - [o_eval, [mt_indep, mt_ev, g4]]
+    - [mt_ev, [m5, b_ownmodel]]

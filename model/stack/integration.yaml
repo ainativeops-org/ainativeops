@@ -2,29 +2,29 @@
 # Ключ RM-… после версии 1.0 не меняется и не переиспользуется. / An RM-… key is frozen after 1.0 and never reused.
 RM-INT-01:
   name:
-    ru: API Gateway
-    en: API Gateway
+    ru: Шлюз API
+    en: API gateway
   desc:
     ru: Публикация API приложений, авторизация запросов и ограничение частоты обращений. Идентичность инициатора передаётся в Harness.
     en: Publishes application APIs, authorises requests and limits call rates. The initiator identity is passed to the Harness.
 RM-INT-02:
   name:
-    ru: MCP-серверы и коннекторы
-    en: MCP servers and connectors
+    ru: Адаптеры инструментов
+    en: Tool adapters
   desc:
-    ru: Коннекторы к ERP, CRM и другим системам через MCP, HTTP API и локальные инструменты. Получают только разрешённые вызовы из диспетчера; служебные секреты подставляются вне контекста модели.
-    en: Connectors to ERP, CRM and other systems through MCP, HTTP APIs and local tools. They receive only calls allowed by the Tool Router; service secrets are injected outside the model context.
+    ru: Передают допущенную операцию конкретному инструменту через MCP, HTTP API или локальный интерфейс. Исполнитель или защищаемый ресурс проверяет применимый допуск к точной операции. Служебные секреты предоставляются исполнителю вне контекста модели.
+    en: Send an admitted action to a specific tool using MCP, HTTP API or a local interface. The executor or protected resource checks the applicable grant for the exact action. Service secrets are supplied to the executor outside model context.
 RM-INT-03:
   name:
-    ru: Event Bus · вебхуки
-    en: Event Bus · webhooks
+    ru: Шлюз прикладных событий
+    en: Application event gateway
   desc:
-    ru: Принимает и публикует прикладные события по контрактам, преобразует сообщения и выбирает адресатов. Брокер сообщений обеспечивает транспорт; шлюз реализует правила прикладного обмена.
-    en: Receives and publishes application events by contract, transforms messages and selects recipients. The message broker provides transport; the bus implements application exchange rules.
+    ru: Принимает и публикует события по прикладным контрактам, проверяет схему, преобразует представление и выбирает получателей. Транспорт обеспечивает брокер сообщений, HTTP или иной механизм доставки.
+    en: Receives and publishes events under application contracts, validates schemas, transforms representations and selects recipients. Delivery is provided by a message broker, HTTP or another transport.
 RM-INT-04:
   name:
-    ru: A2A-шлюз
-    en: A2A gateway
+    ru: Шлюз межагентного взаимодействия
+    en: Inter-agent gateway
   desc:
     ru: Передача задач между независимыми агентными системами с проверкой отправителя, области полномочий и состава контекста. Внутреннее делегирование может выполняться средствами Harness.
     en: Passes tasks between independent agent systems and checks the sender, the authority scope and the context content. Internal delegation can run inside the Harness.

@@ -1,0 +1,109 @@
+# Этапы и варианты процессов. Ключ этапа процесса: <процесс>--<этап>.
+# Stages and variants of processes. A process stage key is <process>--<stage>.
+FLOW-INCIDENT--SIGNAL:
+  kind: operation
+  name:
+    ru: Зарегистрировать сигнал ИБ
+    en: Record the security signal
+  description:
+    - Сохранить корреляцию событий, маршрут, время, предполагаемое действие и связанные версии политик. Назначить руководителя инцидента и канал связи по регламенту.
+    - Preserve event correlation, path, time, suspected action and associated policy versions. Assign the incident lead and the reporting channel under procedure.
+  classes: [RM-SEC-05, RM-OPS-04, RM-TRS-04]
+  architectureSteps: [b_regincident, s_detect, t_siem]
+  workflowNode: signal
+FLOW-INCIDENT--TRIAGE:
+  kind: operation
+  name:
+    ru: Нужно сдерживание?
+    en: Is containment warranted?
+  description:
+    - Определить затронутые границы, срочность и достоверность. При обоснованном подозрении сдерживать до подтверждения полного масштаба; при подтверждённом ложном сигнале записать основание.
+    - Assess affected boundaries, urgency and credibility. Contain a credible suspicion before the full scope is known; document the grounds when an alert is confirmed false.
+  classes: [RM-SEC-05, RM-GOV-04, RM-TRS-04]
+  architectureSteps: [s_detect, b_np, mt_tb]
+  workflowNode: triage
+FLOW-INCIDENT--CONTAIN:
+  kind: operation
+  name:
+    ru: Сдерживание подтверждено?
+    en: Is containment verified?
+  description:
+    - Блокировать новые операции, изолировать исполнителя и отозвать скомпрометированные полномочия. Не ждать сбора свидетельств. Проверить запрет на затронутых путях; при неполной блокировке усилить ограничения и не восстанавливать доступ.
+    - Block new operations, isolate the executor and revoke compromised authority. Do not wait for evidence collection. Verify denials on affected paths; strengthen restrictions and keep access closed if containment is incomplete.
+  classes:
+    - RM-TRS-07
+    - RM-ACT-02
+    - RM-GOV-02
+    - RM-SEC-02
+    - RM-AIC-05
+    - RM-MOD-12
+    - RM-MOD-13
+    - RM-MOD-06
+  architectureSteps: [s_resp, s_runtime, t_gw]
+  workflowNode: contain
+FLOW-INCIDENT--EVIDENCE:
+  kind: operation
+  name:
+    ru: Установить масштаб и причину
+    en: Establish scope and cause
+  description:
+    - Защитить исходные записи, версии конфигурации и события целевых систем, зафиксировать целостность и доступ к свидетельствам. Отметить, какие потери доказаны, исключены или ещё не определены.
+    - Protect original records, configuration versions and target-system events, and document evidence integrity and access. Distinguish confirmed impacts, ruled-out impacts and unknowns.
+  classes: [RM-SEC-05, RM-SEC-07, RM-TRS-04, RM-TRS-05, RM-TRS-06]
+  architectureSteps: [s_resp, mt_ev, t_audit]
+  workflowNode: evidence
+FLOW-INCIDENT--EFFECTS:
+  kind: operation
+  name:
+    ru: Сверить внешние эффекты
+    en: Reconcile external effects
+  description:
+    - Если затронуты инструменты с записью, выяснить статус по идентификатору операции в целевой системе. Не повторять неизвестный эффект. Компенсация получает отдельное решение и обычные проверки допуска.
+    - If write-capable tools were affected, establish status in the target system by operation identifier. Do not retry an unknown effect. Compensation requires a separate decision and ordinary admission checks.
+  classes: [RM-AGT-05, RM-INT-02, RM-ACT-02, RM-TRS-04, RM-TRS-07]
+  architectureSteps: [s_resp, s_runtime, g7]
+  workflowNode: effects
+FLOW-INCIDENT--REMEDIATE:
+  kind: operation
+  name:
+    ru: Устранить причину
+    en: Remove the cause
+  description:
+    - Удалить или исправить скомпрометированный компонент либо правило, закрыть обход, заменить затронутые секреты. Новые полномочия оформляются через FLOW-ACCESS, если они нужны для чистого контура.
+    - Remove or fix the compromised component or rule, close the bypass and replace affected secrets. Use FLOW-ACCESS for new authority if required by the clean environment.
+  classes: [RM-SEC-04, RM-SEC-06, RM-TRS-03, RM-GOV-02, RM-OPS-07]
+  architectureSteps: [s_resp, s_change, g8]
+  workflowNode: remediate
+FLOW-INCIDENT--RETURN-GATE:
+  kind: operation
+  name:
+    ru: Возврат разрешён?
+    en: Is resumption authorized?
+  description:
+    - Проверить устранение причины, отзыв старых полномочий, целостность и достаточность свидетельств. Получить новый допуск при изменении конфигурации или отзыве прежнего допуска, в том числе для неизменённой версии.
+    - Verify remediation, prior authority revocation, integrity and sufficient evidence. Obtain new admission after a configuration change or prior admission revocation, including for an unchanged version.
+  classes: [RM-DEV-07, RM-DEV-09, RM-GOV-04, RM-TRS-06]
+  architectureSteps: [s_resp, g6, g8, mt_ev]
+  workflowNode: return-gate
+FLOW-INCIDENT--REOPEN:
+  kind: operation
+  name:
+    ru: Открыть ограниченный контур
+    en: Reopen a limited path
+  description:
+    - Восстанавливать доступ поэтапно только для разрешённых субъектов и маршрутов. Включить дополнительные оповещения на признаки исходной атаки и отклонения от проверенной конфигурации.
+    - Resume in stages only for authorized subjects and paths. Enable additional alerts for recurrence of the original attack or divergence from the verified configuration.
+  classes: [RM-DEV-10, RM-AIC-05, RM-MOD-12, RM-MOD-13, RM-MOD-06, RM-SEC-05, RM-OPS-01]
+  architectureSteps: [s_resp, o_ops, t_siem]
+  workflowNode: reopen
+FLOW-INCIDENT--VERIFY:
+  kind: operation
+  name:
+    ru: Изоляцию можно снять?
+    en: Can isolation be lifted?
+  description:
+    - По итогам срока наблюдения подтвердить отсутствие признаков повторного нарушения, соблюдение запретов и запись всех решений. Повторный сигнал немедленно блокирует расширение и возвращает ограничение.
+    - At the end of the observation window, verify no signs of recurrence, that prohibitions hold and decisions were recorded. A new signal immediately stops expansion and restores restrictions.
+  classes: [RM-SEC-05, RM-ACT-02, RM-TRS-07, RM-TRS-04]
+  architectureSteps: [s_detect, s_resp, s_runtime]
+  workflowNode: verify

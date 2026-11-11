@@ -1,0 +1,35 @@
+# Маршрут / Route: Модернизация ИТ-системы с помощью ИИ / AI-assisted Application Modernization
+# Шаг = [элемент, [участники]] / Step = [element, [participants]]
+order: 2
+name:
+  ru: Модернизация ИТ-системы с помощью ИИ
+  en: AI-assisted Application Modernization
+routes:
+  stack:
+    - [RM-OPS-07, [RM-OPS-01, RM-GOV-04]]
+    - [RM-DEV-01, [RM-MOD-12, RM-AGT-03, RM-OPS-02, RM-DPR-01, RM-OPS-07, RM-AIC-01, RM-MOD-06, RM-AIC-02, RM-TRS-04, RM-MOD-07, RM-AIC-05, RM-OPS-06, RM-PLT-05, RM-OPS-08, RM-DEV-10]]
+    - [RM-DAT-05, [RM-DEV-07, RM-OPS-01, RM-OPS-07]]
+    - [RM-OPS-08, [RM-DEV-07, RM-AIC-04, RM-GOV-04]]
+    - [RM-ACT-03, [RM-AGT-02, RM-ACT-02, RM-DEV-06, RM-DEV-08, RM-AIC-01, RM-MOD-06, RM-AIC-02]]
+    - [RM-DEV-07, [RM-DAT-05, RM-OPS-01, RM-ACT-02, RM-AIC-01, RM-MOD-06, RM-AIC-02]]
+    - [RM-DEV-09, [RM-DEV-10, RM-OPS-01, RM-OPS-07, RM-TRS-04]]
+    - [RM-DEV-10, [RM-OPS-01, RM-OPS-07, RM-TRS-04]]
+  infrastructure:
+    - [business-apps, [metrics-alerts]]
+    - [git-repository, [request-classifier, context-manager, log-metric-store, data-discovery, input-guardrails, llm-gateway, output-guardrails, audit-log, inference-servers, inference-quotas, usage-billing, archive-backup, cd-deployment]]
+    - [eval-datasets, [eval-red-teaming, log-metric-store]]
+    - [archive-backup, [eval-red-teaming, rule-based-checks]]
+    - [job-sandbox, [agent-runtime, pep, ci-runner, artifact-registry, input-guardrails, llm-gateway, output-guardrails]]
+    - [eval-red-teaming, [eval-datasets, rule-based-checks, metrics-alerts, input-guardrails, llm-gateway, output-guardrails]]
+    - [release-gate, [cd-deployment, metrics-alerts, audit-log]]
+    - [cd-deployment, [metrics-alerts, audit-log]]
+  architecture:
+    - [b_regchange, [b_goal, b_np, g8]]
+    - [mt_tb, [t_route, t_repo, t_audit, v4, t_input, t_infer, t_result, t_base]]
+    - [v1, [g4, mt_indep, t_prod]]
+    - [v4, [b_regchange, mt_assess, mt_residual]]
+    - [g2, [mt_residual, mt_ev, b_ownrisk]]
+    - [v2, [v3, t_harness, t_gw, s_scan, t_input, t_infer, t_result]]
+    - [o_eval, [mt_indep, v4, s_runtime, t_input, t_infer, t_result]]
+    - [g6, [o_release, g7, s_change, t_audit]]
+    - [o_ops, [mt_review, g8]]

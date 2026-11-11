@@ -1,0 +1,24 @@
+# Маршрут / Route: Восстановление ИИ-сервиса после эксплуатационного инцидента / AI Service Incident Recovery
+# Шаг = [элемент, [участники]] / Step = [element, [participants]]
+order: 24
+name:
+  ru: Восстановление ИИ-сервиса после эксплуатационного инцидента
+  en: AI Service Incident Recovery
+routes:
+  stack:
+    - [RM-OPS-01, [RM-OPS-02, RM-OPS-04, RM-TRS-04, RM-SEC-05]]
+    - [RM-MOD-12, []]
+    - [RM-MOD-06, [RM-MOD-13, RM-MOD-08, RM-PLT-04, RM-AGT-05, RM-DEV-10, RM-OPS-08, RM-GOV-04, RM-MOD-07, RM-GOV-03, RM-AIC-01, RM-AIC-02, RM-TRS-04, RM-AIC-05, RM-OPS-06]]
+    - [RM-AIC-01, [RM-AIC-02, RM-ACT-02, RM-OPS-01, RM-OPS-08]]
+    - [RM-DEV-10, [RM-MOD-06, RM-OPS-01, RM-OPS-07]]
+    - [RM-OPS-07, [RM-OPS-08, RM-TRS-04]]
+  infrastructure:
+    - [metrics-alerts, [log-metric-store, audit-log, siem-soc]]
+    - [request-classifier, []]
+    - [llm-gateway, [model-call-planner, rate-limits-budgets, checkpoint-store, cd-deployment, archive-backup, inference-servers, input-guardrails, output-guardrails, audit-log, inference-quotas, usage-billing]]
+    - [input-guardrails, [output-guardrails, pep, metrics-alerts, audit-log]]
+    - [cd-deployment, [llm-gateway, metrics-alerts]]
+    - [metrics-alerts, [provenance-registry, audit-log]]
+  architecture:
+    - [s_detect, [o_ops, b_ownproc, b_regincident, mt_tb]]
+    - [o_ops, [t_route, t_plan, s_runtime, t_prod, g6, mt_tb, t_infer, b_poldisc, b_polext, t_result, mt_ev, s_detect, b_ownproc, s_change, t_audit, t_input, t_base]]

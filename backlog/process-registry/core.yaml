@@ -1,0 +1,16 @@
+# Реестр процессов · Общий защитный контур / Process registry · Shared protection core
+CORE-01:
+  name:
+    ru: Защищённый вызов модели
+    en: Guarded model invocation
+  start:
+    - Потребитель подаёт запрос и контекст по разрешённому маршруту.
+    - A consumer submits a request and context through a permitted route.
+  result:
+    - Проверенный результат или безопасный отказ с коррелированным аудитом.
+    - A checked result or a safe denial with correlated audit.
+  check:
+    - Запрещённый вход не вызывает модель. Выход проверяется перед передачей любому потребителю; при недоступном обязательном контроле нет обхода.
+    - Prohibited input does not invoke the model. Output is checked before it reaches any consumer; when a mandatory control is unavailable, nothing bypasses it.
+  gates: И
+  classes: [RM-SEC-01, RM-GOV-03, RM-AIC-01, RM-AIC-02, RM-MOD-06, RM-TRS-04]

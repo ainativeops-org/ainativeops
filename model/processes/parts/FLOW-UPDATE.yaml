@@ -1,0 +1,79 @@
+# Этапы и варианты процессов. Ключ этапа процесса: <процесс>--<этап>.
+# Stages and variants of processes. A process stage key is <process>--<stage>.
+FLOW-UPDATE--SIGNAL:
+  kind: operation
+  name:
+    ru: Зарегистрировать сигнал
+    en: Record a change signal
+  description:
+    - Связать жалобу, метрику, изменение требований или уведомление поставщика с владельцем, рабочим маршрутом и версией. Пользовательский материал не поступает в обучение без отдельного допуска.
+    - Link a complaint, metric, changed requirement or provider notice to the owner, production path and version. User material cannot enter training without separate approval.
+  classes: [RM-OPS-01, RM-OPS-05, RM-OPS-07, RM-TRS-04]
+  architectureSteps: [s_detect, s_change, mt_review]
+  workflowNode: signal
+FLOW-UPDATE--IMPACT:
+  kind: operation
+  name:
+    ru: Определить область изменения
+    en: Scope the change
+  description:
+    - 'Воспроизвести проблему, зафиксировать контрольную линию и затронутые зависимости: код, инструкции, данные, индекс, модель, политика, инструменты или среда. Назначить повторные проверки G8, критерии остановки и план возврата.'
+    - 'Reproduce the issue and record the baseline and affected dependencies: code, instructions, data, index, model, policy, tools or runtime. Define G8 retests, stop criteria and rollback plan.'
+  classes: [RM-GOV-01, RM-OPS-07, RM-TRS-05, RM-DAT-05]
+  architectureSteps: [g8, s_change, mt_assess]
+  workflowNode: impact
+FLOW-UPDATE--PLAN-GATE:
+  kind: operation
+  name:
+    ru: Изменение обосновано?
+    en: Is the change justified?
+  description:
+    - Владелец подтверждает гипотезу, ценность, область, бюджет и выполнимые критерии. Если недостаточно оснований или невозможно безопасно проверить изменение, рабочая версия остаётся без изменений.
+    - The owner confirms the hypothesis, expected benefit, scope, budget and actionable criteria. If evidence is insufficient or safe testing is infeasible, production remains unchanged.
+  classes: [RM-GOV-04, RM-OPS-05, RM-OPS-07, RM-TRS-04]
+  architectureSteps: [b_ownproc, b_goal, g8, mt_review]
+  workflowNode: plan-gate
+FLOW-UPDATE--CANDIDATE:
+  kind: operation
+  name:
+    ru: Собрать минимальное изменение
+    en: Build the smallest change
+  description:
+    - 'Изменить только нужную часть: например, инструкцию, правило доступа, индекс, интеграцию или модель. Подготовить версионированный кандидат и повторить затронутые проверки; автор не меняет критерии допуска.'
+    - Change only the necessary part, such as instructions, access policy, index, integration or model. Build a versioned candidate and repeat affected checks; the author cannot change admission criteria.
+  classes: [RM-DEV-01, RM-DEV-06, RM-DEV-07, RM-DEV-08, RM-OPS-07]
+  architectureSteps: [v3, s_change, g8]
+  workflowNode: candidate
+FLOW-UPDATE--ADMIT:
+  kind: operation
+  name:
+    ru: Кандидат допущен?
+    en: Is the candidate admitted?
+  description:
+    - Передать манифест в FLOW-ADMISSION и получить решение на эту версию. До положительного решения новая конфигурация не принимает рабочий трафик.
+    - Submit the manifest to FLOW-ADMISSION and obtain a decision for that version. The new configuration cannot receive production traffic before admission.
+  classes: [RM-DEV-09, RM-GOV-04, RM-TRS-05]
+  architectureSteps: [g8, g6, o_release]
+  workflowNode: admit
+FLOW-UPDATE--CANARY:
+  kind: operation
+  name:
+    ru: Включить ограниченный трафик
+    en: Enable limited traffic
+  description:
+    - Переключить согласованную долю на допущенную версию, сохранив проверки исполнения. Для маршрута с записью теневые пробы используют тестовые цели или не производят внешних эффектов.
+    - Route an approved traffic cohort to the admitted version with runtime checks intact. For a path that can write, shadow tests use test targets or produce no external effects.
+  classes: [RM-DEV-10, RM-AIC-05, RM-MOD-12, RM-MOD-13, RM-MOD-06, RM-OPS-01, RM-ACT-02]
+  architectureSteps: [o_ops, g7, t_prod]
+  workflowNode: canary
+FLOW-UPDATE--OBSERVE:
+  kind: operation
+  name:
+    ru: Пороги соблюдены?
+    en: Are thresholds met?
+  description:
+    - Сравнить наблюдаемое качество, безопасность, задержку и стоимость с контрольной линией по выбранным срезам. Недостаточно данных — удерживать ограничение до срока наблюдения; при нарушении или неопределённости к этому сроку остановить продвижение.
+    - Compare observed quality, safety, latency and cost against the baseline across selected slices. Insufficient data holds limited exposure until the observation deadline; a breach or remaining uncertainty then stops promotion.
+  classes: [RM-OPS-01, RM-OPS-04, RM-OPS-05, RM-OPS-06]
+  architectureSteps: [o_ops, s_detect, mt_review]
+  workflowNode: observe

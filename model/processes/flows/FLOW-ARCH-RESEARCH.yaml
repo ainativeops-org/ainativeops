@@ -1,0 +1,268 @@
+# Процесс на карте / Process on the map: FLOW-ARCH-RESEARCH
+# workflow: узлы и переходы схемы; SVG схемы строит tools/build.py через Graphviz.
+# workflow: diagram nodes and edges; tools/build.py renders the SVG with Graphviz.
+name:
+  ru: Исследование и создание новой архитектуры модели
+  en: Model Architecture Research
+group: MOD
+owner:
+  - Руководитель исследования; независимый рецензент и владелец вычислительного бюджета.
+  - Research lead with an independent reviewer and compute budget owner.
+start:
+  - Сформулировано ограничение существующей архитектуры, которое можно проверить экспериментом.
+  - An experimentally testable limitation of an existing architecture is identified.
+result:
+  - Есть воспроизводимый прототип и отчёт о поддержанной, отклонённой или непроверенной гипотезе с границами применимости.
+  - A reproducible prototype and report classify the hypothesis as supported, rejected or inconclusive within stated limits.
+check:
+  - Версионированы гипотеза и протокол. Сравнение на согласованном бюджете и абляции показывают вклад изменения; независимый рецензент может повторить ключевую проверку.
+  - The hypothesis and protocol are versioned. A budget-matched comparison and ablations isolate the change; an independent reviewer can repeat a key check.
+maturity:
+  - Исследовательский контур. Положительный результат не означает промышленную готовность или допуск к эксплуатации.
+  - Research stage. Positive evidence does not establish industrial readiness or production admission.
+calls:
+  - id: FLOW-DATA
+    when:
+      - Если для честного сравнения нужен новый проверенный корпус или новая контрольная выборка.
+      - When a fair comparison needs a new verified corpus or evaluation split.
+order: 8
+protection:
+  - Каждый вызов модели проходит проверку идентичности и прав, защиту входа и выхода и аудит в разрешённом объёме. Вызовы инструментов допускаются отдельно; код исполняется в изолированной среде. Согласование и ограничения раскрытия задаются политикой.
+  - Every model call uses identity and authorization checks, input and output protections, and permitted audit retention. Tool calls are authorized separately; code runs in a sandbox. Approval and disclosure restrictions follow policy.
+parts:
+  - CORE-01
+  - FLOW-ARCH-RESEARCH--QUESTION
+  - FLOW-ARCH-RESEARCH--PROTOCOL
+  - FLOW-ARCH-RESEARCH--PROTOTYPE
+  - FLOW-ARCH-RESEARCH--VERIFY
+  - FLOW-ARCH-RESEARCH--RUN
+  - FLOW-ARCH-RESEARCH--COMPARE
+  - FLOW-ARCH-RESEARCH--REVIEW
+tags: [Model Architecture Research, R&D, NAS, исследование архитектур]
+path: process-flow-arch-research
+workflow:
+  summary:
+    - Сформулировано ограничение существующей архитектуры, которое можно проверить экспериментом. Есть воспроизводимый прототип и отчёт о поддержанной, отклонённой или непроверенной гипотезе с границами применимости.
+    - An experimentally testable limitation of an existing architecture is identified. A reproducible prototype and report classify the hypothesis as supported, rejected or inconclusive within stated limits.
+  synthesis:
+    - Последовательность, условия переходов и сопоставление компонентов — проектный синтез AiNativeOps. Источники подтверждают отдельные практики в указанной области, а не всю схему.
+    - The sequence, conditions and component mapping are AiNativeOps design synthesis. Sources support individual practices within their stated scope, not the entire diagram.
+  basis:
+    - source: P20-EVOLVE
+      claim:
+        - Итеративный поиск программ и архитектур по функции оценки. Успех конкретной исследовательской гипотезы не гарантирован.
+        - Covers iterative search over programs and architectures against an evaluation function. Success of a specific research hypothesis is not guaranteed.
+    - source: TRAIN
+      claim:
+        - Шаблон среды обучения и спецификация задания существуют отдельно от выделения ресурсов.
+        - The training runtime template and the job specification exist separately from resource allocation.
+    - source: KATIB
+      claim:
+        - Управление серией испытаний для поиска параметров и архитектур в заданном пространстве.
+        - Manages a series of trials that search for hyperparameters and architectures within a defined search space.
+    - source: CKPT
+      claim:
+        - Сохраняет распределённые веса, состояния оптимизатора и метаданные для восстановления.
+        - Saves distributed weights, optimizer states, and metadata for recovery.
+    - source: SSDF
+      claim:
+        - Безопасная разработка моделей и ИИ-систем, происхождение, проверки и роли.
+        - Covers secure development of models and AI systems, provenance, checks, and roles.
+  nodes:
+    - id: question
+      label: [Ограничение и проверяемая гипотеза, Limitation and testable hypothesis]
+      detail:
+        - Описать предполагаемое изменение топологии, вычислительной операции или функции обучения. Указать ожидаемый эффект, наблюдаемую метрику и условие, которое опровергнет гипотезу.
+        - Describe a proposed change to topology, an operator or learning objective. Specify the predicted effect, observable metric and a falsification condition.
+      kind: step
+      components:
+        architecture: [g0, b_goal, m2]
+        infrastructure: [git-repository, experiment-tracking]
+        stack: [RM-DEV-01, RM-DEV-05]
+    - id: protocol
+      label: [Протокол и сопоставимый эталон, Protocol and comparable baseline]
+      detail:
+        - До прогона зафиксировать варианты, данные, условия сравнения, случайные инициализации, допуски и бюджет. Указать, что сравнивается при одинаковом объёме вычислений, времени или данных и где сравнение ограничено.
+        - Before running, pin variants, data, comparison conditions, seeds, tolerances and budget. State what is matched by compute, time or data and where comparisons are limited.
+      kind: step
+      components:
+        architecture: [m2, b_polbudget, mt_indep, b_owndata]
+        infrastructure: [eval-datasets, dataset-versioning, experiment-tracking]
+        stack: [RM-DAT-05, RM-DAT-04, RM-DEV-05, RM-OPS-06]
+    - id: prototype
+      label: [Прототип и эталонная реализация, Prototype and reference implementation]
+      detail:
+        - Реализовать минимальный код и эталон в изолированном окружении. Закрепить версии операторов и зависимостей. Если ИИ помогает проектировать или писать код, каждый вызов проходит входные и выходные guardrails, а доступ к инструментам проверяет PEP.
+        - Implement minimal code and the reference in an isolated environment. Pin operator and dependency versions. If AI assists design or coding, each invocation passes input and output guardrails and PEP checks tool access.
+      kind: step
+      components:
+        architecture: [v2, v3, t_repo, t_eng, mt_tb, t_input, t_infer, t_result]
+        infrastructure:
+          - git-repository
+          - ci-runner
+          - job-sandbox
+          - pep
+          - input-guardrails
+          - llm-gateway
+          - output-guardrails
+        stack:
+          - RM-DEV-01
+          - RM-DEV-06
+          - RM-ACT-03
+          - RM-ACT-02
+          - RM-PLT-01
+          - RM-AIC-01
+          - RM-MOD-06
+          - RM-AIC-02
+    - id: verify
+      label: ['Прототип корректен на малом масштабе?', 'Is the prototype correct at small scale?']
+      detail:
+        - Проверить размерности, численные допуски, градиенты, устойчивость и воспроизведение базовой реализации. Остановить дорогие эксперименты, если малый контрольный прогон не прошёл.
+        - Verify shapes, numerical tolerances, gradients, stability and baseline reproduction. Do not start expensive trials when a small validation run fails.
+      kind: decision
+      components:
+        architecture: [v3, m4, g2, s_prep]
+        infrastructure: [ci-runner, eval-red-teaming, rule-based-checks, experiment-tracking]
+        stack: [RM-DEV-06, RM-DEV-07, RM-DEV-05]
+    - id: run
+      label: [Серия контролируемых испытаний, Controlled trial series]
+      detail:
+        - Выполнить эталон, вариант и абляции в согласованном бюджете. Распределение и контрольные точки подключаются по масштабу. Тензорные расчёты идут внутри задания; любые внешние или локальные вызовы модельного сервиса проходят входные и выходные guardrails.
+        - Run the baseline, variant and ablations under the agreed budget. Use distribution and checkpoints as scale requires. Tensor computation stays within the job; all local or external model service calls pass input and output guardrails.
+      kind: step
+      components:
+        architecture: [m3, t_gpu, b_polbudget, mt_ev, t_input, t_infer, t_result]
+        infrastructure:
+          - model-training-service
+          - experiment-tracking
+          - metrics-alerts
+          - input-guardrails
+          - llm-gateway
+          - output-guardrails
+        stack: [RM-DEV-04, RM-DEV-05, RM-OPS-06, RM-AIC-01, RM-MOD-06, RM-AIC-02]
+    - id: compare
+      label: ['Сравнение пригодно для вывода?', 'Is the comparison valid for a conclusion?']
+      detail:
+        - Проверить полноту испытаний, вариативность результатов, расход ресурсов и отсутствие утечки между наборами. Если вывод опирается на вызовы кандидата или ИИ-контролёра, каждый проходит входные и выходные guardrails; блокировки и конфигурации фиксируются.
+        - Check trial completeness, variability, resource cost and cross-split leakage. When candidate or AI controller calls support a conclusion, each passes input and output guardrails; record denials and configurations.
+      kind: decision
+      components:
+        architecture: [m4, o_eval, g4, mt_indep, t_input, t_infer, t_result, t_eval]
+        infrastructure:
+          - eval-datasets
+          - eval-red-teaming
+          - experiment-tracking
+          - llm-as-a-judge
+          - input-guardrails
+          - llm-gateway
+          - output-guardrails
+          - eval-inference-service
+        stack:
+          - RM-DAT-05
+          - RM-DEV-07
+          - RM-DEV-05
+          - RM-AIC-03
+          - RM-OPS-06
+          - RM-AIC-01
+          - RM-MOD-06
+          - RM-AIC-02
+    - id: revise
+      label: ['Какой повтор научно допустим?', 'What rerun is scientifically valid?']
+      detail:
+        - При ошибке реализации исправить и повторить базовый контроль. Изменение гипотезы, набора или метрики оформить новой версией протокола; не подменять критерий после просмотра результата. Ограничить повторы.
+        - Fix implementation errors and repeat the baseline check. Version the protocol when hypothesis, data or metric changes; do not swap criteria after seeing results. Bound reruns.
+      kind: decision
+      components:
+        architecture: [mt_review, s_change, b_polbudget]
+        infrastructure: [experiment-tracking, git-repository, audit-log]
+        stack: [RM-DEV-05, RM-DEV-01, RM-OPS-07, RM-TRS-04]
+    - id: review
+      label: ['Что подтверждает независимая проверка?', 'What does independent review establish?']
+      detail:
+        - Рецензент проверяет сопоставимость, повторяет ключевой опыт, фиксирует ограничения и исключает неподтверждённые выводы. При повторе каждый вызов модельного сервиса проходит те же входные и выходные guardrails. Протокол хранит результаты всех существенных попыток, включая отрицательные.
+        - The reviewer checks comparability, repeats a key trial, records limitations and excludes unsupported conclusions. Any model service call in the rerun passes the same input and output guardrails. Retain results of meaningful attempts, including negative ones.
+      kind: decision
+      components:
+        architecture: [o_eval, mt_indep, mt_ev, g4, t_eval]
+        infrastructure: [eval-red-teaming, eval-datasets, provenance-registry, eval-inference-service]
+        stack: [RM-DEV-07, RM-DAT-05, RM-TRS-05]
+    - id: supported
+      label: [Гипотеза поддержана в заданных пределах, Hypothesis supported within bounds]
+      detail:
+        - Сохранить прототип, конфигурацию, измерения, отрицательные случаи и условия, при которых преимущество наблюдалось. Решение о масштабировании принимается отдельно.
+        - Retain prototype, configuration, measurements, negative cases and the conditions where the advantage was observed. Decide scaling separately.
+      kind: outcome
+      components:
+        architecture: [mt_ev, m5, b_ownmodel]
+        infrastructure: [artifact-registry, experiment-tracking, provenance-registry]
+        stack: [RM-DEV-08, RM-DEV-05, RM-TRS-05]
+    - id: rejected
+      label: [Гипотеза не подтверждена, Hypothesis not supported]
+      detail:
+        - Зафиксировать сопоставимый отрицательный результат, погрешность и известные ограничения. Не выдавать прототип за пригодный кандидат к предобучению или выпуску.
+        - Record the comparable negative result, uncertainty and known limitations. Do not present the prototype as qualified for pretraining or release.
+      kind: outcome
+      components:
+        architecture: [mt_ev, mt_review, b_ownmodel]
+        infrastructure: [experiment-tracking, provenance-registry]
+        stack: [RM-DEV-05, RM-TRS-05]
+    - id: inconclusive
+      label: [Доказательств недостаточно, Evidence inconclusive]
+      detail:
+        - Зафиксировать причину остановки, что можно повторить и какие проверки не были выполнены. Не интерпретировать исчерпание бюджета или сбой как опровержение.
+        - Record the stop reason, reproducible portions and uncompleted checks. Do not interpret budget exhaustion or failure as falsification.
+      kind: outcome
+      components:
+        architecture: [mt_residual, mt_ev, t_audit]
+        infrastructure: [experiment-tracking, audit-log]
+        stack: [RM-DEV-05, RM-TRS-04]
+  edges:
+    - from: question
+      to: protocol
+      label: [Условие опровержения сформулировано, Falsification condition defined]
+    - from: protocol
+      to: prototype
+      label: [Протокол закреплён, Protocol pinned]
+    - from: prototype
+      to: verify
+      label: [Эталон и изменение собраны, Baseline and change built]
+    - from: prototype
+      to: inconclusive
+      label: [Критичная зависимость не допущена, Critical dependency not authorized]
+    - from: verify
+      to: run
+      label: [Малые проверки пройдены, Small checks pass]
+    - from: verify
+      to: revise
+      label: [Численная или системная ошибка, Numerical or system fault]
+    - from: run
+      to: compare
+      label: [Результаты и затраты записаны, Results and costs recorded]
+    - from: run
+      to: inconclusive
+      label: [Бюджет исчерпан или работа остановлена, Budget exhausted or run stopped]
+    - from: compare
+      to: review
+      label: [Результаты сопоставимы, Results comparable]
+    - from: compare
+      to: revise
+      label: [Проблема протокола или данных, Protocol or data issue]
+    - from: revise
+      to: prototype
+      label: [Исправимая реализация, Implementation can be corrected]
+    - from: revise
+      to: protocol
+      label: [Новая версия протокола, New protocol revision]
+    - from: revise
+      to: inconclusive
+      label: [Проверяемый повтор невозможен, Valid rerun unavailable]
+    - from: review
+      to: supported
+      label: [Эффект воспроизведён, Effect reproduced]
+    - from: review
+      to: rejected
+      label: [Критерий улучшения не выполнен, Improvement criterion not met]
+    - from: review
+      to: inconclusive
+      label: [Вывод нельзя подтвердить, Conclusion cannot be verified]
+  main: [question, protocol, prototype, verify, run, compare, review, supported]

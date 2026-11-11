@@ -1,0 +1,47 @@
+# Процессы реестра, которые показываются как часть другого процесса на карте.
+# Registry processes shown as a part of another process on the map.
+INF-02:
+  flow: INF-01
+  part: INF-02
+INF-03:
+  flow: INF-01
+  part: INF-03
+AGT-01:
+  flow: AGT-ACTION
+  part: AGT-01
+FLOW-HYBRID:
+  flow: INF-01
+  part: FLOW-HYBRID
+AGT-03:
+  flow: AGT-ACTION
+MOD-09:
+  flow: FLOW-MODEL
+  part: TRAIN-DISTRIBUTED
+inference:
+  flow: INF-01
+  variant: local
+external:
+  flow: INF-01
+  variant: external
+rag:
+  flow: KNW-03
+  variant: local
+rag-external:
+  flow: KNW-03
+  variant: external
+agent:
+  flow: AGT-ACTION
+  variant: local
+agent-external:
+  flow: AGT-ACTION
+  variant: external
+data:
+  flow: FLOW-DATA
+model:
+  flow: FLOW-MODEL
+update:
+  flow: FLOW-UPDATE
+incident:
+  flow: FLOW-INCIDENT
+retire:
+  flow: RET-02

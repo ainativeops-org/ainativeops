@@ -1,5 +1,5 @@
-# Зоны инфраструктуры и строки элементов в них. Набор зон задан раскладкой в site/app.js.
-# Infrastructure zones and their element rows. The set of zones is fixed by the layout in site/app.js.
+# Зоны вида «Инфраструктура» и строки элементов в них.
+# Zones of the Infrastructure view and their element rows.
 categories:
   ext:
     color: '#FFE0E0'
@@ -46,6 +46,7 @@ zones:
       en: AI Safety Core
     category: node
     accent: core
+    rows: []
   - id: ext
     title:
       ru: Внешний контур
@@ -68,28 +69,29 @@ zones:
       - [egress-proxy]
   - id: data-protection
     title:
-      ru: Защита данных
+      ru: Безопасность данных
       en: Data protection
     category: asc
     rows:
       - [data-discovery, tokenization]
       - [data-access-proxy, role-based-detokenization]
+      - [rag-access-filter, memory-guard]
   - id: guardrails
     title:
-      ru: Guardrails
-      en: Guardrails
+      ru: Безопасность инференса
+      en: Inference protection
     category: asc
     rows:
       - [input-guardrails, output-guardrails]
-      - [rag-access-filter, memory-guard]
+      - [inference-quotas]
   - id: operation-admission
     title:
-      ru: Допуск операций
-      en: Operation admission
+      ru: Безопасность исполнения
+      en: Execution protection
     category: asc
     rows:
       - [job-sandbox, zero-trust-git]
-      - [pep, provenance-registry]
+      - [pep, pdp]
   - id: agents
     title:
       ru: Агенты · Harness
@@ -106,7 +108,9 @@ zones:
     category: node
     rows:
       - [notebooks, dataset-versioning]
-      - [gpu-training-cluster, experiment-tracking]
+      - [experiment-tracking]
+      - [training-runtime, training-state]
+      - [model-training-service]
   - id: eval
     title:
       ru: EVAL · независимые испытания
@@ -115,15 +119,21 @@ zones:
     rows:
       - [eval-datasets, eval-red-teaming]
       - [rule-based-checks, llm-as-a-judge]
+      - [eval-inference-service, eval-inference-runtime]
+      - [eval-base-artifact, eval-adapted-artifact]
   - id: prod
     title:
       ru: PROD · эксплуатация
       en: PROD · operation
     category: node
     rows:
+      - [chat-app, conversation-store]
       - [business-apps, llm-gateway]
+      - [request-classifier, model-call-planner]
       - [mcp-servers, inference-servers]
       - [metrics-alerts]
+      - [inference-runtime]
+      - [foundation-model-artifact, adapted-model-artifact]
   - id: data-platform
     title:
       ru: Платформа данных
@@ -131,6 +141,8 @@ zones:
     category: data
     rows:
       - [landing-zone, dataset-store, data-catalog, vector-db]
+      - [multimodal-processing, analytical-store]
+      - [semantic-layer]
   - id: ci-cd
     title:
       ru: CI/CD
@@ -140,14 +152,16 @@ zones:
       - [git-repository, ci-runner]
       - [sast-sca-secrets, artifact-registry]
       - [release-gate, cd-deployment]
+      - [model-registry]
   - id: observability
     title:
-      ru: Observability
+      ru: Наблюдаемость
       en: Observability
     category: node
     rows:
       - [log-collectors, event-normalization]
       - [log-metric-store, archive-backup]
+      - [evidence-store, usage-billing]
   - id: trusted-services
     title:
       ru: Доверенные сервисы
@@ -156,6 +170,6 @@ zones:
     accent: core
     rows:
       - [hsm-kms, token-vault]
-      - [pdp, secrets-manager]
+      - [provenance-registry, secrets-manager]
       - [agent-iam, kill-switch]
       - [audit-log, integrity-monitoring]

@@ -125,7 +125,7 @@ context-manager:
   type: appcomp
   class: RM-AGT-03
 prompt-skill-registry:
-  type: artifact
+  type: techsvc
   class: RM-AGT-07
 tool-router:
   type: appcomp
@@ -143,15 +143,6 @@ dataset-versioning:
 experiment-tracking:
   type: syssw
   class: RM-DEV-05
-gpu-training-cluster:
-  type: node
-  class: RM-DEV-04
-  name:
-    ru: GPU-кластер обучения
-    en: GPU training cluster
-  desc:
-    ru: Исполняет задания обучения и адаптации на выделенных вычислительных ресурсах. Выбор представления данных обосновывается качеством и политикой раскрытия.
-    en: Runs training and adaptation jobs on dedicated compute. The choice of data representation is justified by quality and the disclosure policy.
 eval-red-teaming:
   type: node
   class: RM-DEV-07
@@ -182,7 +173,7 @@ business-apps:
   type: appcomp
   class: RM-APP-01
 landing-zone:
-  type: artifact
+  type: techsvc
   class: RM-DAT-01
   name:
     ru: Карантинная зона
@@ -191,7 +182,7 @@ landing-zone:
     ru: Изолированно хранит новые данные и обратную связь до допуска. Зафиксированы источник, цель обработки и срок хранения.
     en: Keeps new data and feedback isolated until admission. The source, processing purpose and retention period are recorded.
 dataset-store:
-  type: artifact
+  type: techsvc
   class: RM-DAT-04
   name:
     ru: Хранилище датасетов
@@ -257,8 +248,14 @@ log-metric-store:
   type: syssw
   class: RM-OPS-04
 hsm-kms:
-  type: device
+  type: techsvc
   class: RM-TRS-01
+  name:
+    ru: Управление ключами
+    en: Key management
+  desc:
+    ru: Сервис управления жизненным циклом криптографических ключей и выполнения разрешённых криптографических операций. Аппаратная защита ключей и классы её реализации раскрыты на вкладке «Стек».
+    en: Manages cryptographic key lifecycles and authorized cryptographic operations. Hardware-backed key protection and implementation classes are detailed in the Stack view.
 pdp:
   type: techsvc
   class: RM-ACT-01
@@ -272,7 +269,7 @@ integrity-monitoring:
   type: techsvc
   class: RM-TRS-06
 checkpoint-store:
-  type: artifact
+  type: techsvc
   class: RM-AGT-05
   category: llm
 rate-limits-budgets:
@@ -314,3 +311,135 @@ kill-switch:
   type: techsvc
   class: RM-TRS-07
   category: asc
+chat-app:
+  type: appcomp
+  class: RM-APP-02
+  name:
+    ru: Чат сотрудника
+    en: Employee chat
+  desc:
+    ru: Проверяет право на разговор и собирает контекст из доступной истории. Передаёт запрос в обязательный входной контроль и возвращает только проверенный результат.
+    en: Authorizes the conversation and assembles context from accessible history. Sends requests through mandatory input controls and returns only a checked result.
+conversation-store:
+  type: techsvc
+  class: RM-PLT-03
+  name:
+    ru: Хранилище диалогов
+    en: Conversation store
+  desc:
+    ru: Хранит разрешённые сообщения в области пользователя или проекта. Право на разговор проверяется при каждом чтении. Аудит ведётся отдельно.
+    en: Stores admitted messages in the user or project scope. Authorizes each conversation read. Audit is separate.
+training-runtime:
+  type: techsvc
+  class: RM-DEV-11
+training-state:
+  type: techsvc
+  class: RM-DEV-12
+inference-runtime:
+  type: syssw
+  class: RM-MOD-11
+  category: llm
+model-registry:
+  type: appcomp
+  class: RM-MOD-05
+  category: llm
+  name:
+    ru: Реестр моделей
+    en: Model registry
+  desc:
+    ru: Связывает допущенную версию с метаданными, происхождением и адресом артефакта. Используется при выборе и развёртывании версии; не предполагает обязательного сетевого запроса к реестру при каждом инференсе.
+    en: Links an admitted version to metadata, provenance and an artifact location. Used during version selection and deployment; does not imply a registry network call for every inference request.
+foundation-model-artifact:
+  type: artifact
+  class: RM-MOD-01
+  category: llm
+  name:
+    ru: Артефакт базовой модели
+    en: Base model artifact
+  desc:
+    ru: Зафиксированная версия базовых весов и конфигурации. Загружается для базовой модели или как совместимая основа LoRA. Полный дообученный checkpoint может заменить её при исполнении. Артефакт сам не выполняет вычисления.
+    en: A pinned version of base weights and configuration. Loaded for a base model or as a compatible LoRA base. A full fine-tuned checkpoint can replace it at runtime. The artifact does not perform computation itself.
+adapted-model-artifact:
+  type: artifact
+  class: RM-MOD-02
+  category: llm
+  name:
+    ru: Артефакт адаптированной модели
+    en: Adapted model artifact
+  desc:
+    ru: Допущенный полный checkpoint дообученной модели либо отдельный адаптер. В варианте LoRA требуется указанная совместимая базовая модель; полный checkpoint может исполняться самостоятельно. Включается только при выбранной адаптированной модели.
+    en: An admitted full fine-tuned checkpoint or separate adapter. LoRA requires the specified compatible base model; a full checkpoint can execute on its own. Included only when an adapted model is selected.
+multimodal-processing:
+  type: techsvc
+  class: RM-DAT-10
+  category: data
+evidence-store:
+  type: techsvc
+  class: RM-SEC-07
+  category: node
+analytical-store:
+  type: techsvc
+  class: RM-DAT-06
+  category: data
+semantic-layer:
+  type: techsvc
+  class: RM-DAT-03
+  category: data
+model-training-service:
+  type: techsvc
+  class: RM-DEV-04
+  category: llm
+eval-inference-service:
+  type: techsvc
+  class: RM-MOD-07
+  category: llm
+  name:
+    ru: Инференс кандидата · EVAL
+    en: Candidate inference · EVAL
+  desc:
+    ru: Отдельный экземпляр контура EVAL для проверки кандидата. Не является рабочим backend PROD. Доступ, версии и ресурсы задаются допуском испытания.
+    en: A separate EVAL instance for candidate assessment, not the PROD backend. Test admission specifies access, versions and resources.
+eval-inference-runtime:
+  type: syssw
+  class: RM-MOD-11
+  category: llm
+  name:
+    ru: Среда инференса · EVAL
+    en: Inference runtime · EVAL
+  desc:
+    ru: Отдельный экземпляр контура EVAL для проверки кандидата. Не является рабочим backend PROD. Доступ, версии и ресурсы задаются допуском испытания.
+    en: A separate EVAL instance for candidate assessment, not the PROD backend. Test admission specifies access, versions and resources.
+eval-base-artifact:
+  type: artifact
+  class: RM-MOD-01
+  category: llm
+  name:
+    ru: Базовая модель-кандидат
+    en: Base model candidate
+  desc:
+    ru: Отдельный экземпляр контура EVAL для проверки кандидата. Не является рабочим backend PROD. Доступ, версии и ресурсы задаются допуском испытания.
+    en: A separate EVAL instance for candidate assessment, not the PROD backend. Test admission specifies access, versions and resources.
+eval-adapted-artifact:
+  type: artifact
+  class: RM-MOD-02
+  category: llm
+  name:
+    ru: Адаптированная модель-кандидат
+    en: Adapted model candidate
+  desc:
+    ru: Отдельный экземпляр контура EVAL для проверки кандидата. Не является рабочим backend PROD. Доступ, версии и ресурсы задаются допуском испытания.
+    en: A separate EVAL instance for candidate assessment, not the PROD backend. Test admission specifies access, versions and resources.
+inference-quotas:
+  type: techsvc
+  class: RM-AIC-05
+usage-billing:
+  type: techsvc
+  class: RM-OPS-06
+request-classifier:
+  type: techsvc
+  class: RM-MOD-12
+  category: llm
+model-call-planner:
+  type: techsvc
+  class: RM-MOD-13
+  category: llm

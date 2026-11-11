@@ -1,0 +1,778 @@
+# Реестр источников карточек. / Registry of card sources.
+# type: standard — стандарт или спецификация; practice — опубликованная практика; example — пример реализации.
+# type: standard — standard or specification; practice — published practice; example — implementation example.
+# checked: дата, когда мейнтейнер проверил ссылку и раздел (ГГГГ-ММ-ДД); пусто — не проверено.
+# checked: the date a maintainer verified the link and section (YYYY-MM-DD); empty means not verified.
+AIRA:
+  type: practice
+  title: Australian Government AIRA
+  url: https://www.digital.gov.au/ai-reference-architecture/overview
+  scope:
+    ru: Общая концептуальная схема, затем детализация до групп возможностей и компонентов. Охватывает разные способы реализации, включая GenAI и агентов.
+    en: Gives a general conceptual scheme and then details it down to capability groups and components. Covers several implementation approaches, including GenAI and agents.
+  checked: ''
+AZ:
+  type: example
+  title:
+    ru: Microsoft Foundry в Azure Landing Zone
+    en: 'Microsoft: Baseline Microsoft Foundry chat reference architecture in an Azure landing zone'
+  url: https://learn.microsoft.com/en-us/azure/architecture/ai-ml/architecture/baseline-microsoft-foundry-landing-zone
+  scope:
+    ru: Развёртывание чата с разделением корпоративного и прикладного контуров, частными подключениями и зависимостью от модели или шлюза.
+    en: Describes a chat deployment that separates the platform and application landing zones, uses private connections, and depends on a model or gateway.
+  checked: ''
+GCP:
+  type: practice
+  title:
+    ru: 'Google Cloud: выбор компонентов агентной архитектуры'
+    en: 'Google Cloud: Choose your agentic AI architecture components'
+  url: https://docs.cloud.google.com/architecture/choose-agentic-ai-architecture-components
+  scope:
+    ru: Сопоставление вариантов оркестрации, среды исполнения, состояния, инструментов, идентичностей и защитных средств.
+    en: Compares options for orchestration, runtime, state, tools, identities, and safeguards.
+  checked: ''
+DB:
+  type: practice
+  title: Databricks Lakehouse Reference Architectures
+  url: https://docs.databricks.com/gcp/en/lakehouse-architecture/reference
+  scope:
+    ru: Архитектуры классического ML и GenAI. Признаки, эксперименты, реестр, выдача моделей, RAG и управление данными.
+    en: Covers classical ML and GenAI architectures. Includes features, experiments, the registry, model serving, RAG, and data governance.
+  checked: ''
+NVI:
+  type: example
+  title: NVIDIA HGX AI Factory
+  url: https://docs.nvidia.com/enterprise-reference-architectures/hgx-ai-factory/latest/software.html
+  scope:
+    ru: Согласованная инфраструктура для обучения и инференса. Отделяет вычислительное оборудование от программного управления нагрузками.
+    en: Describes a validated infrastructure for training and inference. Separates compute hardware from software workload management.
+  checked: ''
+KUBE:
+  type: example
+  title: Kubeflow
+  url: https://www.kubeflow.org/docs/components/
+  scope:
+    ru: Набор отдельных подсистем для рабочих пространств, конвейеров, обучения, экспериментов и моделей.
+    en: Provides separate subsystems for workspaces, pipelines, training, experiments, and models.
+  checked: ''
+OPEA:
+  type: example
+  title: Open Platform for Enterprise AI
+  url: https://opea-project.github.io/latest/introduction/index.html
+  scope:
+    ru: Компонуемые сервисы и рабочие схемы GenAI, в том числе RAG. Полезный ориентир при проверке реализуемости маршрута.
+    en: Provides composable GenAI services and workflows, including RAG. Serves as a useful reference when checking that a route is feasible.
+  checked: ''
+OPEN:
+  type: example
+  title: 'OpenAI Agents SDK: Sandbox Agents'
+  url: https://developers.openai.com/api/docs/guides/agents/sandboxes
+  section: Harness and compute
+  scope:
+    ru: Разделяет управление циклом, состоянием и согласованиями и среду фактического исполнения с файлами, командами и сетью.
+    en: Separates control of the loop, state, and approvals from the execution environment that handles files, commands, and network access.
+  checked: ''
+CLAUDE:
+  type: practice
+  title: 'Anthropic: Effective harnesses for long-running agents'
+  url: https://www.anthropic.com/research/effective-harnesses-for-long-running-agents
+  scope:
+    ru: Продолжение работы через несколько окон контекста, инициализация среды и передача рабочих артефактов между сессиями.
+    en: Covers continuing work across multiple context windows, initializing the environment, and handing work artifacts between sessions.
+  checked: ''
+ADK:
+  type: example
+  title: 'Google Agent Development Kit: Runtime'
+  url: https://adk.dev/runtime/
+  scope:
+    ru: Запуск агента и обработка событий. Службы сессий, состояния и артефактов описаны отдельно в ADK.
+    en: Covers agent execution and event processing. ADK documents session, state, and artifact services separately.
+  checked: ''
+LANG:
+  type: example
+  title: 'LangGraph: Persistence and Interrupts'
+  url: https://docs.langchain.com/oss/python/langgraph/persistence
+  scope:
+    ru: Хранение состояния потока и возобновление. Документация Interrupts отдельно показывает риск повторного исполнения узла.
+    en: Covers storing thread state and resuming execution. The Interrupts documentation separately shows the risk of re-executing a node.
+  checked: ''
+ACORE:
+  type: example
+  title: Amazon Bedrock AgentCore
+  url: https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/what-is-bedrock-agentcore.html
+  scope:
+    ru: Модульные среды исполнения, память, инструменты, отдельные идентичности и наблюдаемость. Пример платформенной обвязки агентов.
+    en: Provides modular runtimes, memory, tools, separate identities, and observability. Serves as an example of a platform harness for agents.
+  checked: ''
+AIRA-S:
+  type: practice
+  title:
+    ru: 'AIRA: сопоставление рабочего процесса и возможностей'
+    en: 'AIRA: Mapping a workflow to capabilities'
+  url: https://www.digital.gov.au/ai-reference-architecture/companion-guide/scenario-4
+  scope:
+    ru: Описывает переход от существующего процесса к нужным возможностям и выявляет зависимости. Прямой аналог части замысла AiNativeOps.
+    en: Describes the move from an existing process to the required capabilities and identifies dependencies. Directly parallels part of the AiNativeOps design.
+  checked: ''
+NIST:
+  type: standard
+  title: NIST AI RMF Profiles
+  url: https://airc.nist.gov/airmf-resources/airmf/6-sec-profile/
+  scope:
+    ru: Профили применения, текущего и целевого состояния. Фокус на исходах управления рисками и контексте.
+    en: Covers use-case, current, and target profiles. Focuses on risk management outcomes and context.
+  checked: ''
+NIST-C:
+  type: standard
+  title: NIST AI RMF Core
+  url: https://airc.nist.gov/airmf-resources/airmf/5-sec-core/
+  section: GOVERN / MAP / MEASURE / MANAGE
+  scope:
+    ru: Измерение, независимое участие в оценке, управление и регулярный пересмотр рисков.
+    en: Covers measurement, independent participation in assessment, governance, and regular risk review.
+  checked: ''
+GCP-M:
+  type: practice
+  title: 'Google Cloud: MLOps continuous delivery and automation'
+  url: https://docs.cloud.google.com/architecture/mlops-continuous-delivery-and-automation-pipelines-in-machine-learning
+  scope:
+    ru: Автоматизация конвейера, проверки данных и модели, метаданные, онлайн, пакетный и встроенный инференс.
+    en: Covers pipeline automation, data and model validation, metadata, and online, batch, and embedded inference.
+  checked: ''
+GCP-T:
+  type: practice
+  title: 'Google Cloud: Multi-tenant agentic AI system'
+  url: https://docs.cloud.google.com/architecture/multi-tenant-agentic-ai-system
+  scope:
+    ru: Референс общей агентной системы с разделением арендаторов и их ресурсов.
+    en: Provides a reference for a shared agentic system that separates tenants and their resources.
+  checked: ''
+RAG:
+  type: practice
+  title: 'Google Cloud: RAG infrastructure and Vector Search'
+  url: https://docs.cloud.google.com/architecture/gen-ai-rag-vertex-ai-vector-search
+  scope:
+    ru: Отдельные контуры загрузки, индексации, извлечения и выдачи. Vector Search — пример реализации.
+    en: Separates the ingestion, indexing, retrieval, and serving subsystems. Vector Search is one example implementation.
+  checked: ''
+AWS-G:
+  type: example
+  title:
+    ru: 'Bedrock: обязательное применение guardrails'
+    en: 'Bedrock: Enforce the use of a specific guardrail in model inference requests'
+  url: https://docs.aws.amazon.com/bedrock/latest/userguide/guardrails-permissions-id.html
+  section: IAM policy conditions and examples
+  scope:
+    ru: В поддерживаемом маршруте IAM может отказать вызову, если он не использует заданную проверку.
+    en: On a supported route, IAM can deny a call that does not use the specified guardrail.
+  checked: ''
+AWS-R:
+  type: example
+  title: 'Bedrock: cross-Region inference'
+  url: https://docs.aws.amazon.com/bedrock/latest/userguide/cross-region-inference.html
+  scope:
+    ru: Географический и глобальный профили маршрутизации показывают, почему адрес API недостаточен как описание места обработки.
+    en: Geographic and global routing profiles show why an API endpoint does not adequately describe where processing happens.
+  checked: ''
+AWS-B:
+  type: example
+  title:
+    ru: 'Bedrock: пакетный инференс'
+    en: 'Bedrock: Batch inference'
+  url: https://docs.aws.amazon.com/bedrock/latest/userguide/batch-inference.html
+  scope:
+    ru: Асинхронное задание читает подготовленные входы и сохраняет результаты в хранилище.
+    en: An asynchronous job reads prepared inputs and writes the results to storage.
+  checked: ''
+ARM:
+  type: example
+  title:
+    ru: 'Google Cloud: интеграция Model Armor'
+    en: 'Google Cloud: Model Armor integration with Vertex AI'
+  url: https://docs.cloud.google.com/model-armor/model-armor-vertex-integration
+  scope:
+    ru: Интеграция имеет область применимости и режимы инспекции и блокировки. Покрытие проверяется по конкретному API.
+    en: The integration has a defined applicability scope and inspect-only and block modes. Coverage must be verified for each specific API.
+  checked: ''
+OPEN-G:
+  type: example
+  title: 'OpenAI Agents SDK: Guardrails and human review'
+  url: https://developers.openai.com/api/docs/guides/agents/guardrails-approvals
+  scope:
+    ru: Различает начальные, конечные и инструментальные проверки. Границы SDK не подтверждают проверку каждого промежуточного вызова.
+    en: Distinguishes input, output, and tool guardrails. The SDK boundaries do not confirm that every intermediate call is checked.
+  checked: ''
+ADK-A:
+  type: example
+  title: 'Google ADK: Artifacts'
+  url: https://adk.dev/artifacts/
+  scope:
+    ru: Версионируемые рабочие файлы с областью сессии или пользователя.
+    en: Covers versioned working files scoped to a session or a user.
+  checked: ''
+LANG-I:
+  type: example
+  title: 'LangGraph: Interrupts'
+  url: https://docs.langchain.com/oss/python/langgraph/interrupts
+  scope:
+    ru: При возобновлении исполнение узла может начаться заново. Внешние эффекты требуют защиты от повтора.
+    en: On resume, node execution can start over from the beginning. External side effects require protection against repetition.
+  checked: ''
+TRAIN:
+  type: example
+  title: 'Kubeflow Trainer: Runtime Guide'
+  url: https://trainer.kubeflow.org/en/latest/operator-guides/runtime.html
+  scope:
+    ru: Шаблон среды обучения и спецификация задания существуют отдельно от выделения ресурсов.
+    en: The training runtime template and the job specification exist separately from resource allocation.
+  checked: ''
+CKPT:
+  type: example
+  title: 'NVIDIA NeMo: Distributed Checkpoint'
+  url: https://docs.nvidia.com/nemo-framework/user-guide/latest/nemotoolkit/checkpoints/dist_ckpt.html
+  scope:
+    ru: Сохраняет распределённые веса, состояния оптимизатора и метаданные для восстановления.
+    en: Saves distributed weights, optimizer states, and metadata for recovery.
+  checked: ''
+CUR:
+  type: example
+  title:
+    ru: 'NVIDIA NeMo Curator: обработка корпуса'
+    en: 'NVIDIA NeMo Curator: Process text data'
+  url: https://docs.nvidia.com/nemo/curator/v26.02/curate-text/process-data
+  scope:
+    ru: Нормализация, фильтрация и дедупликация корпуса как инженерные операции подготовки.
+    en: Treats corpus normalization, filtering, and deduplication as engineering preparation operations.
+  checked: ''
+KATIB:
+  type: example
+  title: Kubeflow Katib
+  url: https://www.kubeflow.org/docs/components/katib/overview/
+  scope:
+    ru: Управление серией испытаний для поиска параметров и архитектур в заданном пространстве.
+    en: Manages a series of trials that search for hyperparameters and architectures within a defined search space.
+  checked: ''
+OPT:
+  type: example
+  title: NVIDIA Model Optimizer
+  url: https://github.com/NVIDIA/Model-Optimizer
+  scope:
+    ru: Квантизация, дистилляция и другие преобразования артефакта для среды исполнения.
+    en: Covers quantization, distillation, and other transformations of an artifact for the target runtime.
+  checked: ''
+KSERVE:
+  type: example
+  title: 'KServe: Control Plane API'
+  url: https://kserve.github.io/website/docs/reference/crd-api
+  scope:
+    ru: Раздельно описаны пакетирование запросов и доли трафика для постепенного выпуска модели.
+    en: Describes request batching and traffic splits for gradual model release separately.
+  checked: ''
+SLSA:
+  type: standard
+  title: 'SLSA v1.2: Provenance'
+  url: https://slsa.dev/spec/v1.2/provenance
+  scope:
+    ru: Происхождение связывает артефакт с материалами и способом его построения.
+    en: Provenance links an artifact to its materials and to the way it was built.
+  checked: ''
+RATS:
+  type: standard
+  title: 'IETF RFC 9334: RATS Architecture'
+  url: https://www.rfc-editor.org/rfc/rfc9334.html
+  section: RATS Roles
+  scope:
+    ru: Различает источник свидетельства, его проверку и решение стороны, использующей результат аттестации.
+    en: Distinguishes the source of evidence, its appraisal, and the decision of the party that relies on the attestation result.
+  checked: ''
+OWASP:
+  type: standard
+  title: 'OWASP: Excessive Agency'
+  url: https://genai.owasp.org/llmrisk/llm062025-excessive-agency/
+  scope:
+    ru: Проверка полномочий на стороне вызываемой системы и согласование значимых действий.
+    en: Covers authorization checks on the side of the called system and approval of significant actions.
+  checked: ''
+LIFE:
+  type: example
+  title:
+    ru: 'Bedrock: жизненный цикл внешней модели'
+    en: 'Bedrock: Model lifecycle'
+  url: https://docs.aws.amazon.com/bedrock/latest/userguide/model-lifecycle.html
+  scope:
+    ru: Статусы модели и окончание поддержки создают отдельный сценарий миграции.
+    en: Model statuses and end of support create a separate migration scenario.
+  checked: ''
+ISO:
+  type: standard
+  title: ISO/IEC 5338:2023
+  url: https://www.iso.org/standard/81118.html
+  scope:
+    ru: Терминологическая опора для процессов жизненного цикла ИИ.
+    en: Serves as a terminology reference for AI lifecycle processes.
+  checked: ''
+ZT:
+  type: standard
+  title: 'NIST SP 800-207: Zero Trust Architecture'
+  url: https://csrc.nist.gov/pubs/sp/800/207/final
+  section: 2.1 · Figure 1 · Logical Components
+  scope:
+    ru: Логические компоненты и рисунок 1. PDP, Policy Engine, Policy Administrator и PEP.
+    en: 'Covers the logical components and Figure 1: PDP, Policy Engine, Policy Administrator, and PEP.'
+  checked: ''
+RMF:
+  type: standard
+  title: 'NIST AI 600-1: Generative AI Profile'
+  url: https://www.nist.gov/publications/artificial-intelligence-risk-management-framework-generative-artificial-intelligence
+  scope:
+    ru: Профиль рисков генеративного ИИ и действия по управлению риском.
+    en: Covers the generative AI risk profile and risk management actions.
+  checked: ''
+SSDF:
+  type: standard
+  title: 'NIST SP 800-218A: SSDF Community Profile'
+  url: https://csrc.nist.gov/pubs/sp/800/218/a/final
+  scope:
+    ru: Безопасная разработка моделей и ИИ-систем, происхождение, проверки и роли.
+    en: Covers secure development of models and AI systems, provenance, checks, and roles.
+  checked: ''
+BOM:
+  type: standard
+  title: CycloneDX AI/ML-BOM
+  url: https://cyclonedx.org/capabilities/mlbom/
+  scope:
+    ru: Ведомость состава моделей и данных; каталог действующих активов имеет свой контракт.
+    en: Covers a bill of materials for models and data; the catalog of active assets has its own contract.
+  checked: ''
+OTEL:
+  type: standard
+  title: 'OpenTelemetry: Signals'
+  url: https://opentelemetry.io/docs/concepts/signals/
+  scope:
+    ru: Метрики, трассы и журналы как разные сигналы.
+    en: Treats metrics, traces, and logs as distinct signals.
+  checked: ''
+KEY:
+  type: standard
+  title: NIST SP 800-57 Part 1 Rev. 5
+  url: https://csrc.nist.gov/pubs/sp/800/57/pt1/r5/final
+  section: Key management phases and functions
+  scope:
+    ru: Назначение, состояние, защита и жизненный цикл криптографического материала.
+    en: Covers the purpose, state, protection, and lifecycle of cryptographic material.
+  checked: ''
+PKCS:
+  type: standard
+  title: 'OASIS PKCS #11 v3.1'
+  url: https://docs.oasis-open.org/pkcs11/pkcs11-spec/v3.1/pkcs11-spec-v3.1.pdf
+  scope:
+    ru: Объекты криптографии и атрибуты CKA_EXTRACTABLE и CKA_NEVER_EXTRACTABLE.
+    en: Covers cryptographic objects and the CKA_EXTRACTABLE and CKA_NEVER_EXTRACTABLE attributes.
+  checked: ''
+LOG:
+  type: standard
+  title: 'NIST SP 800-92: Log Management'
+  url: https://csrc.nist.gov/pubs/sp/800/92/final
+  scope:
+    ru: Сбор, хранение и управление журналами.
+    en: Covers log collection, storage, and management.
+  checked: ''
+MCP:
+  type: standard
+  title: 'Model Context Protocol: Tools, 2025-11-25'
+  url: https://modelcontextprotocol.io/specification/2025-11-25/server/tools
+  section: Listing, Calling and Tool Result
+  scope:
+    ru: Схемы инструментов, discovery, вызов и результат; протокол не заменяет допуск.
+    en: Covers tool schemas, discovery, invocation, and results; the protocol does not replace admission.
+  checked: ''
+K8S:
+  type: example
+  title: 'Kubernetes: Device Plugins'
+  url: https://kubernetes.io/docs/concepts/extend-kubernetes/compute-storage-net/device-plugins/
+  scope:
+    ru: Регистрация и выделение специализированных устройств; не весь контракт планировщика.
+    en: Covers registration and allocation of specialized devices; it does not cover the full scheduler contract.
+  checked: ''
+CCC:
+  type: standard
+  title: 'Confidential Computing Consortium: Technical Analysis'
+  url: https://confidentialcomputing.io/wp-content/uploads/sites/10/2023/03/CCC-A-Technical-Analysis-of-Confidential-Computing-v1.3_Updated_November_2022.pdf
+  scope:
+    ru: Границы доверенной среды, данных в обработке и аппаратной аттестации.
+    en: Covers the boundaries of the trusted execution environment, data in use, and hardware attestation.
+  checked: ''
+DIST:
+  type: example
+  title: 'PyTorch: Distributed Checkpoint'
+  url: https://docs.pytorch.org/tutorials/recipes/distributed_checkpoint_recipe.html
+  scope:
+    ru: Распределённое сохранение и загрузка состояния обучения.
+    en: Covers distributed saving and loading of training state.
+  checked: ''
+STORAGE:
+  type: standard
+  title: 'NIST SP 800-209: Storage Infrastructure'
+  url: https://csrc.nist.gov/pubs/sp/800/209/final
+  scope:
+    ru: Защита хранилищ, резервирование и восстановление.
+    en: Covers storage protection, backup, and recovery.
+  checked: ''
+GITOPS:
+  type: standard
+  title: 'OpenGitOps: Principles'
+  url: https://opengitops.dev/
+  scope:
+    ru: Декларативное состояние, версии, автоматическое получение и согласование.
+    en: Covers declarative state, versioning, automatic pulling, and reconciliation.
+  checked: ''
+FINOPS:
+  type: standard
+  title: 'FinOps Foundation: Allocation'
+  url: https://framework.finops.org/framework/capabilities/allocation/
+  scope:
+    ru: Учёт и распределение затрат; принуждение лимита описывается отдельно.
+    en: Covers cost accounting and allocation; limit enforcement is described separately.
+  checked: ''
+BOLA:
+  type: standard
+  title: OWASP API1:2023 Object Level Authorization
+  url: https://api-security.owasp.org/editions/2023/en/0xa1-broken-object-level-authorization/
+  section: How to Prevent
+  scope:
+    ru: Проверка полномочий на конкретный объект, в том числе диалог по ID.
+    en: Covers authorization checks on a specific object, including a conversation accessed by ID.
+  checked: ''
+INC:
+  type: standard
+  title: NIST SP 800-61 Rev. 3
+  url: https://csrc.nist.gov/pubs/sp/800/61/r3/final
+  scope:
+    ru: Обнаружение, реакция, восстановление и управление свидетельствами.
+    en: Covers detection, response, recovery, and evidence management.
+  checked: ''
+ARCH:
+  type: standard
+  title: 'The Open Group: ArchiMate 101'
+  url: https://archimate-community.pages.opengroup.org/workgroups/archimate-101/
+  scope:
+    ru: Типы архитектурных элементов и семантика связей. Для проверки точных допустимых пар использовать редакцию 3.2.
+    en: Covers architecture element types and relationship semantics. Use edition 3.2 to check the exact permitted pairs.
+  checked: ''
+TOK:
+  type: standard
+  title: 'PCI SSC: Tokenization Product Security Guidelines'
+  url: https://www.pcisecuritystandards.org/documents/Tokenization_Product_Security_Guidelines.pdf
+  scope:
+    ru: Защита обратимой токенизации в сфере платёжных данных. Не универсальное требование к размещению.
+    en: Covers protection of reversible tokenization for payment data. It is not a universal placement requirement.
+  checked: ''
+SECRETS:
+  type: standard
+  title: OWASP Secrets Management Cheat Sheet
+  url: https://cheatsheetseries.owasp.org/cheatsheets/Secrets_Management_Cheat_Sheet.html
+  scope:
+    ru: Доступ, ротация, отзыв и журналирование рабочих секретов.
+    en: Covers access, rotation, revocation, and logging of operational secrets.
+  checked: ''
+LLM-C:
+  type: standard
+  title: OWASP LLM Prompt Injection Prevention
+  url: https://cheatsheetseries.owasp.org/cheatsheets/LLM_Prompt_Injection_Prevention_Cheat_Sheet.html
+  scope:
+    ru: Отделение инструкций от данных, проверки ввода и выхода, многослойный контроль.
+    en: Covers separating instructions from data, input and output guardrails, and layered controls.
+  checked: ''
+PROV:
+  type: standard
+  title: 'SLSA v1.2: Build Provenance'
+  url: https://slsa.dev/spec/v1.2/build-provenance
+  section: Build Provenance predicate
+  scope:
+    ru: Свидетельство происхождения сборки и связь с артефактом.
+    en: Covers build provenance evidence and its link to the artifact.
+  checked: ''
+LLMJ:
+  type: practice
+  title: 'Shi et al.: Optimization-based Prompt Injection Attack to LLM-as-a-Judge'
+  url: https://arxiv.org/abs/2403.17710
+  scope:
+    ru: Эксперимент с манипуляцией ИИ-контролёром через оцениваемый ответ. Не доказывает результат конкретного профиля.
+    en: Reports an experiment that manipulates an AI controller through the evaluated response. It does not prove the result for any specific profile.
+  checked: ''
+DEP-KSR:
+  type: example
+  title: 'KServe: Serving Runtime'
+  url: https://kserve.github.io/website/docs/concepts/resources/servingruntime
+  section: Explicit runtime selection; supportedModelFormats; storageUri
+  scope:
+    ru: Разделение InferenceService, runtime, формата и расположения модели. Поддерживает выбранную декомпозицию; не предписывает обязательный набор отдельных сервисов.
+    en: Separates the InferenceService, the runtime, the model format, and the model location. Supports the chosen decomposition; does not prescribe a mandatory set of separate services.
+  checked: ''
+DEP-KSDP:
+  type: example
+  title: 'KServe: Data Plane'
+  url: https://kserve.github.io/website/docs/concepts/architecture/data-plane
+  section: Generative Inference Architecture; Predictor
+  scope:
+    ru: Пример отдельного шлюза, исполнения моделей, загрузки артефактов и вычислительных ресурсов. Конкретные зависимости AiNativeOps являются проектной интерпретацией.
+    en: Gives an example of a separate gateway, model execution, artifact loading, and compute resources. The specific AiNativeOps dependencies are a design interpretation.
+  checked: ''
+DEP-AZGW:
+  type: practice
+  title: 'Microsoft: gateway for multiple model backends'
+  url: https://learn.microsoft.com/en-us/azure/architecture/ai-ml/guide/generative-ai-gateway-multiple-models
+  section: Multiple model deployments; multi-back-end routing for other models
+  scope:
+    ru: Маршрутизация нескольких backend, управление версиями и отказами, внутренние и внешние endpoints. Не подтверждает взаимозаменяемость разных моделей.
+    en: Covers routing across multiple backends, version and failure management, and internal and external endpoints. Does not confirm that different models are interchangeable.
+  checked: ''
+DEP-LORA:
+  type: example
+  title: 'vLLM: LoRA adapters'
+  url: https://docs.vllm.ai/en/latest/features/lora/
+  section: LoRA Adapters; LoRA model lineage
+  scope:
+    ru: Исполнение отдельного LoRA-адаптера поверх совместимой базовой модели. Эта зависимость не переносится автоматически на полный checkpoint.
+    en: Covers serving a separate LoRA adapter on top of a compatible base model. This dependency does not automatically carry over to a full checkpoint.
+  checked: ''
+DEP-CPU:
+  type: example
+  title: 'vLLM: CPU inference'
+  url: https://docs.vllm.ai/en/latest/getting_started/installation/cpu/
+  section: Requirements; supported models on CPU
+  scope:
+    ru: 'Пример CPU-исполнения модели: показывает, что GPU не является универсально обязательным компонентом инференса. Пригодность проверяется для выбранной модели.'
+    en: Gives an example of running a model on CPU and shows that a GPU is not a universally required inference component. Suitability must be verified for the chosen model.
+  checked: ''
+DEP-OTELCOL:
+  type: example
+  title: 'OpenTelemetry: Collector'
+  url: https://opentelemetry.io/docs/collector/
+  section: Receivers, processors, exporters
+  scope:
+    ru: Разделяет приём, обработку и экспорт телеметрии. Collector — пример механизма; конкретный маршрут и необходимость промежуточных компонентов определяет профиль.
+    en: Separates telemetry reception, processing, and export. The Collector is one example mechanism; the profile determines the specific route and whether intermediate components are needed.
+  checked: ''
+DEP-GRAPH:
+  type: practice
+  title: 'Google Cloud: GraphRAG architecture'
+  url: https://docs.cloud.google.com/architecture/gen-ai-graphrag-spanner
+  scope:
+    ru: Получение контекста через граф знаний как условный вариант RAG. Не делает граф обязательным для чата или обычного векторного поиска.
+    en: Covers context retrieval through a knowledge graph as a conditional RAG variant. Does not make a graph mandatory for chat or for ordinary vector search.
+  checked: ''
+DEP-FEAST:
+  type: example
+  title: 'Feast: Feature retrieval'
+  url: https://docs.feast.dev/master/getting-started/concepts/feature-retrieval
+  scope:
+    ru: Пример исторического извлечения признаков для обучения и отдельного онлайн-извлечения. Feature Store нужен выбранным предиктивным сценариям, а не всем LLM-процессам.
+    en: Gives an example of historical feature retrieval for training and separate online retrieval. Selected predictive scenarios need a Feature Store; not all LLM processes do.
+  checked: ''
+DEP-A2A:
+  type: standard
+  title: 'A2A Protocol 1.0.1: Authentication and Authorization'
+  url: https://a2a-protocol.org/v1.0.1/specification/
+  section: 7. Authentication and Authorization
+  scope:
+    ru: Аутентификация и полномочия при обмене между агентными системами. Корпоративные идентичности и правила делегирования задаются реализацией; протокол не создаёт их автоматически.
+    en: Covers authentication and authorization in exchanges between agentic systems. The implementation defines enterprise identities and delegation rules; the protocol does not create them automatically.
+  checked: ''
+DEP-SEMCACHE:
+  type: example
+  title: 'Microsoft: LLM semantic cache lookup'
+  url: https://learn.microsoft.com/en-us/azure/api-management/llm-semantic-cache-lookup-policy
+  section: Policy statement; usage notes
+  scope:
+    ru: Векторное сопоставление запросов через embedding-backend и разделение кеша по области доступа. Не доказывает допустимость повторного использования ответа для любой задачи.
+    en: Covers vector matching of requests through an embedding backend and cache partitioning by access scope. Does not prove that reusing a response is acceptable for every task.
+  checked: ''
+DEP-K8S:
+  type: example
+  title: 'Kubernetes: Cluster Architecture'
+  url: https://kubernetes.io/docs/concepts/architecture/
+  scope:
+    ru: Роли узлов, планирования и container runtime в Kubernetes. Это условный вариант платформы, а не единственная допустимая среда ИИ.
+    en: Covers the roles of nodes, scheduling, and the container runtime in Kubernetes. Kubernetes is a conditional platform option, not the only acceptable AI environment.
+  checked: ''
+UBER-GATEWAY:
+  type: practice
+  title: 'Uber — Navigating the LLM Landscape: GenAI Gateway'
+  url: https://www.uber.com/us/en/blog/genai-gateway/
+  section: Design & Architecture
+  scope:
+    ru: Общий шлюз собственных и внешних моделей, обработка PII, авторизация и аудит; не подтверждает всю предлагаемую схему fallback.
+    en: Covers a shared gateway for in-house and external models, PII handling, authorization, and audit; does not confirm the whole proposed fallback scheme.
+  checked: ''
+AWS-MULTI-GATEWAY:
+  type: practice
+  title: AWS — Multi-Provider Generative AI Gateway
+  url: https://aws.amazon.com/blogs/machine-learning/streamline-ai-operations-with-the-multi-provider-generative-ai-gateway-reference-architecture/
+  section: Intelligent routing and resilience; Advanced policy management
+  scope:
+    ru: Шлюз нескольких провайдеров, guardrails, ограничения доступа, маршрутизация и обработка временных отказов.
+    en: Covers a multi-provider gateway, guardrails, access restrictions, routing, and handling of transient failures.
+  checked: ''
+MS-EVALS:
+  type: practice
+  title: Morgan Stanley — AI evaluations and enterprise knowledge retrieval
+  url: https://openai.com/index/morgan-stanley/
+  section: Building a foundation; Strengthening trust with controls
+  scope:
+    ru: Корпоративный поиск, экспертная оценка и регрессионные проверки; конкретные правила эскалации этой схемы являются проектными.
+    en: Covers enterprise search, expert evaluation, and regression checks; the specific escalation rules of this scheme are design decisions.
+  checked: ''
+AZURE-RAG-ACCESS:
+  type: practice
+  title: Microsoft — Design a secure multitenant RAG inferencing solution
+  url: https://learn.microsoft.com/en-us/azure/architecture/ai-ml/guide/secure-multitenant-rag
+  section: Multitenancy in RAG architecture; Data filtering
+  scope:
+    ru: Передача идентичности и ограничение извлекаемого контекста данными, доступными пользователю.
+    en: Covers identity propagation and restricting retrieved context to data the user can access.
+  checked: ''
+UBER-SOFTWARE-FACTORY:
+  type: practice
+  title: Uber — Running a Software Factory Efficiently at Uber Scale
+  url: https://www.uber.com/us/en/blog/efficient-software-factory/
+  section: Introduction; Benchmark-Driven Model Selection; Default Model Selection
+  scope:
+    ru: Агентные задачи разработки и CI, человеческое review и эскалации, декомпозиция основной моделью и выполнение подагентами.
+    en: Covers agentic development and CI tasks, human review and escalations, and task decomposition by a primary model with execution by subagents.
+  checked: ''
+INTUIT-GENOS:
+  type: practice
+  title: Intuit — Accelerating development velocity with GenOS
+  url: https://www.intuit.com/blog/innovative-thinking/accelerating-development-velocity-with-major-enhancements-to-genos/
+  section: GenOS AI Workbench
+  scope:
+    ru: Каталог моделей, версии промптов, автоматическая и ручная оценка качества, задержки и стоимости.
+    en: Covers a model catalog, prompt versions, and automated and manual evaluation of quality, latency, and cost.
+  checked: ''
+UBER-LLMOPS:
+  type: practice
+  title: 'Uber — From Predictive to Generative: Michelangelo'
+  url: https://www.uber.com/us/en/blog/from-predictive-to-generative-ai/
+  section: Generative AI
+  scope:
+    ru: Подготовка данных, дообучение, оценка и размещение LLM; хранение модели и метаданных для serving.
+    en: Covers data preparation, fine-tuning, evaluation, and deployment of LLMs, and storage of the model and metadata for serving.
+  checked: ''
+AZURE-SAFE-ROLLOUT:
+  type: example
+  title: Microsoft — Safe rollout for online endpoints
+  url: https://learn.microsoft.com/en-us/azure/machine-learning/how-to-safely-rollout-online-endpoints?view=azureml-api-2
+  section: Test the deployment with mirrored traffic; Allocate a small percentage of live traffic
+  scope:
+    ru: Изолированная проверка новой версии, shadow-трафик и постепенное переключение production-трафика. Критерии отката задаёт организация.
+    en: Covers isolated testing of a new version, shadow traffic, and gradual shifting of production traffic. The organization defines the rollback criteria.
+  checked: ''
+P20-HARNESS:
+  type: practice
+  title: Anthropic — Harness design for long-running application development
+  url: https://www.anthropic.com/research/harness-design-long-running-apps
+  scope:
+    ru: Разделение планирования, генерации и оценки, длительное исполнение с передачей состояния; не подтверждает весь предлагаемый корпоративный цикл.
+    en: Separates planning, generation, and evaluation, and covers long-running execution with state handoff; does not confirm the whole proposed enterprise cycle.
+  checked: ''
+P20-LIFECYCLE:
+  type: practice
+  title: Microsoft — Manage the agent lifecycle
+  url: https://learn.microsoft.com/en-us/agents/center-of-excellence/agent-lifecycle
+  scope:
+    ru: Владение агентом, этапы создания, допуска, наблюдения, улучшения и вывода.
+    en: Covers agent ownership and the stages of creation, admission, monitoring, improvement, and retirement.
+  checked: ''
+P20-MULTIMODAL:
+  type: example
+  title: Microsoft — Content Understanding
+  url: https://learn.microsoft.com/en-us/azure/ai-services/content-understanding/
+  scope:
+    ru: Преобразование документов, изображений, аудио и видео в структурированные данные; классы AiNativeOps не привязаны к поставщику.
+    en: Covers converting documents, images, audio, and video into structured data; AiNativeOps classes are not tied to a vendor.
+  checked: ''
+P20-RESEARCH:
+  type: practice
+  title: Anthropic — How we built our multi-agent research system
+  url: https://www.anthropic.com/research/multi-agent-research-system
+  scope:
+    ru: Декомпозиция исследования, параллельный поиск, синтез и устойчивое ведение состояния.
+    en: Covers research decomposition, parallel search, synthesis, and durable state management.
+  checked: ''
+P20-EVOLVE:
+  type: practice
+  title: 'Google Cloud — AlphaEvolve: algorithm and architecture search'
+  url: https://cloud.google.com/blog/products/ai-machine-learning/alphaevolve-is-available-for-everyone/
+  scope:
+    ru: Итеративный поиск программ и архитектур по функции оценки. Успех конкретной исследовательской гипотезы не гарантирован.
+    en: Covers iterative search over programs and architectures against an evaluation function. Success of a specific research hypothesis is not guaranteed.
+  checked: ''
+P20-NEMO:
+  type: example
+  title: NVIDIA — NeMo Framework
+  url: https://docs.nvidia.com/nemo-framework/index.html
+  scope:
+    ru: Предобучение и адаптация генеративных моделей, распределённые вычисления и контрольные точки.
+    en: Covers pretraining and adaptation of generative models, distributed computing, and checkpoints.
+  checked: ''
+P20-MODERNIZE:
+  type: example
+  title: Microsoft — GitHub Copilot modernization
+  url: https://learn.microsoft.com/en-us/azure/developer/github-copilot-app-modernization/overview
+  scope:
+    ru: Анализ приложений, планирование модернизации, преобразование и развёртывание; эквивалентность определяется критериями конкретной системы.
+    en: Covers application analysis, modernization planning, transformation, and deployment; the criteria of the specific system define equivalence.
+  checked: ''
+P20-SERVICE:
+  type: practice
+  title: Microsoft — Workplace and IT services pattern
+  url: https://learn.microsoft.com/en-us/agents/adoption-patterns/pattern-workplace-it-services
+  scope:
+    ru: Приём и исполнение сервисных заявок, полномочия, эскалация и ответственность владельца.
+    en: Covers intake and fulfillment of service requests, authority, escalation, and owner accountability.
+  checked: ''
+P20-GENOPS:
+  type: practice
+  title: Google Cloud — Deploy and operate generative AI applications
+  url: https://docs.cloud.google.com/architecture/deploy-operate-generative-ai-applications
+  scope:
+    ru: Оценка и версионирование конфигурации ИИ-приложения, выпуск, наблюдение и улучшение.
+    en: Covers evaluation and versioning of the AI application configuration, release, monitoring, and improvement.
+  checked: ''
+OWASP-LLM10:
+  type: standard
+  title: 'OWASP Top 10 for LLM Applications 2025: LLM10 Unbounded Consumption'
+  url: https://genai.owasp.org/llmrisk/llm102025-unbounded-consumption/
+  section: Prevention and Mitigation Strategies
+  scope:
+    ru: Квоты пользователя, ограничение частоты запросов, защита от извлечения модели через API и от отказа в обслуживании по стоимости. Учёт затрат источник не описывает.
+    en: User quotas, rate limiting, protection from model extraction via API and from denial of wallet. The source does not cover cost accounting.
+  checked: ''
+ROUTELLM:
+  type: practice
+  title: 'RouteLLM: Learning to Route LLMs with Preference Data'
+  url: https://arxiv.org/abs/2406.18665
+  section: 3 LLM Routing
+  scope:
+    ru: Маршрутизатор выбирает между сильной и дешёвой моделью по запросу и обучается на данных предпочтений. Многоуровневую сложность и длительность рассуждения статья не рассматривает.
+    en: A router chooses between a strong and a cheap model per query and learns from preference data. The paper does not cover multi-level complexity or reasoning length.
+  checked: ''
+FRUGALGPT:
+  type: practice
+  title: 'FrugalGPT: How to Use Large Language Models While Reducing Cost and Improving Performance'
+  url: https://arxiv.org/abs/2305.05176
+  section: LLM cascade
+  scope:
+    ru: Снижение стоимости через адаптацию промпта, приближение ответов и каскад моделей от дешёвой к дорогой. Разбиение запроса на подзадачи статья не описывает.
+    en: Cost reduction through prompt adaptation, response approximation and a cascade from cheap to expensive models. The paper does not describe splitting a request into subtasks.
+  checked: ''
+LLMCOMPILER:
+  type: practice
+  title: An LLM Compiler for Parallel Function Calling
+  url: https://arxiv.org/abs/2312.04511
+  section: Function Calling Planner, Task Fetching Unit, Executor
+  scope:
+    ru: Планировщик строит план вызовов, независимые вызовы исполняются параллельно. Выбор разных моделей для подзадач статья не рассматривает.
+    en: A planner builds a call plan and independent calls run in parallel. The paper does not consider choosing different models for subtasks.
+  checked: ''

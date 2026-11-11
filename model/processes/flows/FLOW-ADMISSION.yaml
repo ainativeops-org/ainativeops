@@ -1,0 +1,199 @@
+# Процесс на карте / Process on the map: FLOW-ADMISSION
+# workflow: узлы и переходы схемы; SVG схемы строит tools/build.py через Graphviz.
+# workflow: diagram nodes and edges; tools/build.py renders the SVG with Graphviz.
+name:
+  ru: Независимая оценка и допуск ИИ-системы
+  en: Independent AI Evaluation and Admission
+group: EVA
+owner:
+  - Владелец рубежа выпуска; оценку проводит независимый руководитель испытаний.
+  - Release gate owner; an independent test lead conducts the assessment.
+start:
+  - На допуск передана неизменяемая конфигурация кандидата с назначением, источниками и планом отката.
+  - An immutable candidate configuration, its purpose, provenance and rollback plan are submitted.
+result:
+  - Точная версия имеет подписанный допуск к выпуску либо документированный отказ. Развёртывание — отдельная операция.
+  - The exact version has a signed release admission or a documented denial. Deployment is a separate operation.
+check:
+  - Автор не может заменить критерии или сам выпустить версию. Подмена манифеста, недопустимый эффект и отсутствие обязательного свидетельства блокируют допуск.
+  - The author cannot change the criteria or approve their own release. Manifest substitution, a prohibited effect or missing mandatory evidence blocks admission.
+maturity:
+  - 'Формализованный выпуск: независимая оценка, происхождение, подпись и проверенный откат.'
+  - 'Managed release: independent evaluation, provenance, signing and verified rollback.'
+calls: []
+order: 15
+protection:
+  - Каждый вызов модели проходит проверку идентичности и прав, защиту входа и выхода и аудит в разрешённом объёме. Вызовы инструментов допускаются отдельно; код исполняется в изолированной среде. Согласование и ограничения раскрытия задаются политикой.
+  - Every model call uses identity and authorization checks, input and output protections, and permitted audit retention. Tool calls are authorized separately; code runs in a sandbox. Approval and disclosure restrictions follow policy.
+parts:
+  - CORE-01
+  - FLOW-ADMISSION--CANDIDATE
+  - FLOW-ADMISSION--CRITERIA
+  - FLOW-ADMISSION--EVALUATE
+  - FLOW-ADMISSION--EVAL-GATE
+  - FLOW-ADMISSION--VERIFY-PACKAGE
+  - FLOW-ADMISSION--RELEASE-GATE
+  - FLOW-ADMISSION--SIGN
+tags: [Independent AI Evaluation and Admission]
+path: process-flow-admission
+workflow:
+  summary:
+    - На допуск передана неизменяемая конфигурация кандидата с назначением, источниками и планом отката. Точная версия имеет подписанный допуск к выпуску либо документированный отказ. Развёртывание — отдельная операция.
+    - An immutable candidate configuration, its purpose, provenance and rollback plan are submitted. The exact version has a signed release admission or a documented denial. Deployment is a separate operation.
+  synthesis:
+    - Последовательность, условия переходов и сопоставление компонентов — проектный синтез AiNativeOps. Источники подтверждают отдельные практики в указанной области, а не всю схему.
+    - The sequence, conditions and component mapping are AiNativeOps design synthesis. Sources support individual practices within their stated scope, not the entire diagram.
+  basis:
+    - source: NIST-C
+      claim:
+        - Измерение, независимое участие в оценке, управление и регулярный пересмотр рисков.
+        - Covers measurement, independent participation in assessment, governance, and regular risk review.
+    - source: SSDF
+      claim:
+        - Безопасная разработка моделей и ИИ-систем, происхождение, проверки и роли.
+        - Covers secure development of models and AI systems, provenance, checks, and roles.
+    - source: PROV
+      claim:
+        - Свидетельство происхождения сборки и связь с артефактом.
+        - Covers build provenance evidence and its link to the artifact.
+    - source: LLMJ
+      claim:
+        - Эксперимент с манипуляцией ИИ-контролёром через оцениваемый ответ. Не доказывает результат конкретного профиля.
+        - Reports an experiment that manipulates an AI controller through the evaluated response. It does not prove the result for any specific profile.
+  nodes:
+    - id: candidate
+      label: [Зафиксировать кандидата, Freeze the candidate]
+      detail:
+        - Связать идентификатор и хеш кандидата с применимыми версиями кода, модели, данных, среды, инструкций, инструментов и политик. Отдельно указать цель выпуска и план возврата.
+        - Bind the candidate identifier and digest to applicable versions of code, model, data, runtime, instructions, tools and policies. Record the release purpose and rollback plan separately.
+      kind: step
+      components:
+        architecture: [mt_profile, v5, g5]
+        infrastructure: [artifact-registry, model-registry, provenance-registry]
+        stack: [RM-DEV-08, RM-MOD-05, RM-TRS-05]
+    - id: criteria
+      label: [Назначить критерии оценки, Set assessment criteria]
+      detail:
+        - Независимый оценщик утверждает наборы, пороги, запрещённые исходы и негативные пробы для заявленных маршрутов. Автор не может изменить эти критерии или контрольные наборы.
+        - An independent evaluator approves datasets, thresholds, forbidden outcomes and negative tests for the declared paths. The author cannot change the criteria or control datasets.
+      kind: step
+      components:
+        architecture: [b_goal, mt_indep, g4]
+        infrastructure: [eval-datasets, eval-red-teaming]
+        stack: [RM-DAT-05, RM-DEV-07]
+    - id: evaluate
+      label: [Испытать версию в EVAL, Test the version in EVAL]
+      detail:
+        - 'В изолированной среде проверить качество, регрессию и защиту: запрет раскрытия, обход входа или выхода, отказы обязательных проверок и эффекты на тестовых целях. ИИ-контролёр может дополнить проверку; его вызовы тоже проходят защитный маршрут.'
+        - 'In an isolated environment, test quality, regressions and controls: disclosure denial, input or output bypass, mandatory-check failures and effects on test targets. An AI controller can assist; its own calls follow the guarded path.'
+      kind: step
+      components:
+        architecture: [o_eval, g4, t_ctl, t_eval]
+        infrastructure:
+          - eval-red-teaming
+          - eval-datasets
+          - job-sandbox
+          - rule-based-checks
+          - llm-as-a-judge
+          - eval-inference-service
+        stack: [RM-DEV-07, RM-DAT-05, RM-ACT-03, RM-AIC-01, RM-AIC-02, RM-AIC-03]
+    - id: eval-gate
+      label: ['Критерии выполнены?', 'Did the candidate pass?']
+      detail:
+        - Сверить результаты с заранее утверждёнными критериями, версией кандидата и охватом тестов. Обязательный провал, неполнота или неразрешённое расхождение блокируют переход.
+        - Reconcile results with the agreed criteria, candidate version and test coverage. A mandatory failure, missing evidence or an unresolved discrepancy blocks progression.
+      kind: decision
+      components:
+        architecture: [g4, mt_indep, mt_ev]
+        infrastructure: [eval-red-teaming, eval-datasets, audit-log]
+        stack: [RM-DEV-07, RM-DAT-05, RM-TRS-04]
+    - id: verify-package
+      label: [Проверить пакет и откат, Verify package and rollback]
+      detail:
+        - Подтвердить происхождение и целостность точного выпускаемого пакета. На стенде проверить возврат к допущенной версии, совместимость схем и порядок сверки возможных внешних эффектов.
+        - Verify provenance and integrity of the exact package to be released. In staging, test return to an admitted version, schema compatibility and how any external effects would be reconciled.
+      kind: step
+      components:
+        architecture: [g5, o_pack, mt_ev]
+        infrastructure: [artifact-registry, provenance-registry, integrity-monitoring, cd-deployment]
+        stack: [RM-DEV-08, RM-TRS-05, RM-TRS-06, RM-DEV-10]
+    - id: release-gate
+      label: ['Версию можно допустить?', 'Can this version be admitted?']
+      detail:
+        - Владелец рубежа сверяет манифест, обязательные свидетельства и готовность отката. Остаточный риск принимается в заданных пределах со сроком и ответственным; исключение не отменяет обязательный запрет.
+        - The gate owner verifies the manifest, mandatory evidence and rollback readiness. Residual risk may be accepted within defined bounds with an expiry and owner; an exception cannot override a mandatory prohibition.
+      kind: decision
+      components:
+        architecture: [b_ownrisk, mt_residual, g6, o_release]
+        infrastructure: [release-gate, provenance-registry, integrity-monitoring]
+        stack: [RM-DEV-09, RM-GOV-04, RM-TRS-05, RM-TRS-06]
+    - id: sign
+      label: ['Подпись и запись созданы?', 'Are signature and record complete?']
+      detail:
+        - Связать решение, версию политики, назначение и срок с хешем полной конфигурации. Подписать разрешённый манифест защищённым ключом. Ошибка подписи или записи означает отсутствие допуска.
+        - Bind decision, policy version, purpose and expiry to the full configuration digest. Sign the authorized manifest with a protected key. A signing or record failure means no admission.
+      kind: decision
+      components:
+        architecture: [g6, o_release, t_audit]
+        infrastructure: [release-gate, hsm-kms, audit-log, provenance-registry]
+        stack: [RM-DEV-09, RM-TRS-01, RM-TRS-04, RM-TRS-05]
+    - id: admitted
+      label: [Точная версия допущена, Exact version admitted]
+      detail:
+        - Решение действительно только для точного digest, области и срока. CD проверяет одновременно подпись и действующую зафиксированную запись допуска; отсутствие любого условия запрещает развёртывание.
+        - The decision applies only to the exact digest, scope and expiry. CD checks both the signature and an active committed admission record; absence of either blocks deployment.
+      kind: outcome
+      components:
+        architecture: [g6, o_release, s_runtime]
+        infrastructure: [release-gate, artifact-registry, cd-deployment]
+        stack: [RM-DEV-09, RM-DEV-10, RM-GOV-04]
+    - id: denied
+      label: [Выпуск заблокирован, Release blocked]
+      detail:
+        - Записать критерий или свидетельство, из-за которого отказано. Кандидат не получает допуск; исправленная версия повторно подаётся с новым идентификатором.
+        - Record the failed criterion or missing evidence. The candidate gets no admission; a corrected version is resubmitted with a new identifier.
+      kind: outcome
+      components:
+        architecture: [g4, g6, mt_ev]
+        infrastructure: [release-gate, audit-log]
+        stack: [RM-DEV-09, RM-TRS-04, RM-GOV-04]
+  edges:
+    - from: candidate
+      to: criteria
+      label: [Версия закреплена, Version pinned]
+    - from: criteria
+      to: evaluate
+      label: [Набор проверок, Test suite]
+    - from: evaluate
+      to: eval-gate
+      label: [Результаты, Results]
+    - from: eval-gate
+      to: verify-package
+      label: [Критерии выполнены, Criteria met]
+    - from: eval-gate
+      to: denied
+      label: [Провал или нет данных, Failed or incomplete]
+    - from: verify-package
+      to: release-gate
+      label: [Пакет и план возврата, Package and rollback]
+    - from: release-gate
+      to: sign
+      label: [Допуск разрешён, Admission granted]
+    - from: release-gate
+      to: denied
+      label: [Допуск запрещён, Admission denied]
+    - from: sign
+      to: admitted
+      label: [Подпись и запись, Signature and record]
+    - from: sign
+      to: denied
+      label: [Не удалось подписать или записать, Signature or record failed]
+  main:
+    - candidate
+    - criteria
+    - evaluate
+    - eval-gate
+    - verify-package
+    - release-gate
+    - sign
+    - admitted

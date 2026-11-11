@@ -12,7 +12,7 @@ AiNativeOps is a Community Interest Project. The model belongs to its contributo
 | Layer steward | Reviews and approves changes to one or more layers; listed in `.github/CODEOWNERS` | Three accepted contributions to the layer and agreement of the maintainers |
 | Maintainer | Merges, releases versions, appoints stewards, moderates | Agreement of the existing maintainers |
 
-The owners of the `ainativeops-org` GitHub organisation act as maintainers until the project names maintainers in this file. The domain ainativeops.org is held for the project; if its holder leaves the project, the domain is transferred to a person or an organisation named by the maintainers.
+The owners of the `ainativeops` GitHub organisation act as maintainers until the project names maintainers in this file. The domain ainativeops.org is held for the project; if its holder leaves the project, the domain is transferred to a person or an organisation named by the maintainers.
 
 ## Decisions
 
@@ -48,7 +48,7 @@ AiNativeOps развивается как Community Interest Project. Модел
 | Сопровождающий слоя | Рецензирует и одобряет изменения одного или нескольких слоёв; указан в `.github/CODEOWNERS` | Три принятых вклада в слой и согласие мейнтейнеров |
 | Мейнтейнер | Сливает изменения, выпускает версии, назначает сопровождающих, модерирует | Согласие действующих мейнтейнеров |
 
-Пока проект не назвал мейнтейнеров в этом файле, их обязанности исполняют владельцы организации `ainativeops-org` на GitHub. Домен ainativeops.org принадлежит проекту; если его держатель выходит из проекта, он передаёт домен лицу или организации, которых назовут мейнтейнеры.
+Пока проект не назвал мейнтейнеров в этом файле, их обязанности исполняют владельцы организации `ainativeops` на GitHub. Домен ainativeops.org принадлежит проекту; если его держатель выходит из проекта, он передаёт домен лицу или организации, которых назовут мейнтейнеры.
 
 ## Решения
 

@@ -1,0 +1,33 @@
+# Маршрут / Route: Инференс по API · внешняя модель / API inference · external model
+# Шаг = [элемент, [участники]] / Step = [element, [participants]]
+order: 34
+name:
+  ru: Инференс по API · внешняя модель
+  en: API inference · external model
+routes:
+  architecture:
+    - [t_iam, []]
+    - [t_input, []]
+    - [t_route, []]
+    - [t_infer, [t_plan, b_poldisc]]
+    - [t_ext, []]
+    - [t_result, []]
+    - [t_audit, []]
+  infrastructure:
+    - [business-apps, [iam-sso]]
+    - [input-guardrails, []]
+    - [request-classifier, []]
+    - [llm-gateway, [model-call-planner, inference-quotas, usage-billing]]
+    - [egress-proxy, []]
+    - [external-llm-api, []]
+    - [output-guardrails, []]
+    - [business-apps, [audit-log]]
+  stack:
+    - [RM-INT-01, [RM-SEC-01, RM-APP-01]]
+    - [RM-AIC-01, [RM-GOV-03]]
+    - [RM-MOD-12, []]
+    - [RM-MOD-06, [RM-MOD-13, RM-AIC-05, RM-OPS-06]]
+    - [RM-SEC-02, []]
+    - [RM-MOD-03, []]
+    - [RM-AIC-02, []]
+    - [RM-TRS-04, []]

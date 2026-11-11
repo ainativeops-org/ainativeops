@@ -1,0 +1,262 @@
+# Процесс на карте / Process on the map: FLOW-INCIDENT
+# workflow: узлы и переходы схемы; SVG схемы строит tools/build.py через Graphviz.
+# workflow: diagram nodes and edges; tools/build.py renders the SVG with Graphviz.
+name:
+  ru: Расследование и устранение инцидента безопасности ИИ
+  en: AI Security Incident Response
+group: SEC
+owner:
+  - Руководитель реагирования ИБ; возврат согласуют ИБ и владелец системы.
+  - Security incident lead; security and the system owner approve resumption.
+start:
+  - Получен сигнал о возможном раскрытии, компрометации, обходе защитных проверок, нарушении целостности или недопустимом действии.
+  - A signal suggests disclosure, compromise, control bypass, loss of integrity or an unauthorized action.
+result:
+  - Инцидент локализован и расследован. Возврат подтверждён проверками и отдельным решением, либо изоляция сохраняется; ложный сигнал закрывается с основанием.
+  - The incident is contained and investigated. Verification and a separate decision authorize resumption, or isolation remains; a false alert closes with a rationale.
+check:
+  - Учебный инцидент блокирует новые действия в заданный срок. Свидетельства доступны с контролем целостности, внешние эффекты сверены, а возврат невозможен без проверенного устранения причины и допуска.
+  - An exercise blocks new actions within the target time. Evidence remains available with integrity controls, external effects are reconciled, and resumption requires verified remediation and admission.
+maturity:
+  - 'Управляемое реагирование: независимая остановка, сохранение свидетельств и проверяемый возврат.'
+  - 'Managed incident response: independent containment, evidence preservation and verified resumption.'
+calls:
+  - id: AGT-ACTION
+    when:
+      - Только если владелец отдельно согласовал компенсацию, её выполняет агент и для неё доступен чистый допущенный маршрут с проверкой точных аргументов. Новый сигнал при компенсации прикрепляется к текущему инциденту и останавливает компенсацию без вложенного повторного запуска.
+      - Only when an owner separately approves compensation, an agent must perform it, and a clean admitted path checks the exact arguments. A new signal during compensation attaches to the current incident and stops compensation without recursively starting another incident.
+  - id: FLOW-ACCESS
+    when:
+      - Если возврат требует новых полномочий, выдать минимальные права и проверить отзыв старых. Первичная блокировка выполняется немедленно, без ожидания этого процесса.
+      - If recovery requires new authority, provision least privilege and verify prior revocation. Initial containment is immediate and does not wait for this process.
+  - id: FLOW-ADMISSION
+    when:
+      - Если устранение причины изменило выпускаемую конфигурацию или прежний допуск отозван, повторно оценить и допустить точную версию перед возвратом.
+      - If remediation changed the release configuration or revoked its prior admission, re-evaluate and admit the exact version before resumption.
+order: 19
+protection:
+  - Каждый вызов модели проходит проверку идентичности и прав, защиту входа и выхода и аудит в разрешённом объёме. Вызовы инструментов допускаются отдельно; код исполняется в изолированной среде. Согласование и ограничения раскрытия задаются политикой.
+  - Every model call uses identity and authorization checks, input and output protections, and permitted audit retention. Tool calls are authorized separately; code runs in a sandbox. Approval and disclosure restrictions follow policy.
+parts:
+  - CORE-01
+  - FLOW-INCIDENT--SIGNAL
+  - FLOW-INCIDENT--TRIAGE
+  - FLOW-INCIDENT--CONTAIN
+  - FLOW-INCIDENT--EVIDENCE
+  - FLOW-INCIDENT--EFFECTS
+  - FLOW-INCIDENT--REMEDIATE
+  - FLOW-INCIDENT--RETURN-GATE
+  - FLOW-INCIDENT--REOPEN
+  - FLOW-INCIDENT--VERIFY
+tags: [AI Security Incident Response]
+path: process-flow-incident
+workflow:
+  summary:
+    - Получен сигнал о возможном раскрытии, компрометации, обходе защитных проверок, нарушении целостности или недопустимом действии. Инцидент локализован и расследован. Возврат подтверждён проверками и отдельным решением, либо изоляция сохраняется; ложный сигнал закрывается с основанием.
+    - A signal suggests disclosure, compromise, control bypass, loss of integrity or an unauthorized action. The incident is contained and investigated. Verification and a separate decision authorize resumption, or isolation remains; a false alert closes with a rationale.
+  synthesis:
+    - Последовательность, условия переходов и сопоставление компонентов — проектный синтез AiNativeOps. Источники подтверждают отдельные практики в указанной области, а не всю схему.
+    - The sequence, conditions and component mapping are AiNativeOps design synthesis. Sources support individual practices within their stated scope, not the entire diagram.
+  basis:
+    - source: INC
+      claim:
+        - Обнаружение, реакция, восстановление и управление свидетельствами.
+        - Covers detection, response, recovery, and evidence management.
+    - source: NIST-C
+      claim:
+        - Измерение, независимое участие в оценке, управление и регулярный пересмотр рисков.
+        - Covers measurement, independent participation in assessment, governance, and regular risk review.
+    - source: RMF
+      claim:
+        - Профиль рисков генеративного ИИ и действия по управлению риском.
+        - Covers the generative AI risk profile and risk management actions.
+    - source: SECRETS
+      claim:
+        - Доступ, ротация, отзыв и журналирование рабочих секретов.
+        - Covers access, rotation, revocation, and logging of operational secrets.
+    - source: OWASP
+      claim:
+        - Проверка полномочий на стороне вызываемой системы и согласование значимых действий.
+        - Covers authorization checks on the side of the called system and approval of significant actions.
+    - source: LANG-I
+      claim:
+        - При возобновлении исполнение узла может начаться заново. Внешние эффекты требуют защиты от повтора.
+        - On resume, node execution can start over from the beginning. External side effects require protection against repetition.
+  nodes:
+    - id: signal
+      label: [Зарегистрировать сигнал ИБ, Record the security signal]
+      detail:
+        - Сохранить корреляцию событий, маршрут, время, предполагаемое действие и связанные версии политик. Назначить руководителя инцидента и канал связи по регламенту.
+        - Preserve event correlation, path, time, suspected action and associated policy versions. Assign the incident lead and the reporting channel under procedure.
+      kind: step
+      components:
+        architecture: [b_regincident, s_detect, t_siem]
+        infrastructure: [siem-soc, log-metric-store, audit-log]
+        stack: [RM-SEC-05, RM-OPS-04, RM-TRS-04]
+    - id: triage
+      label: ['Нужно сдерживание?', 'Is containment warranted?']
+      detail:
+        - Определить затронутые границы, срочность и достоверность. При обоснованном подозрении сдерживать до подтверждения полного масштаба; при подтверждённом ложном сигнале записать основание.
+        - Assess affected boundaries, urgency and credibility. Contain a credible suspicion before the full scope is known; document the grounds when an alert is confirmed false.
+      kind: decision
+      components:
+        architecture: [s_detect, b_np, mt_tb]
+        infrastructure: [siem-soc, audit-log]
+        stack: [RM-SEC-05, RM-GOV-04, RM-TRS-04]
+    - id: contain
+      label: ['Сдерживание подтверждено?', 'Is containment verified?']
+      detail:
+        - Блокировать новые операции, изолировать исполнителя и отозвать скомпрометированные полномочия. Не ждать сбора свидетельств. Проверить запрет на затронутых путях; при неполной блокировке усилить ограничения и не восстанавливать доступ.
+        - Block new operations, isolate the executor and revoke compromised authority. Do not wait for evidence collection. Verify denials on affected paths; strengthen restrictions and keep access closed if containment is incomplete.
+      kind: decision
+      components:
+        architecture: [s_resp, s_runtime, t_gw]
+        infrastructure: [kill-switch, pep, agent-iam, egress-proxy, llm-gateway]
+        stack: [RM-TRS-07, RM-ACT-02, RM-GOV-02, RM-SEC-02, RM-MOD-06]
+    - id: evidence
+      label: [Установить масштаб и причину, Establish scope and cause]
+      detail:
+        - Защитить исходные записи, версии конфигурации и события целевых систем, зафиксировать целостность и доступ к свидетельствам. Отметить, какие потери доказаны, исключены или ещё не определены.
+        - Protect original records, configuration versions and target-system events, and document evidence integrity and access. Distinguish confirmed impacts, ruled-out impacts and unknowns.
+      kind: step
+      components:
+        architecture: [s_resp, mt_ev, t_audit]
+        infrastructure:
+          - siem-soc
+          - audit-log
+          - provenance-registry
+          - integrity-monitoring
+          - archive-backup
+          - evidence-store
+        stack: [RM-SEC-05, RM-SEC-07, RM-TRS-04, RM-TRS-05, RM-TRS-06]
+    - id: effects
+      label: [Сверить внешние эффекты, Reconcile external effects]
+      detail:
+        - Если затронуты инструменты с записью, выяснить статус по идентификатору операции в целевой системе. Не повторять неизвестный эффект. Компенсация получает отдельное решение и обычные проверки допуска.
+        - If write-capable tools were affected, establish status in the target system by operation identifier. Do not retry an unknown effect. Compensation requires a separate decision and ordinary admission checks.
+      kind: step
+      components:
+        architecture: [s_resp, s_runtime, g7]
+        infrastructure: [checkpoint-store, mcp-servers, erp-crm, pep, audit-log]
+        stack: [RM-AGT-05, RM-INT-02, RM-ACT-02, RM-TRS-04, RM-TRS-07]
+    - id: remediate
+      label: [Устранить причину, Remove the cause]
+      detail:
+        - Удалить или исправить скомпрометированный компонент либо правило, закрыть обход, заменить затронутые секреты. Новые полномочия оформляются через FLOW-ACCESS, если они нужны для чистого контура.
+        - Remove or fix the compromised component or rule, close the bypass and replace affected secrets. Use FLOW-ACCESS for new authority if required by the clean environment.
+      kind: step
+      components:
+        architecture: [s_resp, s_change, g8]
+        infrastructure: [artifact-registry, sast-sca-secrets, agent-iam, secrets-manager, pep]
+        stack: [RM-SEC-04, RM-SEC-06, RM-TRS-03, RM-GOV-02, RM-OPS-07]
+    - id: return-gate
+      label: ['Возврат разрешён?', 'Is resumption authorized?']
+      detail:
+        - Проверить устранение причины, отзыв старых полномочий, целостность и достаточность свидетельств. Получить новый допуск при изменении конфигурации или отзыве прежнего допуска, в том числе для неизменённой версии.
+        - Verify remediation, prior authority revocation, integrity and sufficient evidence. Obtain new admission after a configuration change or prior admission revocation, including for an unchanged version.
+      kind: decision
+      components:
+        architecture: [s_resp, g6, g8, mt_ev]
+        infrastructure: [release-gate, eval-red-teaming, integrity-monitoring, audit-log]
+        stack: [RM-DEV-07, RM-DEV-09, RM-GOV-04, RM-TRS-06]
+    - id: reopen
+      label: [Открыть ограниченный контур, Reopen a limited path]
+      detail:
+        - Восстанавливать доступ поэтапно только для разрешённых субъектов и маршрутов. Включить дополнительные оповещения на признаки исходной атаки и отклонения от проверенной конфигурации.
+        - Resume in stages only for authorized subjects and paths. Enable additional alerts for recurrence of the original attack or divergence from the verified configuration.
+      kind: step
+      components:
+        architecture: [s_resp, o_ops, t_siem]
+        infrastructure: [cd-deployment, llm-gateway, siem-soc, metrics-alerts]
+        stack: [RM-DEV-10, RM-MOD-06, RM-SEC-05, RM-OPS-01]
+    - id: verify
+      label: ['Изоляцию можно снять?', 'Can isolation be lifted?']
+      detail:
+        - По итогам срока наблюдения подтвердить отсутствие признаков повторного нарушения, соблюдение запретов и запись всех решений. Повторный сигнал немедленно блокирует расширение и возвращает ограничение.
+        - At the end of the observation window, verify no signs of recurrence, that prohibitions hold and decisions were recorded. A new signal immediately stops expansion and restores restrictions.
+      kind: decision
+      components:
+        architecture: [s_detect, s_resp, s_runtime]
+        infrastructure: [siem-soc, pep, kill-switch, audit-log]
+        stack: [RM-SEC-05, RM-ACT-02, RM-TRS-07, RM-TRS-04]
+    - id: closed
+      label: [Инцидент закрыт с решением, Incident closed with decision]
+      detail:
+        - Зафиксировать фактический масштаб, допущенную конфигурацию, срок наблюдения, последствия и владельцев мер. Сохранить допустимые свидетельства и выполнить предусмотренные регламентом уведомления.
+        - Record the actual scope, admitted configuration, observation window, impacts and action owners. Retain permitted evidence and send notifications required by the incident procedure.
+      kind: outcome
+      components:
+        architecture: [b_regincident, s_resp, mt_ev]
+        infrastructure: [audit-log, provenance-registry, archive-backup, evidence-store]
+        stack: [RM-SEC-07, RM-TRS-04, RM-TRS-05, RM-OPS-07]
+    - id: isolated
+      label: [Контур остаётся ограниченным, Environment remains restricted]
+      detail:
+        - Удержать или усилить блокировку затронутых маршрутов. Сохранить доступные свидетельства, незавершённые проверки и владельца решения; возврат требует нового подтверждения.
+        - Maintain or strengthen restrictions on affected paths. Preserve available evidence, outstanding checks and the decision owner; resumption requires fresh verification.
+      kind: outcome
+      components:
+        architecture: [s_resp, mt_review, t_audit]
+        infrastructure: [kill-switch, egress-proxy, pep, audit-log]
+        stack: [RM-TRS-07, RM-SEC-02, RM-ACT-02, RM-TRS-04]
+    - id: dismissed
+      label: [Сигнал не подтвердился, Alert not substantiated]
+      detail:
+        - Записать факты, исключившие нарушение, и ответственного за решение. При обычной деградации передать эксплуатационной команде симптомы; никаких полномочий автоматически не расширять.
+        - Record the evidence ruling out a breach and the decision owner. For ordinary degradation, pass symptoms to operations; do not expand access automatically.
+      kind: outcome
+      components:
+        architecture: [s_detect, t_siem, t_audit]
+        infrastructure: [siem-soc, audit-log]
+        stack: [RM-SEC-05, RM-TRS-04]
+  edges:
+    - from: signal
+      to: triage
+      label: [Сигнал и корреляция, Signal and correlation]
+    - from: triage
+      to: contain
+      label: [Есть основание, Credible concern]
+    - from: triage
+      to: dismissed
+      label: [Нарушение исключено, Breach ruled out]
+    - from: contain
+      to: evidence
+      label: [Затронутые пути изолированы, Affected paths isolated]
+    - from: evidence
+      to: effects
+      label: [Область и факты, Scope and facts]
+    - from: effects
+      to: remediate
+      label: [Сверка зафиксирована, Reconciliation recorded]
+    - from: remediate
+      to: return-gate
+      label: [Причина устранена, Cause addressed]
+    - from: return-gate
+      to: reopen
+      label: [Возврат согласован, Resumption approved]
+    - from: return-gate
+      to: isolated
+      label: [Безопасность не доказана, Safety not verified]
+    - from: reopen
+      to: verify
+      label: [Наблюдение завершено, Observation completed]
+    - from: verify
+      to: closed
+      label: [Контроль устойчив, Controls stable]
+    - from: verify
+      to: isolated
+      label: [Повторный сигнал, Indicator recurs]
+    - from: contain
+      to: isolated
+      label: [Блокировка неполная, Containment incomplete]
+  main:
+    - signal
+    - triage
+    - contain
+    - evidence
+    - effects
+    - remediate
+    - return-gate
+    - reopen
+    - verify
+    - closed

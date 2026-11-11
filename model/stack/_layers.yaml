@@ -1,5 +1,5 @@
-# Слои стека: порядок, размещение на схеме, категория цвета. Классы слоя лежат в файле <id слоя>.yaml.
-# Stack layers: order, placement, colour category. A layer's classes live in <layer id>.yaml.
+# Слои стека, их порядок и цвета. Файл слоя: model/stack/<id>.yaml.
+# Stack layers, their order and colours. A layer file is model/stack/<id>.yaml.
 categories:
   gov:
     color: '#F5DEAA'
@@ -117,19 +117,19 @@ layers:
     placement: column
   - id: operation-admission
     title:
-      ru: Допуск операций · PDP / PEP
-      en: Operation admission · PDP / PEP
+      ru: Безопасность исполнения · PDP / PEP
+      en: Execution protection · PDP / PEP
     category: asc
     placement: core
   - id: guardrails
     title:
-      ru: Guardrails
-      en: Guardrails
+      ru: Безопасность инференса · Guardrails
+      en: Inference protection · Guardrails
     category: asc
     placement: core
   - id: data-protection
     title:
-      ru: Защита данных
+      ru: Безопасность данных
       en: Data protection
     category: asc
     placement: core

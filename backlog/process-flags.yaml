@@ -1,0 +1,44 @@
+# Flags of processes removed from the 0.2 model: executionScope, modelAssisted.
+AGT-ACTION:
+  modelAssisted: true
+FLOW-ACCESS:
+  modelAssisted: false
+FLOW-ADMISSION:
+  executionScope: eval
+  modelAssisted: true
+FLOW-AGENT-BUILD:
+  modelAssisted: true
+FLOW-ANALYTICS:
+  modelAssisted: true
+FLOW-ARCH-RESEARCH:
+  executionScope: eval
+  modelAssisted: true
+FLOW-DATA:
+  modelAssisted: true
+FLOW-INCIDENT:
+  modelAssisted: true
+FLOW-IT:
+  modelAssisted: true
+FLOW-KNOWLEDGE:
+  modelAssisted: true
+FLOW-MODEL:
+  modelAssisted: true
+FLOW-MODERNIZE:
+  modelAssisted: true
+FLOW-MULTIMODAL:
+  modelAssisted: true
+FLOW-PRETRAIN:
+  executionScope: eval
+  modelAssisted: true
+FLOW-RECOVERY:
+  modelAssisted: true
+FLOW-RESEARCH:
+  modelAssisted: true
+FLOW-UPDATE:
+  modelAssisted: true
+INF-01:
+  modelAssisted: true
+KNW-03:
+  modelAssisted: true
+RET-02:
+  modelAssisted: true

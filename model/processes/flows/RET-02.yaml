@@ -1,0 +1,227 @@
+# Процесс на карте / Process on the map: RET-02
+# workflow: узлы и переходы схемы; SVG схемы строит tools/build.py через Graphviz.
+# workflow: diagram nodes and edges; tools/build.py renders the SVG with Graphviz.
+name:
+  ru: Вывод ИИ-системы из эксплуатации
+  en: AI System Retirement
+group: RET
+owner:
+  - Владелец ИИ-системы; владельцы зависимостей и данных подтверждают миграцию и судьбу остатков.
+  - AI system owner; dependency and data owners confirm migration and disposition.
+start:
+  - Принято решение о замене, прекращении использования или завершении поддержки ИИ-системы; определена выводимая область.
+  - A decision to replace, stop using or end support for an AI system identifies the scope to retire.
+result:
+  - 'Рубеж G9 закрыт: рабочие пути и полномочия отозваны, остаточные данные обработаны, допустимые свидетельства сохранены. При неполной проверке вывод не отмечается завершённым.'
+  - 'G9 is closed: live paths and authority are withdrawn, remaining data handled and permitted evidence retained. Retirement stays incomplete if verification is incomplete.'
+check:
+  - Выведенный маршрут недоступен напрямую, через резерв и по расписанию. Прежнее полномочие отклоняется, а восстановление не возвращает актив или закрытые права.
+  - A retired path is unavailable directly, via fallback and on a schedule. Previous authority is rejected, and recovery does not restore the asset or closed grants.
+maturity:
+  - 'Контролируемый вывод: зависимости, отзыв полномочий, обработка остатков и проверка после восстановления.'
+  - 'Controlled retirement: dependency inventory, revocation, disposition and recovery verification.'
+calls:
+  - id: FLOW-ACCESS
+    when:
+      - В момент вывода отозвать принадлежащие выводимому контуру полномочия. Для общей интеграции закрыть только права выводимого субъекта и проверить действующие зависимости.
+      - During retirement, revoke grants belonging to the retired scope. For a shared integration, close only the retiring subject's grants and verify remaining dependencies.
+order: 20
+protection:
+  - Каждый вызов модели проходит проверку идентичности и прав, защиту входа и выхода и аудит в разрешённом объёме. Вызовы инструментов допускаются отдельно; код исполняется в изолированной среде. Согласование и ограничения раскрытия задаются политикой.
+  - Every model call uses identity and authorization checks, input and output protections, and permitted audit retention. Tool calls are authorized separately; code runs in a sandbox. Approval and disclosure restrictions follow policy.
+parts:
+  - CORE-01
+  - RET-02--DECISION
+  - RET-02--INVENTORY
+  - RET-02--READY
+  - RET-02--DISABLE
+  - RET-02--SETTLE
+  - RET-02--REVOKE
+  - RET-02--DISPOSE
+  - RET-02--VERIFY
+tags: [AI System Retirement]
+path: process-ret-02
+workflow:
+  summary:
+    - 'Принято решение о замене, прекращении использования или завершении поддержки ИИ-системы; определена выводимая область. Рубеж G9 закрыт: рабочие пути и полномочия отозваны, остаточные данные обработаны, допустимые свидетельства сохранены. При неполной проверке вывод не отмечается завершённым.'
+    - 'A decision to replace, stop using or end support for an AI system identifies the scope to retire. G9 is closed: live paths and authority are withdrawn, remaining data handled and permitted evidence retained. Retirement stays incomplete if verification is incomplete.'
+  synthesis:
+    - Последовательность, условия переходов и сопоставление компонентов — проектный синтез AiNativeOps. Источники подтверждают отдельные практики в указанной области, а не всю схему.
+    - The sequence, conditions and component mapping are AiNativeOps design synthesis. Sources support individual practices within their stated scope, not the entire diagram.
+  basis:
+    - source: P20-LIFECYCLE
+      claim:
+        - Владение агентом, этапы создания, допуска, наблюдения, улучшения и вывода.
+        - Covers agent ownership and the stages of creation, admission, monitoring, improvement, and retirement.
+    - source: ISO
+      claim:
+        - Терминологическая опора для процессов жизненного цикла ИИ.
+        - Serves as a terminology reference for AI lifecycle processes.
+    - source: NIST-C
+      claim:
+        - Измерение, независимое участие в оценке, управление и регулярный пересмотр рисков.
+        - Covers measurement, independent participation in assessment, governance, and regular risk review.
+    - source: BOM
+      claim:
+        - Ведомость состава моделей и данных; каталог действующих активов имеет свой контракт.
+        - Covers a bill of materials for models and data; the catalog of active assets has its own contract.
+    - source: STORAGE
+      claim:
+        - Защита хранилищ, резервирование и восстановление.
+        - Covers storage protection, backup, and recovery.
+    - source: LIFE
+      claim:
+        - Статусы модели и окончание поддержки создают отдельный сценарий миграции.
+        - Model statuses and end of support create a separate migration scenario.
+  nodes:
+    - id: decision
+      label: [Оформить решение о выводе, Record the retirement decision]
+      detail:
+        - Указать выводимую систему, версии, владельца, причину и окно выключения. Зафиксировать требования к доступности потребителей, хранению и уничтожению данных.
+        - Identify the retiring system, versions, owner, reason and shutdown window. Record consumer continuity and data retention or deletion requirements.
+      kind: step
+      components:
+        architecture: [b_regretire, b_ownproc, g9]
+        infrastructure: [provenance-registry, audit-log]
+        stack: [RM-GOV-01, RM-GOV-04, RM-OPS-07, RM-TRS-04]
+    - id: inventory
+      label: [Найти маршруты и зависимости, Find paths and dependencies]
+      detail:
+        - Инвентаризировать точки входа, резервы, задания, интеграции, права, артефакты, данные, индексы, кэш, память и резервные копии. Для общих ресурсов определить остающихся владельцев.
+        - Inventory entry points, fallbacks, jobs, integrations, authority, artifacts, data, indexes, caches, memory and backups. Identify remaining owners of shared resources.
+      kind: step
+      components:
+        architecture: [s_retire, mt_profile, mt_tb]
+        infrastructure: [llm-gateway, model-registry, provenance-registry, data-catalog, agent-iam]
+        stack: [RM-GOV-01, RM-MOD-05, RM-DAT-02, RM-TRS-05, RM-GOV-02]
+    - id: ready
+      label: ['Потребители готовы к выключению?', 'Are consumers ready for shutdown?']
+      detail:
+        - Подтвердить перенос на допущенную замену либо согласованное прекращение, план сверки операций и решения по данным и свидетельствам. При критической зависимости без плана не подтверждать вывод.
+        - Confirm migration to an admitted replacement or agreed cessation, the reconciliation plan, and data and evidence disposition. Do not confirm retirement if a critical dependency has no plan.
+      kind: decision
+      components:
+        architecture: [b_ownproc, b_owndata, b_regretire, g9]
+        infrastructure: [provenance-registry, data-catalog, audit-log]
+        stack: [RM-GOV-01, RM-GOV-04, RM-OPS-07, RM-TRS-04]
+    - id: disable
+      label: [Закрыть новые операции, Close new operations]
+      detail:
+        - Снять регистрацию маршрутов, резервов, подписок и расписаний; остановить новые задания и интеграции в выводимой области. Совместно используемый сервис не выключать целиком.
+        - Remove paths, fallbacks, subscriptions and schedules; stop new jobs and integrations in the retiring scope. Keep unrelated consumers of shared services operational.
+      kind: step
+      components:
+        architecture: [s_retire, o_ops, t_infer]
+        infrastructure: [llm-gateway, cd-deployment, kill-switch, mcp-servers]
+        stack: [RM-MOD-06, RM-DEV-10, RM-TRS-07, RM-INT-02, RM-INT-03]
+    - id: settle
+      label: [Завершить ожидающие операции, Settle pending operations]
+      detail:
+        - Отменить неисполненное; сверить известные внешние эффекты и неизвестные состояния с целевой системой без повторной записи. Если эффект требует дальнейшего решения, передать его именованному владельцу и исключить автоматическое возобновление.
+        - Cancel unexecuted work; reconcile known external effects and unknown outcomes with target systems without repeating writes. Assign unresolved effects to a named owner and prevent automatic resumption.
+      kind: step
+      components:
+        architecture: [s_retire, s_runtime, t_gw]
+        infrastructure: [checkpoint-store, mcp-servers, erp-crm, audit-log]
+        stack: [RM-AGT-05, RM-INT-02, RM-ACT-02, RM-TRS-04, RM-TRS-07]
+    - id: revoke
+      label: ['Права и секреты отозваны?', 'Are grants and secrets revoked?']
+      detail:
+        - Вызвать FLOW-ACCESS для отзыва делегирования, машинных удостоверений и секретов выводимой области. Проверить действующих пользователей общих ключей и интеграций. При неподтверждённом отзыве не закрывать G9.
+        - Use FLOW-ACCESS to revoke delegation, workload credentials and secrets in the retiring scope. Verify remaining users of shared keys and integrations. An unverified revocation leaves G9 open.
+      kind: decision
+      components:
+        architecture: [t_iam, s_retire, s_runtime]
+        infrastructure: [iam-sso, agent-iam, secrets-manager, kill-switch, pep]
+        stack: [RM-SEC-01, RM-GOV-02, RM-TRS-03, RM-TRS-07, RM-ACT-02]
+    - id: dispose
+      label: [Обработать данные и артефакты, Dispose of data and artifacts]
+      detail:
+        - 'Применить решение к каждому набору и производной копии: удалить, передать владельцу или оставить на ограниченном хранении до срока. Для архивов и резервных копий исключить повторную публикацию; общие артефакты сохранить только для оставшихся потребителей.'
+        - For each dataset and derivative, delete it, transfer it to its owner or retain it under access restrictions until expiry. Prevent archives and backups from republishing retired data; retain shared artifacts only for remaining consumers.
+      kind: step
+      components:
+        architecture: [b_owndata, b_law, s_retire]
+        infrastructure: [data-catalog, dataset-store, vector-db, agent-memory, archive-backup, evidence-store]
+        stack: [RM-DAT-02, RM-DAT-04, RM-MOD-10, RM-AGT-06, RM-OPS-08, RM-SEC-07]
+    - id: verify
+      label: ['Все условия G9 выполнены?', 'Are all G9 conditions met?']
+      detail:
+        - Протестировать прямой, резервный и отложенный пути, отказ по старым правам и невозможность возобновления после восстановления. Сверить остатки, допустимое хранение и целостность свидетельств.
+        - Test direct, fallback and scheduled paths, denial of old authority and no restart after recovery. Reconcile remaining material, permitted retention and evidence integrity.
+      kind: decision
+      components:
+        architecture: [g9, s_retire, mt_ev, t_audit]
+        infrastructure:
+          - llm-gateway
+          - agent-iam
+          - archive-backup
+          - audit-log
+          - integrity-monitoring
+          - evidence-store
+        stack: [RM-GOV-04, RM-TRS-07, RM-OPS-08, RM-SEC-07, RM-TRS-06]
+    - id: retired
+      label: [Вывод подтверждён, Retirement verified]
+      detail:
+        - Отметить актив выведенным, связать решение G9 с проверками, датой, владельцем и сроками оставшегося хранения. Хранить только допустимые свидетельства; автоматический возврат исключён.
+        - Mark the asset retired and link the G9 decision to checks, date, owner and remaining retention periods. Keep only permitted evidence; automatic reactivation is disabled.
+      kind: outcome
+      components:
+        architecture: [g9, s_retire, mt_ev]
+        infrastructure: [provenance-registry, audit-log, archive-backup, evidence-store]
+        stack: [RM-GOV-01, RM-GOV-04, RM-SEC-07, RM-TRS-04, RM-TRS-05]
+    - id: deferred
+      label: [Выключение отложено, Shutdown deferred]
+      detail:
+        - Зафиксировать незакрытую зависимость, ограничения текущей работы и условия новой попытки. Не считать запланированную дату подтверждением вывода.
+        - Record the unresolved dependency, interim service restrictions and criteria for a new attempt. A planned date is not proof of retirement.
+      kind: outcome
+      components:
+        architecture: [b_regretire, mt_review, t_audit]
+        infrastructure: [audit-log, provenance-registry]
+        stack: [RM-OPS-07, RM-GOV-04, RM-TRS-04]
+    - id: incomplete
+      label: [Вывод не подтверждён, Retirement unverified]
+      detail:
+        - Не восстанавливать закрытые маршруты. Изолировать оставшийся путь, сохранить незавершённые проверки и назначить ответственного за устранение; статус G9 остаётся открытым.
+        - Do not reopen closed paths. Isolate any remaining route, preserve outstanding checks and assign remediation; G9 remains open.
+      kind: outcome
+      components:
+        architecture: [g9, s_retire, mt_review]
+        infrastructure: [llm-gateway, kill-switch, audit-log]
+        stack: [RM-MOD-06, RM-TRS-07, RM-OPS-07, RM-TRS-04]
+  edges:
+    - from: decision
+      to: inventory
+      label: [Утверждённая область, Approved scope]
+    - from: inventory
+      to: ready
+      label: [Карта зависимостей, Dependency map]
+    - from: ready
+      to: disable
+      label: [Миграция согласована, Migration agreed]
+    - from: ready
+      to: deferred
+      label: [Зависимость не закрыта, Dependency unresolved]
+    - from: disable
+      to: settle
+      label: [Новые операции закрыты, New work blocked]
+    - from: settle
+      to: revoke
+      label: [Операции сверены, Pending work reconciled]
+    - from: revoke
+      to: dispose
+      label: [Доступ отозван, Authority revoked]
+    - from: dispose
+      to: verify
+      label: [Остатки обработаны, Disposition applied]
+    - from: verify
+      to: retired
+      label: [G9 подтверждён, G9 verified]
+    - from: verify
+      to: incomplete
+      label: [Остались путь или проверка, A path or check remains]
+    - from: revoke
+      to: incomplete
+      label: [Отзыв не подтверждён, Revocation unverified]
+  main: [decision, inventory, ready, disable, settle, revoke, dispose, verify, retired]

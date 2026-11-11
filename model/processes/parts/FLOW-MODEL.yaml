@@ -1,0 +1,120 @@
+# Этапы и варианты процессов. Ключ этапа процесса: <процесс>--<этап>.
+# Stages and variants of processes. A process stage key is <process>--<stage>.
+FLOW-MODEL--OBJECTIVE:
+  kind: operation
+  name:
+    ru: Задача, эталон и допуски
+    en: Task, baseline and tolerances
+  description:
+    - Зафиксировать поведение базовой модели, целевую метрику, пороги общих задач, безопасности, задержки и стоимости. Определить условия, при которых настройка оправдана.
+    - Pin base behavior, target metric and thresholds for general tasks, safety, latency and cost. Define when adaptation is justified.
+  classes: [RM-DEV-05, RM-DAT-05, RM-OPS-06]
+  architectureSteps: [m2, b_goal, b_np, b_polbudget]
+  workflowNode: objective
+FLOW-MODEL--INTAKE:
+  kind: operation
+  name:
+    ru: Базовые веса и данные допустимы?
+    en: Are base weights and data approved?
+  description:
+    - Проверить происхождение, хеши, формат загрузки и условия использования весов, токенизатора и данных. Отделить защищённую контрольную выборку от разработки; непроверенный код загрузки не выполнять.
+    - Check provenance, digests, loading format and use terms for weights, tokenizer and data. Keep the protected evaluation split separate; do not execute unverified loading code.
+  classes: [RM-SEC-03, RM-MOD-01, RM-DAT-04, RM-DAT-05, RM-DPR-04]
+  architectureSteps: [m1, s_src, g1, b_poldisc]
+  workflowNode: intake
+FLOW-MODEL--RECIPE:
+  kind: operation
+  name:
+    ru: Рецепт адаптации и бюджет
+    en: Adaptation recipe and budget
+  description:
+    - Выбрать адаптер, дообучение на примерах или оптимизацию на закреплённых предпочтениях. Задать совместимость базовых весов, форматы, вычислительный бюджет, критерии остановки и правила повтора.
+    - Select an adapter, supervised tuning or optimization on pinned preferences. Define base-weight compatibility, formats, compute budget, stopping criteria and retry rules.
+  classes: [RM-DEV-01, RM-DEV-05, RM-DEV-04, RM-OPS-06]
+  architectureSteps: [m2, s_prep, g2, b_polbudget]
+  workflowNode: recipe
+FLOW-MODEL--ADAPT:
+  kind: operation
+  name:
+    ru: Запуск адаптации
+    en: Run adaptation
+  description:
+    - Обучить в допущенной среде и сохранить состояние, если это требуется для возобновления. Офлайн-вычисления обучения контролируются как задание; каждый вызов отдельного сервиса модели для разметки, попыток или ИИ-контролёра проходит входные и выходные guardrails.
+    - Train in an approved environment and retain state when restart is needed. Offline training computations are governed as a job; every separate model service call for labels, rollouts or the AI controller passes input and output guardrails.
+  classes:
+    - RM-DEV-04
+    - RM-DEV-05
+    - RM-PLT-02
+    - RM-AIC-01
+    - RM-AIC-05
+    - RM-MOD-12
+    - RM-MOD-13
+    - RM-MOD-06
+    - RM-AIC-02
+  architectureSteps: [m3, t_gpu, t_target, s_prep, t_input, t_infer, t_result]
+  workflowNode: adapt
+FLOW-MODEL--REGISTER:
+  kind: operation
+  name:
+    ru: Кандидат и его зависимости
+    en: Candidate and dependencies
+  description:
+    - Зафиксировать веса или пару базовых весов и адаптера, токенизатор, код, параметры, данные и ожидаемую среду исполнения. Зарегистрировать хеш кандидата и ссылки на эксперимент.
+    - Pin weights or the base-and-adapter pair, tokenizer, code, parameters, data and serving expectations. Register the candidate digest and run references.
+  classes: [RM-MOD-02, RM-MOD-05, RM-DEV-08, RM-TRS-05]
+  architectureSteps: [m5, g3, o_pack, t_reg]
+  workflowNode: register
+FLOW-MODEL--EVALUATE:
+  kind: operation
+  name:
+    ru: Улучшение и границы подтверждены?
+    en: Are improvement and limits verified?
+  description:
+    - Проверить кандидата и базу на независимом наборе, включая сегменты, нежелательные ответы, устойчивость и целевую нагрузку. Каждый модельный вызов кандидата, базы и ИИ-контролёра проходит входные и выходные guardrails; ИИ-контролёр не решает вопрос выпуска.
+    - Compare candidate and baseline on independent cases, including slices, unwanted outputs, robustness and target load. Every candidate, baseline and AI controller call passes input and output guardrails; the AI controller does not decide release.
+  classes:
+    - RM-DEV-07
+    - RM-DAT-05
+    - RM-AIC-03
+    - RM-MOD-11
+    - RM-AIC-01
+    - RM-AIC-05
+    - RM-MOD-12
+    - RM-MOD-13
+    - RM-MOD-06
+    - RM-AIC-02
+  architectureSteps: [m4, o_eval, mt_indep, g4, t_ctl, t_input, t_infer, t_result, t_eval]
+  workflowNode: evaluate
+FLOW-MODEL--ADMIT:
+  kind: operation
+  name:
+    ru: Пара модели и среды допущена?
+    en: Is the model and runtime configuration admitted?
+  description:
+    - Подтвердить пригодность точной версии и совместимость инференса. Зафиксировать политику маршрута, ограничения входов и выходов, план переключения и версию возврата.
+    - Verify the exact version and serving compatibility. Pin routing policy, input and output controls, rollout plan and fallback version.
+  classes: [RM-DEV-09, RM-MOD-05, RM-MOD-11, RM-TRS-06]
+  architectureSteps: [o_release, g6, mt_ev, b_ownrisk]
+  workflowNode: admit
+FLOW-MODEL--ROLLOUT:
+  kind: operation
+  name:
+    ru: Ограниченная выдача стабильна?
+    en: Is limited serving stable?
+  description:
+    - Проверить допущенную версию на разрешённой части трафика с входными и выходными guardrails для каждого вызова. При нарушении качества, задержки или политики закрыть маршрут и вернуть только разрешённую совместимую версию.
+    - Check the admitted version on an authorized traffic slice with input and output guardrails on every call. On quality, latency or policy breaches, close the route and restore only an authorized compatible version.
+  classes:
+    - RM-DEV-10
+    - RM-MOD-07
+    - RM-OPS-01
+    - RM-OPS-05
+    - RM-MOD-05
+    - RM-AIC-01
+    - RM-AIC-05
+    - RM-MOD-12
+    - RM-MOD-13
+    - RM-MOD-06
+    - RM-AIC-02
+  architectureSteps: [o_ops, s_runtime, g7, s_detect, t_input, t_infer, t_result]
+  workflowNode: rollout

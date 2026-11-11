@@ -1,0 +1,35 @@
+# Sources that no element, dependency or workflow of 0.2 refers to.
+AWS:
+  type: practice
+  title: AWS Well-Architected Generative AI Lens
+  url: https://docs.aws.amazon.com/wellarchitected/latest/generative-ai-lens/scenarios.html
+  scope:
+    ru: Сценарии общего сервиса, контакт-центра, аналитики, разработки и реагирования. Сопоставлять прикладные маршруты и выбор защитных мер.
+    en: Covers general service, contact center, analytics, development, and response scenarios. Use it to compare application routes and the choice of safeguards.
+  checked: ''
+IBM:
+  type: practice
+  title: IBM Generative AI Reference Architecture
+  url: https://www.ibm.com/think/architectures/patterns/genai-platform
+  scope:
+    ru: Явное сопоставление групп возможностей с реализациями, включая модели, управление данными и контроль.
+    en: Maps capability groups to implementations explicitly, including models, data management, and control.
+  checked: ''
+MLOPS:
+  type: practice
+  title:
+    ru: 'Amou Najafabadi и соавт.: An architectural perspective on MLOps'
+    en: 'Amou Najafabadi et al.: An architectural perspective on MLOps'
+  url: https://research.vu.nl/en/publications/an-architectural-perspective-on-mlops-structures-processes-tools-/
+  scope:
+    ru: Систематическое сопоставление 93 исследований. Категории 39 компонентов, варианты архитектур, 56 шагов процесса и роли участников.
+    en: Systematically compares 93 studies. Identifies 39 component categories, architecture variants, 56 process steps, and participant roles.
+  checked: ''
+ISO-ML:
+  type: standard
+  title: ISO/IEC 23053:2022
+  url: https://www.iso.org/standard/74438.html
+  scope:
+    ru: Концептуальная модель и общие термины для ИИ-систем на основе машинного обучения.
+    en: Provides a conceptual model and common terms for AI systems based on machine learning.
+  checked: ''

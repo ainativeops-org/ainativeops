@@ -1,0 +1,34 @@
+# Маршрут / Route: Адаптация модели под корпоративную задачу / Enterprise Model Adaptation
+# Шаг = [элемент, [участники]] / Step = [element, [participants]]
+order: 6
+name:
+  ru: Адаптация модели под корпоративную задачу
+  en: Enterprise Model Adaptation
+routes:
+  stack:
+    - [RM-DEV-05, [RM-DAT-05, RM-OPS-06]]
+    - [RM-SEC-03, [RM-MOD-01, RM-DAT-04, RM-DAT-05, RM-DPR-04]]
+    - [RM-DEV-01, [RM-DEV-05, RM-DEV-04, RM-OPS-06]]
+    - [RM-DEV-04, [RM-MOD-12, RM-MOD-13, RM-DEV-05, RM-PLT-02, RM-AIC-01, RM-MOD-06, RM-AIC-02, RM-TRS-04, RM-MOD-07, RM-AIC-05, RM-OPS-06]]
+    - [RM-MOD-02, [RM-MOD-05, RM-DEV-08, RM-TRS-05]]
+    - [RM-DEV-07, [RM-DAT-05, RM-AIC-03, RM-MOD-11, RM-AIC-01, RM-MOD-06, RM-AIC-02]]
+    - [RM-DEV-09, [RM-MOD-05, RM-MOD-11, RM-TRS-06]]
+    - [RM-DEV-10, [RM-MOD-07, RM-OPS-01, RM-OPS-05, RM-MOD-05, RM-AIC-01, RM-MOD-06, RM-AIC-02]]
+    - [RM-MOD-05, [RM-MOD-07, RM-OPS-05, RM-TRS-04]]
+  infrastructure:
+    - [experiment-tracking, [eval-datasets, model-training-service, eval-inference-service, git-repository, rate-limits-budgets]]
+    - [artifact-intake, [foundation-model-artifact, dataset-versioning, data-access-proxy]]
+    - [model-training-service, [request-classifier, model-call-planner, experiment-tracking, input-guardrails, llm-gateway, output-guardrails, audit-log, inference-servers, inference-quotas, usage-billing]]
+    - [adapted-model-artifact, [model-registry, artifact-registry, provenance-registry]]
+    - [eval-red-teaming, [eval-datasets, rule-based-checks, llm-as-a-judge, eval-inference-runtime, input-guardrails, llm-gateway, output-guardrails]]
+    - [release-gate, [model-registry, eval-inference-runtime, integrity-monitoring]]
+    - [cd-deployment, [inference-servers, metrics-alerts, model-registry, input-guardrails, llm-gateway, output-guardrails]]
+    - [model-registry, [inference-servers, metrics-alerts, audit-log]]
+  architecture:
+    - [m2, [b_goal, b_np, b_polbudget, t_eval, s_prep, g2]]
+    - [m1, [s_src, g1, b_poldisc]]
+    - [m3, [t_route, t_plan, t_gpu, t_target, s_prep, t_input, t_infer, t_result, t_audit, t_base]]
+    - [m5, [g3, o_pack, t_reg]]
+    - [m4, [o_eval, mt_indep, g4, t_ctl, t_input, t_infer, t_result]]
+    - [o_release, [g6, mt_ev, b_ownrisk]]
+    - [o_ops, [s_runtime, g7, s_detect, t_input, t_infer, t_result, t_prod, t_audit]]

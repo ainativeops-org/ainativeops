@@ -1,0 +1,136 @@
+# Реестр процессов · Управление ИИ / Process registry · AI governance
+GOV-01:
+  name:
+    ru: Определение задачи и допустимой автономии
+    en: Use-case and autonomy definition
+  start:
+    - Владелец предлагает применение, разработку или замену ИИ-системы.
+    - An owner proposes the use, development or replacement of an AI system.
+  result:
+    - Назначение, границы автономии, ожидаемые результаты и ответственные.
+    - The purpose, autonomy boundaries, expected results and responsible people.
+  check:
+    - Указано, что является успехом, какие действия допустимы и кто принимает решение при неопределённости.
+    - Success criteria, permitted actions and the decision maker under uncertainty are specified.
+  gates: G0
+  classes: [RM-GOV-04, RM-APP-01, RM-APP-03]
+GOV-02:
+  name:
+    ru: Формирование профиля ИИ-платформы
+    en: AI platform profile definition
+  start:
+    - Выбраны процессы, данные, размещение, права и требования к результату.
+    - Processes, data, placement, permissions and result requirements are selected.
+  result:
+    - Состав возможностей, зависимости, ответственные и проверяемые условия.
+    - The set of capabilities, dependencies, responsible people and verifiable conditions.
+  check:
+    - Для каждого включения видно основание. При неполных входах показаны варианты и нерешённые ограничения.
+    - Each inclusion has a visible rationale. With incomplete inputs, options and unresolved constraints are shown.
+  gates: G0
+  classes: [RM-GOV-01, RM-GOV-04]
+GOV-03:
+  name:
+    ru: Инвентаризация ИИ-активов
+    en: AI asset and dependency inventory
+  start:
+    - Появляется либо меняется модель, набор, агент, инструмент или рабочая точка входа.
+    - A model, dataset, agent, tool or production entry point appears or changes.
+  result:
+    - Актуальный реестр версий, владельцев и зависимостей.
+    - A current registry of versions, owners and dependencies.
+  check:
+    - По точке входа находится фактическая конфигурация. Незарегистрированное применение отделяется от допущенного.
+    - The actual configuration can be found from an entry point. Unregistered use is distinguished from admitted use.
+  gates: G1 G8
+  classes: [RM-GOV-01, RM-MOD-05, RM-DAT-02, RM-TRS-05]
+GOV-04:
+  name:
+    ru: Пересмотр риска и исключений
+    en: Risk and exception review
+  start:
+    - Новый сценарий, изменение, инцидент либо истечение срока исключения.
+    - A new scenario, a change, an incident or the expiry of an exception occurs.
+  result:
+    - Действующее решение о риске, ограничения и владелец.
+    - A current risk decision, restrictions and an owner.
+  check:
+    - Исключение ограничено сроком, версией и областью. Просроченное решение не сохраняет допуск автоматически.
+    - An exception is limited by period, version and scope. An expired decision does not automatically keep the admission.
+  gates: G0 G8
+  classes: [RM-GOV-04, RM-OPS-07, RM-GOV-01, RM-TRS-04]
+GOV-05:
+  name:
+    ru: Изменение и публикация политик контроля
+    en: Control policy publication
+  start:
+    - Изменились правила доступа, раскрытия, допуска действий или режим отказа.
+    - Rules for access, disclosure, action admission or the failure mode have changed.
+  result:
+    - Версия политики с утверждением, тестами и областью применения.
+    - A policy version with approval, tests and a scope of application.
+  check:
+    - Управление политикой отдельно от проверяемого агента. Новая версия проверяется на разрешённых и запрещённых маршрутах.
+    - Policy management is separate from the agent being checked. A new version is tested on permitted and prohibited routes.
+  gates: G4 G8
+  classes: [RM-GOV-03, RM-ACT-01, RM-AIC-01, RM-AIC-02, RM-DEV-07]
+GOV-06:
+  name:
+    ru: Квалификация поставщика и размещения
+    en: Provider and deployment qualification
+  start:
+    - Рассматривается внешний API, SaaS, собственное или управляемое размещение.
+    - An external API, SaaS, self-hosted or managed deployment is under consideration.
+  result:
+    - Условия допустимого использования и разделение ответственности.
+    - Conditions of permitted use and the division of responsibility.
+  check:
+    - Указать место обработки, хранения и журналирования, разрешённые данные и средства принуждения. Неподтверждённые свойства остаются ограничениями.
+    - Specify where processing, storage and logging occur, the permitted data and the enforcement mechanisms. Unconfirmed properties remain constraints.
+  gates: G0 G1
+  classes: [RM-GOV-04, RM-GOV-03, RM-MOD-03, RM-SEC-02]
+GOV-07:
+  name:
+    ru: Подключение проекта к общей платформе
+    en: Project onboarding and tenancy setup
+  start:
+    - Новая команда, проект или арендатор запрашивает подключение.
+    - A new team, project or tenant requests onboarding.
+  result:
+    - Рабочая область, роли, секреты, квоты и маршруты по политике.
+    - A workspace, roles, secrets, quotas and routes according to policy.
+  check:
+    - Проверить границы данных, моделей, контекста и журналов между арендаторами.
+    - Check the boundaries of data, models, context and logs between tenants.
+  gates: G0 G8
+  classes: [RM-PLT-02, RM-PLT-05, RM-SEC-01, RM-TRS-03, RM-OPS-06]
+GOV-08:
+  name:
+    ru: Установление порядка надзора и пересмотра
+    en: Human oversight and appeal design
+  start:
+    - Назначение и риски требуют участия ответственного человека.
+    - The purpose and risks require the involvement of a responsible person.
+  result:
+    - Порядок уведомления, согласования, пересмотра и остановки.
+    - A procedure for notification, approval, review and stopping.
+  check:
+    - Назначены люди с фактическими полномочиями и определены критерии вмешательства.
+    - People with actual authority are assigned, and intervention criteria are defined.
+  gates: G0 G4
+  classes: [RM-GOV-04, RM-APP-03, RM-AIC-04, RM-TRS-07]
+GOV-09:
+  name:
+    ru: Проектирование ролей и полномочий
+    en: Role and authority design
+  start:
+    - Заданы пользовательские роли, типы действий агента и границы ресурсов.
+    - User roles, agent action types and resource boundaries are defined.
+  result:
+    - Матрица ролей и полномочий сотрудников, агента и исполнителей с владельцем и условиями отзыва.
+    - A matrix of roles and permissions for employees, the agent and executors, with an owner and revocation conditions.
+  check:
+    - Проверить разделение автора, выпускающего и оператора, узкие права агента и актуальный отказ после отзыва.
+    - Check separation of author, releaser and operator, narrow agent permissions and effective denial after revocation.
+  gates: G0 G8
+  classes: [RM-SEC-01, RM-GOV-02, RM-GOV-03, RM-ACT-01, RM-ACT-02]

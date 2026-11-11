@@ -1,0 +1,1235 @@
+# Зависимости классов стека / Dependencies between stack classes
+dependencies:
+  - from: RM-MOD-06
+    to: RM-MOD-07
+    highlight: local
+    when: [Выбран внутренний backend, An internal backend is selected]
+    phase: [Исполнение, Runtime]
+    reason:
+      - Шлюз направляет разрешённый вызов в сервис модели.
+      - The gateway sends an admitted call to the model service.
+    sources: [DEP-AZGW, DEP-KSDP]
+  - from: RM-MOD-06
+    to: RM-MOD-03
+    highlight: external
+    when: [Разрешён внешний backend, An external backend is permitted]
+    phase: [Исполнение, Runtime]
+    reason: [Внешняя ветвь требует доступного API поставщика., The external branch needs the provider API.]
+    sources: [DEP-AZGW]
+  - from: RM-MOD-06
+    to: RM-SEC-02
+    highlight: external
+    when: [Внешняя ветвь с контролируемым исходящим трафиком, An external branch with controlled egress]
+    phase: [Исполнение, Runtime]
+    reason:
+      - Исходящий маршрут ограничивается корпоративной сетевой политикой.
+      - Corporate network policy constrains the outbound route.
+    sources: [DEP-AZGW, ZT]
+  - from: RM-MOD-06
+    to: RM-TRS-03
+    highlight: support
+    when:
+      - Backend требует выдаваемые шлюзу credentials
+      - The backend needs credentials supplied to the gateway
+    phase: [Исполнение, Runtime]
+    reason:
+      - Рабочий секрет получает шлюз, не контекст модели.
+      - The gateway receives the credential outside model context.
+    sources: [SECRETS, DEP-AZGW]
+  - from: RM-MOD-06
+    to: RM-ACT-01
+    highlight: support
+    when:
+      - Выбор или резервная смена backend в этом профиле
+      - Backend selection or fallback in this profile
+    phase: [Исполнение, Runtime]
+    reason:
+      - Проверяется допустимость модели, данных и получателя.
+      - Model, data and recipient eligibility are checked.
+    sources: [ZT, DEP-AZGW]
+  - from: RM-MOD-07
+    to: RM-MOD-11
+    highlight: support
+    when: [Собственное размещение модели, A self-hosted model]
+    phase: [Исполнение, Runtime]
+    reason:
+      - API сервиса реализуется исполняющей средой модели.
+      - The model runtime implements the service API.
+    sources: [DEP-KSR]
+  - from: RM-MOD-11
+    to: RM-MOD-01
+    highlight: support
+    when: [Базовая модель либо отдельный LoRA-адаптер, A base model or separate LoRA adapter is used]
+    phase: [Развёртывание, Deployment]
+    reason: [Загружаются точные совместимые базовые веса., The exact compatible base weights are loaded.]
+    sources: [DEP-KSR, DEP-LORA]
+    alternative: true
+  - from: RM-MOD-11
+    to: RM-MOD-02
+    highlight: support
+    when:
+      - 'Выбрана адаптированная модель: checkpoint или адаптер'
+      - An adapted checkpoint or adapter is selected
+    phase: [Развёртывание, Deployment]
+    reason:
+      - Загружается допущенный артефакт выбранной адаптации.
+      - The admitted artifact of the selected adaptation is loaded.
+    sources: [DEP-KSR, DEP-LORA]
+    alternative: true
+  - from: RM-MOD-02
+    to: RM-MOD-01
+    highlight: support
+    when: [Отдельный LoRA-адаптер; не полный checkpoint, 'A separate LoRA adapter, not a full checkpoint']
+    phase: [Развёртывание, Deployment]
+    reason:
+      - Адаптер применяется поверх указанной базовой модели.
+      - The adapter is applied to its specified base model.
+    sources: [DEP-LORA]
+    alternative: true
+  - from: RM-MOD-11
+    to: RM-HW-01
+    highlight: support
+    when: [CPU-профиль вместо GPU-профиля, The CPU profile instead of the GPU profile]
+    phase: [Исполнение, Runtime]
+    reason:
+      - Выделяются совместимые CPU и достаточная память.
+      - Compatible CPUs and sufficient memory are allocated.
+    sources: [DEP-CPU]
+    alternative: true
+  - from: RM-MOD-11
+    to: RM-HW-02
+    highlight: support
+    when: [Выбран GPU-профиль нагрузки, A GPU workload profile is selected]
+    phase: [Исполнение, Runtime]
+    reason:
+      - Выделяются ускорители с необходимой памятью и ёмкостью.
+      - Accelerators provide the required memory and capacity.
+    sources: [DEP-KSDP]
+    alternative: true
+  - from: RM-MOD-11
+    to: RM-MOD-05
+    highlight: support
+    when: [Версия разрешается через корпоративный реестр, A corporate registry resolves the version]
+    phase: [Развёртывание, Deployment]
+    reason:
+      - При запуске проверяется ссылка на допущенную версию.
+      - Startup verifies the reference to an admitted version.
+    sources: [DEP-KSR, GCP-M]
+  - from: RM-MOD-05
+    to: RM-DEV-08
+    highlight: support
+    when:
+      - Метаданные реестра отделены от хранилища артефактов
+      - Registry metadata is separate from artifact storage
+    phase: [Развёртывание, Deployment]
+    reason:
+      - Запись версии указывает неизменяемый пакет модели.
+      - A version record points to the immutable model package.
+    sources: [GCP-M, PROV]
+  - from: RM-MOD-11
+    to: RM-PLT-01
+    highlight: support
+    when: [Контейнерное или системное размещение runtime, The runtime uses container or system hosting]
+    phase: [Исполнение, Runtime]
+    reason:
+      - Нужна совместимая ОС и среда исполнения контейнеров.
+      - A compatible OS and container execution environment are needed.
+    sources: [DEP-KSDP, DEP-CPU]
+  - from: RM-MOD-06
+    to: RM-AIC-01
+    highlight: support
+    when: [Каждый модельный вызов в защищённом профиле, Every model call in the guarded profile]
+    phase: [Исполнение, Runtime]
+    reason:
+      - До маршрутизации проверяется допустимость входного контекста.
+      - Input context is checked before routing.
+    sources: [LLM-C, ARM]
+  - from: RM-MOD-06
+    to: RM-AIC-02
+    highlight: support
+    when: [Каждый ответ перед выдачей потребителю, Every response before delivery to its consumer]
+    phase: [Исполнение, Runtime]
+    reason:
+      - Результат проверяется до передачи пользователю или агенту.
+      - Output is checked before delivery to a user or agent.
+    sources: [LLM-C, ARM]
+  - from: RM-MOD-06
+    to: RM-AGT-08
+    highlight: support
+    when: [Вызов расходует лимит задачи или подразделения, The call consumes a task or team budget]
+    phase: [Исполнение, Runtime]
+    reason:
+      - Стоимость и токены учитываются до продолжения задачи.
+      - Cost and tokens are accounted for before the task continues.
+    sources: [DEP-AZGW, FINOPS]
+  - from: RM-AGT-02
+    to: RM-AGT-03
+    highlight: support
+    when: [Агент выполняет модельный шаг, The agent executes a model step]
+    phase: [Исполнение, Runtime]
+    reason:
+      - Контекст собирается из разрешённых источников текущей задачи.
+      - Context is assembled from permitted task sources.
+    sources: [GCP, ADK]
+  - from: RM-AGT-02
+    to: RM-MOD-06
+    highlight: support
+    when:
+      - Агент обращается к модели через корпоративный шлюз
+      - The agent calls a model through the corporate gateway
+    phase: [Исполнение, Runtime]
+    reason:
+      - Единый маршрут применяет правила выбора модели.
+      - The shared route enforces model selection rules.
+    sources: [GCP, DEP-AZGW]
+  - from: RM-AGT-02
+    to: RM-AGT-05
+    highlight: selected
+    when: ['Нужны пауза, согласование или восстановление', 'Pause, approval or recovery is required']
+    phase: [Исполнение, Runtime]
+    reason:
+      - Состояние позволяет продолжить задачу после остановки.
+      - Persisted state enables the task to resume.
+    sources: [LANG, LANG-I]
+  - from: RM-AGT-02
+    to: RM-AGT-07
+    highlight: support
+    when: [Инструкции и skills управляются как версии, Instructions and skills are version-managed]
+    phase: [Развёртывание, Deployment]
+    reason:
+      - Исполнение связано с допущенной конфигурацией инструкций.
+      - Execution is bound to the admitted instruction configuration.
+    sources: [SSDF, CLAUDE]
+  - from: RM-AGT-02
+    to: RM-GOV-02
+    highlight: support
+    when: [Агент обращается к корпоративным ресурсам, The agent accesses corporate resources]
+    phase: [Исполнение, Runtime]
+    reason:
+      - Полномочия привязаны к идентичности и делегированию.
+      - Permissions are bound to identity and delegation.
+    sources: [GCP, ZT]
+  - from: RM-AGT-02
+    to: RM-AGT-04
+    highlight: selected
+    when: [Агент предлагает вызов инструмента, The agent proposes a tool call]
+    phase: [Исполнение, Runtime]
+    reason:
+      - Вызов направляется через проверяемый маршрут инструментов.
+      - The call follows the checked tool route.
+    sources: [GCP, MCP]
+  - from: RM-AGT-04
+    to: RM-ACT-02
+    highlight: support
+    when: [Любой вызов инструмента в защищённом профиле, Every tool call in the guarded profile]
+    phase: [Исполнение, Runtime]
+    reason:
+      - Точное действие допускается до внешнего эффекта.
+      - The exact action is admitted before its external effect.
+    sources: [OWASP, ZT]
+  - from: RM-ACT-02
+    to: RM-ACT-01
+    highlight: support
+    when: [Перед исполнением защищаемой операции, Before executing a protected operation]
+    phase: [Исполнение, Runtime]
+    reason:
+      - PEP исполняет решение отдельного механизма политики.
+      - The PEP enforces the policy mechanism decision.
+    sources: [ZT]
+  - from: RM-ACT-02
+    to: RM-AIC-04
+    highlight: support
+    when: [Политика требует согласования человеком, Policy requires human approval]
+    phase: [Исполнение, Runtime]
+    reason:
+      - Рискованное действие ожидает подтверждения точных параметров.
+      - A risky action awaits approval of its exact parameters.
+    sources: [OPEN-G, OWASP]
+  - from: RM-INT-02
+    to: RM-TRS-03
+    highlight: support
+    when: [Коннектору нужен сервисный секрет, The connector needs a service credential]
+    phase: [Исполнение, Runtime]
+    reason:
+      - Секрет выдаётся исполнителю в ограниченной области.
+      - The executor receives a scope-limited credential.
+    sources: [SECRETS]
+  - from: RM-AGT-02
+    to: RM-ACT-03
+    highlight: selected
+    when: ['Исполняется код, shell или недоверенная работа', 'Code, shell or untrusted work is executed']
+    phase: [Исполнение, Runtime]
+    reason:
+      - Ресурсы и доступы ограничиваются средой задания.
+      - The task environment constrains resources and access.
+    sources: [OPEN, OWASP]
+  - from: RM-AGT-01
+    to: RM-AGT-02
+    highlight: support
+    when: [Оркестратор назначает агенту подзадачу, The orchestrator assigns an agent subtask]
+    phase: [Исполнение, Runtime]
+    reason: [Для подзадачи нужен управляемый цикл исполнения., The subtask needs a managed execution loop.]
+    sources: [GCP, ADK]
+  - from: RM-AGT-03
+    to: RM-DPR-06
+    highlight: selected
+    when: [Контекст включает корпоративные знания RAG, Context includes corporate RAG knowledge]
+    phase: [Исполнение, Runtime]
+    reason:
+      - В контекст попадают только доступные субъекту фрагменты.
+      - Only fragments accessible to the subject enter context.
+    sources: [RAG, ZT]
+  - from: RM-DPR-06
+    to: RM-DAT-07
+    highlight: support
+    when: [Выбран корпоративный поисковый индекс, The corporate retrieval index is selected]
+    phase: [Исполнение, Runtime]
+    reason:
+      - Проверенный поиск возвращает фрагменты с происхождением.
+      - Checked retrieval returns fragments with provenance.
+    sources: [RAG]
+  - from: RM-DAT-07
+    to: RM-MOD-09
+    highlight: support
+    when: [Выбран векторный либо гибридный поиск, Vector or hybrid retrieval is selected]
+    phase: [Исполнение, Runtime]
+    reason:
+      - Запрос и документы используют совместимую embedding-модель.
+      - Queries and documents use compatible embedding models.
+    sources: [RAG]
+    alternative: true
+  - from: RM-AGT-03
+    to: RM-AGT-06
+    highlight: selected
+    when: [Разрешено использование памяти между задачами, Cross-task memory use is permitted]
+    phase: [Исполнение, Runtime]
+    reason:
+      - Ранее сохранённые сведения добавляются по области доступа.
+      - Stored information is recalled within the access scope.
+    sources: [GCP, ADK]
+  - from: RM-AGT-06
+    to: RM-DPR-07
+    highlight: support
+    when: [Включена долговременная память агента, Long-term agent memory is enabled]
+    phase: [Исполнение, Runtime]
+    reason:
+      - Запись и чтение контролируют происхождение и область памяти.
+      - Reads and writes check provenance and memory scope.
+    sources: [LLM-C, OWASP]
+  - from: RM-DPR-06
+    to: RM-ACT-01
+    highlight: support
+    when: [Извлекаются защищаемые корпоративные данные, Protected corporate data is retrieved]
+    phase: [Исполнение, Runtime]
+    reason:
+      - Доступ проверяется для субъекта и конкретного ресурса.
+      - Access is checked for the subject and exact resource.
+    sources: [ZT, BOLA]
+  - from: RM-DEV-11
+    to: RM-HW-02
+    highlight: support
+    when: [Распределённое обучение использует GPU, Distributed training uses GPUs]
+    phase: [Обучение, Training]
+    reason:
+      - Рабочим процессам выделяются согласованные вычислительные ресурсы.
+      - Workers receive the coordinated compute resources.
+    sources: [TRAIN, NVI]
+  - from: RM-DEV-11
+    to: RM-DPR-04
+    highlight: support
+    when: [Обучение использует защищаемые корпоративные данные, Training uses protected corporate data]
+    phase: [Обучение, Training]
+    reason: [Чтение выборки проходит через контроль доступа., Sample reads pass through access control.]
+    sources: [ZT, TRAIN]
+  - from: RM-DEV-11
+    to: RM-DAT-04
+    highlight: support
+    when: [Воспроизводимый обучающий запуск, A reproducible training run]
+    phase: [Обучение, Training]
+    reason: [Задание фиксирует версию обучающей выборки., The job pins its training dataset version.]
+    sources: [GCP-M, TRAIN]
+  - from: RM-DEV-11
+    to: RM-DEV-12
+    highlight: support
+    when: [Требуется возобновление распределённого задания, Distributed job resumption is required]
+    phase: [Обучение, Training]
+    reason:
+      - Сохраняется согласованное состояние обучения для восстановления.
+      - Consistent training state is persisted for recovery.
+    sources: [CKPT, DIST]
+  - from: RM-DEV-11
+    to: RM-DEV-05
+    highlight: support
+    when: [Запуск включён в учёт экспериментов, The run participates in experiment tracking]
+    phase: [Обучение, Training]
+    reason:
+      - Метрики связываются с параметрами и точным запуском.
+      - Metrics are linked to parameters and the exact run.
+    sources: [GCP-M]
+  - from: RM-DEV-06
+    to: RM-DEV-01
+    highlight: support
+    when: [Воспроизводимая сборка из исходного кода, A reproducible source build]
+    phase: [Сборка и выпуск, Build and release]
+    reason:
+      - Сборка использует зафиксированную версию исходных материалов.
+      - The build uses a pinned source version.
+    sources: [PROV]
+  - from: RM-DEV-06
+    to: RM-SEC-04
+    highlight: support
+    when:
+      - Профиль выпуска требует проверки кода и зависимостей
+      - The release profile requires source and dependency checks
+    phase: [Сборка и выпуск, Build and release]
+    reason:
+      - Сканирование создаёт свидетельства по конкретному кандидату.
+      - Scanning produces evidence for the exact candidate.
+    sources: [SSDF]
+  - from: RM-DEV-09
+    to: RM-DEV-07
+    highlight: support
+    when: [Допуск ИИ-кандидата к выпуску, Admission of an AI release candidate]
+    phase: [Сборка и выпуск, Build and release]
+    reason:
+      - Решение использует независимые результаты испытаний кандидата.
+      - The decision uses independent candidate evaluation results.
+    sources: [NIST-C, GCP-M]
+  - from: RM-DEV-07
+    to: RM-DAT-05
+    highlight: support
+    when: [Выполняются контрольные испытания кандидата, Candidate acceptance tests are performed]
+    phase: [Сборка и выпуск, Build and release]
+    reason:
+      - Качество проверяется на версионируемых контрольных наборах.
+      - Quality is checked against versioned evaluation sets.
+    sources: [NIST-C, GCP-M]
+  - from: RM-DEV-09
+    to: RM-TRS-05
+    highlight: support
+    when: [Происхождение входит в критерии допуска, Provenance is an admission criterion]
+    phase: [Сборка и выпуск, Build and release]
+    reason:
+      - Проверяются связи кандидата с материалами и свидетельствами.
+      - Candidate links to materials and evidence are verified.
+    sources: [PROV]
+  - from: RM-DEV-09
+    to: RM-TRS-01
+    highlight: support
+    when:
+      - Профиль требует криптографической подписи выпуска
+      - The profile requires cryptographic release signing
+    phase: [Сборка и выпуск, Build and release]
+    reason:
+      - Подпись выполняется без раскрытия защищённого ключа.
+      - Signing is performed without exposing the protected key.
+    sources: [KEY, PKCS]
+  - from: RM-DEV-10
+    to: RM-DEV-09
+    highlight: support
+    when: [Продвижение конфигурации в PROD, A configuration is promoted to PROD]
+    phase: [Развёртывание, Deployment]
+    reason: [Развёртывается только точная допущенная версия., Only the exact admitted version is deployed.]
+    sources: [GCP-M, SSDF]
+  - from: RM-DEV-10
+    to: RM-DEV-08
+    highlight: support
+    when:
+      - Развёртывание из корпоративного хранилища артефактов
+      - Deployment uses the corporate artifact store
+    phase: [Развёртывание, Deployment]
+    reason:
+      - Получается проверяемый неизменяемый пакет выпуска.
+      - A verifiable immutable release package is retrieved.
+    sources: [PROV, GCP-M]
+  - from: RM-DEV-10
+    to: RM-MOD-05
+    highlight: support
+    when: [Развёртывается зарегистрированная версия модели, A registered model version is deployed]
+    phase: [Развёртывание, Deployment]
+    reason:
+      - Идентификатор модели разрешается в допущенный артефакт.
+      - The model identifier resolves to an admitted artifact.
+    sources: [GCP-M, DEP-KSR]
+  - from: RM-ACT-01
+    to: RM-GOV-03
+    highlight: support
+    when: [Политики исполняются в виде управляемых версий, Policies execute as managed versions]
+    phase: [Настройка и управление, Configuration and governance]
+    reason:
+      - Решение использует опубликованную версию правил.
+      - The decision uses the published rule version.
+    sources: [ZT, SSDF]
+  - from: RM-GOV-03
+    to: RM-DEV-01
+    highlight: support
+    when: [Для политик принят Git-процесс, Policies use a Git workflow]
+    phase: [Настройка и управление, Configuration and governance]
+    reason: [Изменения правил проходят версионирование и ревью., Rule changes are versioned and reviewed.]
+    sources: [GITOPS, SSDF]
+  - from: RM-GOV-02
+    to: RM-SEC-01
+    highlight: support
+    when:
+      - Идентичности агентов связаны с корпоративным IAM
+      - Agent identities are federated with corporate IAM
+    phase: [Исполнение, Runtime]
+    reason:
+      - Делегирование опирается на проверенную исходную идентичность.
+      - Delegation relies on a verified originating identity.
+    sources: [GCP, ZT]
+  - from: RM-GOV-04
+    to: RM-GOV-01
+    highlight: support
+    when: [Оценивается конкретная ИИ-система, A specific AI system is assessed]
+    phase: [Настройка и управление, Configuration and governance]
+    reason:
+      - Риск относится к определённым активам и версиям.
+      - Risk is tied to identified assets and versions.
+    sources: [NIST-C, BOM]
+  - from: RM-GOV-01
+    to: RM-MOD-05
+    highlight: support
+    when: [Инвентаризация включает зарегистрированные модели, The inventory includes registered models]
+    phase: [Настройка и управление, Configuration and governance]
+    reason:
+      - Записи активов связываются с версиями реестра моделей.
+      - Asset records refer to model registry versions.
+    sources: [BOM, GCP-M]
+  - from: RM-TRS-07
+    to: RM-GOV-02
+    highlight: support
+    when: [Остановка требует отзыва полномочий агента, Stopping requires revoking agent permissions]
+    phase: [Исполнение, Runtime]
+    reason:
+      - Механизм отзыва прекращает дальнейшее использование полномочий.
+      - Revocation prevents continued use of permissions.
+    sources: [ZT, OWASP]
+  - from: RM-TRS-07
+    to: RM-ACT-02
+    highlight: support
+    when:
+      - Новые действия должны блокироваться независимо от агента
+      - New actions must be blocked independently of the agent
+    phase: [Исполнение, Runtime]
+    reason:
+      - Принуждение остановки находится у границы исполнения.
+      - The execution boundary enforces the stop.
+    sources: [ZT, OWASP]
+  - from: RM-ACT-02
+    to: RM-TRS-04
+    highlight: support
+    when:
+      - Защищаемая операция требует доказуемого решения
+      - A protected operation requires an auditable decision
+    phase: [Исполнение, Runtime]
+    reason:
+      - Сохраняется связь операции с субъектом и решением.
+      - The operation is recorded with its subject and decision.
+    sources: [ZT, LOG]
+  - from: RM-TRS-04
+    to: RM-SEC-07
+    highlight: support
+    when: [Политика требует неизменяемых свидетельств аудита, Policy requires immutable audit evidence]
+    phase: [Наблюдение и сопровождение, Monitoring and operations]
+    reason:
+      - Записи защищаются от изменения в срок хранения.
+      - Records are protected against modification during retention.
+    sources: [LOG, STORAGE]
+  - from: RM-DEV-09
+    to: RM-TRS-06
+    highlight: support
+    when: [Перед выпуском требуется контроль неизменности, Integrity must be checked before release]
+    phase: [Сборка и выпуск, Build and release]
+    reason:
+      - Проверяется сохранность допущенных артефактов и правил.
+      - Admitted artifacts and rules are checked for changes.
+    sources: [PROV, SSDF]
+  - from: RM-TRS-06
+    to: RM-TRS-05
+    highlight: support
+    when:
+      - Контроль использует доверенный манифест происхождения
+      - The check uses a trusted provenance manifest
+    phase: [Наблюдение и сопровождение, Monitoring and operations]
+    reason:
+      - Текущая версия сравнивается с доверенным основанием.
+      - The current version is compared with a trusted baseline.
+    sources: [PROV]
+  - from: RM-DPR-02
+    to: RM-DPR-01
+    highlight: support
+    when:
+      - Поля для преобразования выбираются по классификации
+      - Classification selects fields for transformation
+    phase: [Подготовка данных, Data preparation]
+    reason:
+      - Метки чувствительности определяют область преобразования.
+      - Sensitivity labels determine the transformation scope.
+    sources: [TOK, RMF]
+  - from: RM-DPR-02
+    to: RM-TRS-02
+    highlight: support
+    when:
+      - Применена обратимая токенизация с таблицей соответствий
+      - Reversible mapping-based tokenization is used
+    phase: [Подготовка данных, Data preparation]
+    reason: [Обратная подмена требует сохранённого соответствия., Reversal requires the retained mapping.]
+    sources: [TOK]
+  - from: RM-DPR-03
+    to: RM-TRS-02
+    highlight: support
+    when: [Восстанавливается исходное значение по токену, An original value is restored from a token]
+    phase: [Исполнение, Runtime]
+    reason:
+      - Разрешённое значение берётся из защищённого соответствия.
+      - The permitted value is read from the protected mapping.
+    sources: [TOK]
+  - from: RM-DPR-03
+    to: RM-ACT-01
+    highlight: support
+    when: [Запрашивается раскрытие защищаемого значения, Disclosure of a protected value is requested]
+    phase: [Исполнение, Runtime]
+    reason:
+      - Проверяются субъект, цель и область раскрытия.
+      - Subject, purpose and disclosure scope are checked.
+    sources: [ZT, TOK]
+  - from: RM-DPR-05
+    to: RM-TRS-01
+    highlight: support
+    when: [Шифрование использует централизованный KMS, Encryption uses centralized key management]
+    phase: [Настройка и управление, Configuration and governance]
+    reason:
+      - Ключи имеют управляемый жизненный цикл и доступ.
+      - Keys have a managed lifecycle and access policy.
+    sources: [KEY]
+  - from: RM-TRS-01
+    to: RM-CMP-03
+    highlight: support
+    when: [Выбран аппаратно защищённый вариант KMS, A hardware-backed KMS option is selected]
+    phase: [Исполнение, Runtime]
+    reason:
+      - Криптографические операции выполняет выбранный HSM.
+      - The selected HSM performs cryptographic operations.
+    sources: [KEY, PKCS]
+  - from: RM-CMP-01
+    to: RM-HW-03
+    highlight: support
+    when:
+      - Для нагрузки выбран профиль Confidential Computing
+      - The workload uses a confidential-computing profile
+    phase: [Исполнение, Runtime]
+    reason:
+      - Защита исполнения требует поддерживаемого аппаратного TEE.
+      - Execution protection requires supported hardware TEE capabilities.
+    sources: [CCC]
+  - from: RM-CMP-01
+    to: RM-CMP-02
+    highlight: support
+    when:
+      - Доступ к данным обусловлен аттестацией среды
+      - Data access is conditional on environment attestation
+    phase: [Исполнение, Runtime]
+    reason:
+      - Доверие к среде подтверждается проверкой свидетельств.
+      - Evidence appraisal establishes trust in the environment.
+    sources: [RATS]
+  - from: RM-CMP-02
+    to: RM-TRS-01
+    highlight: support
+    when:
+      - Успешная аттестация разрешает выдачу ключа из KMS
+      - Successful attestation permits key release from a KMS
+    phase: [Исполнение, Runtime]
+    reason:
+      - Ключ выдаётся только после требуемой проверки среды.
+      - The key is released only after the required environment check.
+    sources: [RATS, KEY]
+  - from: RM-SEC-03
+    to: RM-SEC-04
+    highlight: support
+    when:
+      - Принимаются код, пакеты или контейнерные образы
+      - Source, packages or container images are ingested
+    phase: [Сборка и выпуск, Build and release]
+    reason:
+      - Программные зависимости проверяются перед внутренней публикацией.
+      - Software dependencies are checked before internal publication.
+    sources: [SSDF]
+  - from: RM-SEC-06
+    to: RM-GOV-01
+    highlight: support
+    when:
+      - AI-BOM содержит версии программных компонентов
+      - The AI-BOM includes software-component versions
+    phase: [Наблюдение и сопровождение, Monitoring and operations]
+    reason:
+      - Уязвимости сопоставляются с установленными версиями компонентов.
+      - Vulnerabilities are matched to deployed component versions.
+    sources: [BOM, SSDF]
+  - from: RM-SEC-06
+    to: RM-OPS-07
+    highlight: support
+    when:
+      - Уязвимость требует изменения допущенной конфигурации
+      - A vulnerability requires changing an admitted configuration
+    phase: [Наблюдение и сопровождение, Monitoring and operations]
+    reason:
+      - Исправление проходит управляемое изменение и проверку.
+      - Remediation follows managed change and validation.
+    sources: [SSDF, INC]
+  - from: RM-SEC-05
+    to: RM-OPS-03
+    highlight: support
+    when:
+      - События собираются и нормализуются централизованно
+      - Events are collected and normalized centrally
+    phase: [Наблюдение и сопровождение, Monitoring and operations]
+    reason:
+      - Корреляция использует согласованный поток событий безопасности.
+      - Correlation uses a consistent security-event feed.
+    sources: [LOG, DEP-OTELCOL]
+  - from: RM-SEC-05
+    to: RM-OPS-04
+    highlight: support
+    when: [Расследование требует сохранённой истории событий, Investigation needs retained event history]
+    phase: [Наблюдение и сопровождение, Monitoring and operations]
+    reason:
+      - Исторические события позволяют восстановить ход инцидента.
+      - Historical events support reconstructing the incident.
+    sources: [INC, LOG]
+  - from: RM-SEC-07
+    to: RM-HW-04
+    highlight: support
+    when:
+      - Выбрано хранилище с проверенным режимом неизменяемости
+      - Storage with verified immutability is selected
+    phase: [Настройка и управление, Configuration and governance]
+    reason:
+      - Неизменяемость зависит от режима конкретного хранилища.
+      - Immutability depends on the actual storage configuration.
+    sources: [STORAGE]
+  - from: RM-OPS-01
+    to: RM-OPS-04
+    highlight: support
+    when:
+      - Метрики и правила алертов используют общее хранилище
+      - Metrics and alert rules use a shared store
+    phase: [Наблюдение и сопровождение, Monitoring and operations]
+    reason:
+      - Алерты вычисляются по доступным временным рядам.
+      - Alerts are evaluated against available time series.
+    sources: [OTEL, LOG]
+  - from: RM-OPS-02
+    to: RM-OPS-03
+    highlight: support
+    when: [Трассы экспортируются через Collector, Traces are exported through a Collector]
+    phase: [Наблюдение и сопровождение, Monitoring and operations]
+    reason:
+      - Промежуточный сборщик принимает и направляет трассы.
+      - An intermediate collector receives and routes traces.
+    sources: [DEP-OTELCOL]
+  - from: RM-OPS-03
+    to: RM-OPS-04
+    highlight: support
+    when:
+      - Нормализованные события направляются в общее хранилище
+      - Normalized events are sent to shared storage
+    phase: [Наблюдение и сопровождение, Monitoring and operations]
+    reason:
+      - Для последующего анализа нужен целевой backend хранения.
+      - Later analysis needs a destination storage backend.
+    sources: [DEP-OTELCOL, LOG]
+  - from: RM-OPS-04
+    to: RM-HW-04
+    highlight: support
+    when: [Платформа самостоятельно размещает телеметрию, The platform self-hosts telemetry storage]
+    phase: [Наблюдение и сопровождение, Monitoring and operations]
+    reason:
+      - Физическое хранение обеспечивает ёмкость и сохранность данных.
+      - Physical storage provides capacity and data durability.
+    sources: [STORAGE]
+  - from: RM-OPS-05
+    to: RM-DEV-07
+    highlight: support
+    when:
+      - Качество проверяется периодическими контрольными испытаниями
+      - Quality is checked by periodic control evaluations
+    phase: [Наблюдение и сопровождение, Monitoring and operations]
+    reason:
+      - Деградация оценивается на воспроизводимых проверках.
+      - Reproducible checks assess quality degradation.
+    sources: [GCP-M, NIST-C]
+  - from: RM-OPS-06
+    to: RM-OPS-01
+    highlight: support
+    when:
+      - FinOps анализирует фактическое потребление ресурсов
+      - FinOps analyzes actual resource consumption
+    phase: [Наблюдение и сопровождение, Monitoring and operations]
+    reason:
+      - Расходы и загрузка сопоставляются с измерениями.
+      - Costs and utilization are compared with measurements.
+    sources: [FINOPS, OTEL]
+  - from: RM-OPS-07
+    to: RM-DEV-09
+    highlight: support
+    when: [Изменение затрагивает допущенный ИИ-артефакт, A change affects an admitted AI artifact]
+    phase: [Наблюдение и сопровождение, Monitoring and operations]
+    reason:
+      - Затронутые критерии допуска проверяются повторно.
+      - Affected admission criteria are checked again.
+    sources: [SSDF, GCP-M]
+  - from: RM-OPS-08
+    to: RM-HW-04
+    highlight: support
+    when: [Резервные копии размещаются в выделенном хранилище, Backups use a dedicated storage target]
+    phase: [Наблюдение и сопровождение, Monitoring and operations]
+    reason:
+      - Восстановление требует доступных проверенных резервных копий.
+      - Recovery needs available and verified backups.
+    sources: [STORAGE]
+  - from: RM-DAT-01
+    to: RM-SEC-03
+    highlight: support
+    when: [Поступают внешние материалы, External materials are ingested]
+    phase: [Подготовка данных, Data preparation]
+    reason:
+      - Источник и допустимость материалов проверяются до публикации.
+      - Source and permitted use are checked before publication.
+    sources: [RMF, SSDF]
+  - from: RM-DAT-01
+    to: RM-DPR-01
+    highlight: support
+    when:
+      - Принимаемые данные могут содержать защищаемые значения
+      - Ingested data may contain protected values
+    phase: [Подготовка данных, Data preparation]
+    reason:
+      - Категория данных определяет дальнейшую обработку и доступ.
+      - Data classification determines processing and access.
+    sources: [RMF, TOK]
+  - from: RM-DAT-04
+    to: RM-DAT-02
+    highlight: support
+    when:
+      - Версии наборов регистрируются в корпоративном каталоге
+      - Dataset versions are registered in a corporate catalog
+    phase: [Подготовка данных, Data preparation]
+    reason:
+      - Версия связывается с владельцем, источником и правилами.
+      - The version is linked to its owner, source and rules.
+    sources: [GCP-M, DB]
+  - from: RM-DAT-06
+    to: RM-HW-04
+    highlight: support
+    when: [Выбрано собственное физическое хранилище данных, A self-hosted physical data store is selected]
+    phase: [Настройка и управление, Configuration and governance]
+    reason:
+      - Хранилище данных опирается на выделенные ресурсы хранения.
+      - The data store relies on allocated storage resources.
+    sources: [STORAGE, DB]
+  - from: RM-AGT-03
+    to: RM-DAT-08
+    highlight: selected
+    when: [Выбран вариант GraphRAG, A GraphRAG option is selected]
+    phase: [Исполнение, Runtime]
+    reason:
+      - Контекст дополняется найденными связями сущностей.
+      - Retrieved entity relationships enrich the context.
+    sources: [DEP-GRAPH]
+  - from: RM-DEV-04
+    to: RM-DAT-09
+    highlight: selected
+    when: [Предиктивное обучение использует Feature Store, Predictive training uses a feature store]
+    phase: [Обучение, Training]
+    reason:
+      - Исторические признаки извлекаются с временной согласованностью.
+      - Historical features are retrieved with temporal consistency.
+    sources: [DEP-FEAST]
+  - from: RM-DEV-03
+    to: RM-DAT-01
+    highlight: support
+    when:
+      - Конвейер включает загрузку и подготовку данных
+      - The pipeline includes ingestion and data preparation
+    phase: [Подготовка данных, Data preparation]
+    reason:
+      - Оркестратор запускает выбранные операции подготовки данных.
+      - The orchestrator invokes the selected preparation operations.
+    sources: [GCP-M, KUBE]
+  - from: RM-DEV-03
+    to: RM-DAT-04
+    highlight: support
+    when:
+      - Результат конвейера публикуется как версия датасета
+      - The pipeline publishes a versioned dataset
+    phase: [Подготовка данных, Data preparation]
+    reason:
+      - Результат закрепляется за воспроизводимой версией набора.
+      - The result is bound to a reproducible dataset version.
+    sources: [GCP-M]
+  - from: RM-DEV-02
+    to: RM-DPR-04
+    highlight: support
+    when: [Ноутбук использует защищаемые корпоративные данные, A notebook uses protected corporate data]
+    phase: [Исследование, Research]
+    reason:
+      - Исследователь получает только разрешённое представление выборки.
+      - The researcher receives only the permitted sample representation.
+    sources: [ZT]
+  - from: RM-DEV-04
+    to: RM-DEV-11
+    highlight: selected
+    when: [Обучение распределяется между несколькими workers, Training is distributed across workers]
+    phase: [Обучение, Training]
+    reason:
+      - Распределённый вариант требует координации участников.
+      - The distributed option requires worker coordination.
+    sources: [TRAIN]
+  - from: RM-DEV-04
+    to: RM-DEV-05
+    highlight: support
+    when:
+      - Эксперимент включён в управляемый цикл разработки
+      - The experiment belongs to a managed development lifecycle
+    phase: [Обучение, Training]
+    reason:
+      - Кандидат связывается с параметрами и результатами запуска.
+      - The candidate is linked to run parameters and results.
+    sources: [GCP-M]
+  - from: RM-PLT-02
+    to: RM-PLT-01
+    highlight: support
+    when: [Размещение реализовано через Kubernetes, Kubernetes provides workload placement]
+    phase: [Настройка и управление, Configuration and governance]
+    reason:
+      - Узлы исполняют контейнеры через совместимый runtime.
+      - Nodes run containers through a compatible runtime.
+    sources: [DEP-K8S]
+  - from: RM-PLT-05
+    to: RM-DEV-01
+    highlight: support
+    when: [Для IaC выбран GitOps-процесс, IaC uses a GitOps workflow]
+    phase: [Настройка и управление, Configuration and governance]
+    reason:
+      - Желаемое состояние хранится в управляемой истории версий.
+      - Desired state is retained in managed version history.
+    sources: [GITOPS]
+  - from: RM-PLT-03
+    to: RM-HW-04
+    highlight: support
+    when: [Самостоятельно размещена персистентная СУБД, A persistent database is self-hosted]
+    phase: [Настройка и управление, Configuration and governance]
+    reason:
+      - Сохранность транзакций опирается на устойчивое хранение.
+      - Transaction durability relies on persistent storage.
+    sources: [STORAGE]
+  - from: RM-PLT-04
+    to: RM-HW-04
+    highlight: support
+    when: [Брокер использует устойчивые очереди, The broker uses durable queues]
+    phase: [Настройка и управление, Configuration and governance]
+    reason:
+      - Сообщения должны переживать остановку процесса брокера.
+      - Messages must survive broker process termination.
+    sources: [STORAGE]
+  - from: RM-INT-03
+    to: RM-PLT-04
+    highlight: support
+    when: [Прикладные события доставляются через брокер, Application events are broker-delivered]
+    phase: [Исполнение, Runtime]
+    reason:
+      - Транспорт обеспечивает выбранные гарантии доставки событий.
+      - The transport provides the selected delivery guarantees.
+    sources: [RAG, GCP]
+  - from: RM-MOD-08
+    to: RM-AGT-08
+    highlight: support
+    when: [Очередь использует лимит выполняемой задачи, The queue consumes an executing task budget]
+    phase: [Исполнение, Runtime]
+    reason: [Пакетирование сохраняет выделенный задаче лимит., Batching respects the allocated task limit.]
+    sources: [KSERVE, FINOPS]
+  - from: RM-MOD-10
+    to: RM-MOD-09
+    highlight: support
+    when: [Кеш сравнивает запросы по embedding-векторам, The cache compares query embedding vectors]
+    phase: [Исполнение, Runtime]
+    reason:
+      - Сходство вычисляется в совместимом векторном пространстве.
+      - Similarity is computed in a compatible vector space.
+    sources: [DEP-SEMCACHE]
+    alternative: true
+  - from: RM-INT-01
+    to: RM-SEC-01
+    highlight: support
+    when: [API использует корпоративную идентичность, The API uses corporate identity]
+    phase: [Исполнение, Runtime]
+    reason:
+      - Шлюз проверяет идентичность до обращения к backend.
+      - The gateway verifies identity before backend access.
+    sources: [ZT, DEP-AZGW]
+  - from: RM-INT-04
+    to: RM-GOV-02
+    highlight: support
+    when:
+      - A2A обменивается задачами между корпоративными агентами
+      - A2A exchanges tasks between corporate agents
+    phase: [Исполнение, Runtime]
+    reason:
+      - Отправитель действует с установленной идентичностью и полномочиями.
+      - The sender acts with an established identity and permissions.
+    sources: [DEP-A2A, ZT]
+  - from: RM-APP-02
+    to: RM-SEC-01
+    highlight: support
+    when: [Сотрудник обращается к корпоративному чату, An employee uses the corporate chat]
+    phase: [Исполнение, Runtime]
+    reason:
+      - Сессия сохраняет проверенную идентичность пользователя.
+      - The session preserves the verified user identity.
+    sources: [AZ, BOLA]
+  - from: RM-APP-02
+    to: RM-PLT-03
+    highlight: selected
+    when: [Включено хранение истории диалога, Conversation history is retained]
+    phase: [Исполнение, Runtime]
+    reason:
+      - Продолжение диалога использует доступную пользователю историю.
+      - Conversation continuation uses history accessible to the user.
+    sources: [BOLA, AZ]
+  - from: RM-APP-01
+    to: RM-INT-01
+    highlight: support
+    when: [Приложение публикуется через управляемый API, The application is exposed through a managed API]
+    phase: [Исполнение, Runtime]
+    reason:
+      - Единая точка входа применяет правила API-доступа.
+      - A shared entry point applies API access rules.
+    sources: [ZT, DEP-AZGW]
+  - from: RM-APP-01
+    to: RM-AGT-01
+    highlight: selected
+    when: [Приложение передаёт агентам составную задачу, The application delegates a compound agent task]
+    phase: [Исполнение, Runtime]
+    reason:
+      - Декомпозиция задачи выполняется выбранным оркестратором.
+      - The selected orchestrator decomposes the task.
+    sources: [GCP, ADK]
+  - from: RM-AIC-04
+    to: RM-APP-03
+    highlight: support
+    when: [Согласование проводится в консоли оператора, Approval uses an operator console]
+    phase: [Исполнение, Runtime]
+    reason:
+      - Человек видит точное действие перед подтверждением.
+      - The reviewer sees the exact action before approval.
+    sources: [OPEN-G, LANG-I]
+  - from: RM-APP-04
+    to: RM-AGT-01
+    highlight: selected
+    when: [Бизнес-процесс включает агентную ветвь, The business workflow includes an agent branch]
+    phase: [Исполнение, Runtime]
+    reason:
+      - Агентный этап передаётся специализированной оркестрации.
+      - The agent stage is delegated to specialized orchestration.
+    sources: [GCP]
+  - from: RM-AIC-03
+    to: RM-MOD-06
+    highlight: support
+    when: [Оценка моделью проходит через защищённый шлюз, Model-based evaluation uses the guarded gateway]
+    phase: [Исполнение, Runtime]
+    reason:
+      - ИИ-контролёр тоже выполняет управляемый модельный вызов.
+      - The AI controller also performs a governed model invocation.
+    sources: [LLMJ, DEP-AZGW]
+  - from: RM-DPR-04
+    to: RM-DAT-04
+    highlight: support
+    when:
+      - Защищаемая выборка хранится как допущенная версия набора
+      - A protected sample is stored as an admitted dataset version
+    phase: [Чтение данных, Data access]
+    reason:
+      - Прокси выдаёт содержимое только выбранной разрешённой версии.
+      - The proxy returns content only from the selected permitted version.
+    sources: [ZT, GCP-M]
+  - from: RM-DEV-06
+    to: RM-DEV-08
+    highlight: support
+    when:
+      - Сборка использует принятое внутреннее зеркало пакетов
+      - The build uses an admitted internal package mirror
+    phase: [Сборка, Build]
+    reason:
+      - Библиотеки и образы берутся из проверяемого внутреннего источника.
+      - Libraries and images come from a verifiable internal source.
+    sources: [SSDF, PROV]
+  - from: RM-DAT-10
+    to: RM-DAT-01
+    highlight: support
+    when:
+      - Выбран профиль разбора материалов; модельное извлечение подключается отдельно.
+      - A material extraction profile is selected; model extraction is enabled separately.
+    phase: [Подготовка и исполнение, Preparation and execution]
+    reason:
+      - Извлечение опирается на допущенный вход, контролируемый вызов модели по профилю и версии результатов.
+      - Extraction relies on admitted input, guarded model calls where enabled, and versioned results.
+    sources: [P20-MULTIMODAL, LLM-C]
+  - from: RM-DAT-10
+    to: RM-MOD-06
+    highlight: selected
+    when:
+      - Извлечение или проверка использует генеративную модель.
+      - Extraction or verification uses a generative model.
+    phase: [Подготовка и исполнение, Preparation and execution]
+    reason:
+      - Извлечение опирается на допущенный вход, контролируемый вызов модели по профилю и версии результатов.
+      - Extraction relies on admitted input, guarded model calls where enabled, and versioned results.
+    sources: [P20-MULTIMODAL, LLM-C]
+  - from: RM-DAT-10
+    to: RM-DAT-04
+    highlight: support
+    when:
+      - Выбран профиль разбора материалов; модельное извлечение подключается отдельно.
+      - A material extraction profile is selected; model extraction is enabled separately.
+    phase: [Подготовка и исполнение, Preparation and execution]
+    reason:
+      - Извлечение опирается на допущенный вход, контролируемый вызов модели по профилю и версии результатов.
+      - Extraction relies on admitted input, guarded model calls where enabled, and versioned results.
+    sources: [P20-MULTIMODAL, LLM-C]
+  - from: RM-MOD-06
+    to: RM-AIC-05
+    highlight: support
+    when: &id002 [Каждый рабочий вызов модели, Every production model call]
+    phase: &id001 [Исполнение, Runtime]
+    reason:
+      - Шлюз запрашивает решение по квоте до маршрутизации вызова.
+      - The gateway asks for a quota decision before it routes the call.
+    sources: [OWASP-LLM10]
+  - from: RM-AIC-05
+    to: RM-OPS-06
+    highlight: support
+    when: [Проверка квоты, A quota check]
+    phase: *id001
+    reason:
+      - Квота сравнивается с фактическим потреблением потребителя.
+      - The quota is compared with the consumer's actual consumption.
+    sources: [FINOPS]
+  - from: RM-MOD-06
+    to: RM-OPS-06
+    highlight: support
+    when: *id002
+    phase: [Учёт, Metering]
+    reason:
+      - Шлюз передаёт объём и стоимость вызова в учёт.
+      - The gateway reports the volume and cost of the call to metering.
+    sources: [FINOPS]
+  - from: RM-ACT-02
+    to: RM-OPS-06
+    highlight: support
+    when: [Каждое допущенное действие агента, Every admitted agent action]
+    phase: &id003 [Учёт, Metering]
+    reason:
+      - PEP передаёт в учёт действие, задачу, потребителя и стоимость инструмента.
+      - The PEP reports the action, task, consumer and tool cost to metering.
+    sources: [FINOPS]
+  - from: RM-ACT-03
+    to: RM-OPS-06
+    highlight: support
+    when: [Каждое исполнение в изолированной среде, Every run in the isolated environment]
+    phase: *id003
+    reason:
+      - Изолированная среда передаёт в учёт время CPU и GPU, память и сетевой трафик задания.
+      - The isolated environment reports CPU and GPU time, memory and network traffic of the job.
+    sources: [FINOPS]
+  - from: RM-DPR-06
+    to: RM-OPS-06
+    highlight: support
+    when: [Каждый запрос к знаниям, Every knowledge query]
+    phase: *id003
+    reason:
+      - Контроль доступа к знаниям передаёт в учёт запрос, объём выдачи и потребителя.
+      - Knowledge access control reports the query, the result volume and the consumer.
+    sources: [FINOPS]
+  - from: RM-AGT-08
+    to: RM-OPS-06
+    highlight: support
+    when: [Резервирование бюджета задачи, Reserving a task budget]
+    phase: [Исполнение, Runtime]
+    reason:
+      - Бюджет задачи сверяется с фактическим потреблением.
+      - The task budget is compared with actual consumption.
+    sources: [FINOPS]
+  - from: RM-INT-04
+    to: RM-OPS-06
+    highlight: support
+    when: [Передача задачи другой агентной системе, Handing a task to another agent system]
+    phase: *id003
+    reason:
+      - Шлюз межагентного взаимодействия передаёт в учёт делегированную задачу и её стоимость.
+      - The inter-agent gateway reports the delegated task and its cost to metering.
+    sources: [FINOPS]
+  - from: RM-MOD-06
+    to: RM-MOD-12
+    highlight: support
+    when: &id004 [Каждый рабочий вызов модели, Every production model call]
+    phase: &id005 [Исполнение, Runtime]
+    reason:
+      - Шлюз берёт модель и параметры вызова из профиля маршрута.
+      - The gateway takes the model and call parameters from the route profile.
+    sources: [ROUTELLM]
+  - from: RM-MOD-12
+    to: RM-ACT-01
+    highlight: support
+    when: *id004
+    phase: *id005
+    reason:
+      - Классификатор выбирает модель только среди разрешённых решением о раскрытии.
+      - The classifier chooses a model only among those the disclosure decision permits.
+    sources: [ZT]
+  - from: RM-MOD-12
+    to: RM-DPR-01
+    highlight: support
+    when: *id004
+    phase: *id005
+    reason:
+      - Категория данных берётся из классификации данных и не меняется классификатором.
+      - The data category comes from data classification; the classifier does not change it.
+    sources: [ZT]
+  - from: RM-MOD-13
+    to: RM-MOD-06
+    highlight: support
+    when: &id006 [Запрос составной, The request is composite]
+    phase: *id005
+    reason:
+      - Каждая подзадача вызывает модель через шлюз с проверками, квотой и учётом.
+      - Every subtask calls a model through the gateway with checks, quota and metering.
+    sources: [LLMCOMPILER]
+  - from: RM-MOD-13
+    to: RM-MOD-10
+    highlight: support
+    when: *id006
+    phase: *id005
+    reason:
+      - Готовый результат подзадачи берётся из кеша ответов.
+      - A finished subtask result is taken from the response cache.
+    sources: [FRUGALGPT]
+  - from: RM-MOD-13
+    to: RM-OPS-06
+    highlight: support
+    when: *id006
+    phase: *id005
+    reason:
+      - Тарифы учёта задают стоимость модели при выборе исполнителя подзадачи.
+      - Metering tariffs give the model cost used to choose a subtask executor.
+    sources: [FRUGALGPT]
+  - from: RM-MOD-13
+    to: RM-AGT-01
+    highlight: support
+    when: [Подзадаче нужен инструмент или действие, A subtask needs a tool or an action]
+    phase: *id005
+    reason:
+      - Подзадача с побочным эффектом передаётся оркестратору агентов.
+      - A subtask with a side effect is handed to the agent orchestrator.
+    sources: [LLMCOMPILER]

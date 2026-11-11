@@ -1,0 +1,458 @@
+# Параметры профиля, пресеты и контракты обязательного состава.
+# Profile options, presets and contracts of the mandatory composition.
+version: a02-ui-1
+defaults:
+  placement: local
+  data: ordinary
+  transfer: unknown
+  search: lexical
+  executor: tools
+  training: single
+options:
+  placement:
+    name: [Размещение модели, Model placement]
+    values:
+      local: [В своём контуре, Within the boundary]
+      external: [Внешний API, External API]
+  data:
+    name: [Категория данных, Data classification]
+    values:
+      ordinary: [Рабочие данные, Work data]
+      restricted: [Ограниченный доступ, Restricted access]
+  transfer:
+    name: [Передача поставщику, Disclosure to provider]
+    values:
+      unknown: [Требуется решение, Decision required]
+      approved: [Согласована, Approved]
+      denied: [Запрещена, Prohibited]
+  search:
+    name: [Способ поиска, Retrieval mode]
+    values:
+      lexical: [По тексту, Lexical]
+      vector: [По эмбеддингам, Embedding-based]
+  executor:
+    name: [Инструменты агента, Agent tools]
+    values:
+      tools: [Прикладной API, Application API]
+      code: [Код и команды, Code and commands]
+  training:
+    name: [Режим обучения, Training mode]
+    values:
+      single: [Один узел, Single node]
+      multi: [Распределённое, Distributed]
+presets:
+  - id: chat
+    name: [Чат сотрудника, Employee chat]
+    processes: [INF-01]
+    scenario: process-inf-01-local
+    description:
+      - Текстовый диалог с LLM, сохранение истории и независимая проверка запроса и ответа.
+      - Text dialogue with an LLM, conversation history, and input and output checks.
+  - id: external
+    name: [Внешний инференс, External inference]
+    processes: [INF-01]
+    options:
+      placement: external
+    scenario: process-inf-01-external
+    description:
+      - Чат с внешней моделью. Передача допустима после решения по данным и поставщику.
+      - Chat with an external model. Transfer requires approval for the data and provider.
+  - id: rag
+    name: [Ответ по источникам, Grounded answer]
+    processes: [KNW-03]
+    scenario: process-knw-03-local
+    description:
+      - Поиск по разрешённым источникам и проверяемая связь ответа с документами.
+      - Retrieval from permitted sources and a traceable link from answer to evidence.
+  - id: agent
+    name: [Агент с записью, Agent with write access]
+    processes: [AGT-03]
+    scenario: process-agt-action-local
+    description:
+      - Агент предлагает изменение в бизнес-системе. Допуск проверяется у исполнителя.
+      - The agent proposes a business-system change. Admission is enforced by the executor.
+  - id: batch
+    name: [Пакетный инференс, Batch inference]
+    processes: [INF-04]
+    description:
+      - Длительное задание с версией входа, повтором и проверкой результатов перед публикацией.
+      - A versioned input job with retry and result checks before publication.
+  - id: adapt
+    name: [Адаптация модели, Model adaptation]
+    processes: [MOD-04]
+    scenario: process-flow-model
+    description:
+      - Допущенная исходная модель и примеры образуют воспроизводимый кандидат.
+      - An admitted base model and examples yield a reproducible candidate.
+  - id: train
+    name: [Распределённое обучение, Distributed training]
+    processes: [MOD-09]
+    options:
+      training: multi
+    scenario: training
+    description:
+      - Версия корпуса, рабочие процессы на нескольких узлах и возобновляемое состояние.
+      - A versioned corpus, workers across nodes, and resumable training state.
+  - id: research
+    name: [Новая архитектура, New architecture]
+    processes: [MOD-12]
+    scenario: process-flow-arch-research
+    description:
+      - Гипотеза и воспроизводимые эксперименты перед отдельной квалификацией.
+      - A hypothesis and reproducible experiments ahead of separate qualification.
+  - id: retire
+    name: [Вывод из эксплуатации, Retirement]
+    processes: [RET-02]
+    scenario: process-ret-02
+    description:
+      - Отзыв прав и маршрутов, проверка остатков данных и сохранение свидетельств.
+      - Revoke access and routes, account for residual data, and retain evidence.
+contracts:
+  CORE-01:
+    options: [placement, data]
+    deps:
+      - [SEC-01, uses_result]
+      - [GOV-05, uses_result]
+    required:
+      RM-AIC-01: [Проверка запроса и контекста до вызова., Check request and context before invocation.]
+      RM-MOD-06: [Выбор допущенного маршрута и модели., Select an admitted route and model.]
+      RM-AIC-02:
+        - Проверка результата до показа или повторного использования.
+        - Check the result before delivery or reuse.
+      RM-TRS-04:
+        - След решения с версией политики и маршрута.
+        - Record the decision and policy and route versions.
+    variants:
+      - when:
+          placement: local
+        required:
+          RM-MOD-07: [Исполнение допущенной модели в своём контуре., Serve an admitted model within the boundary.]
+      - when:
+          placement: external
+        required:
+          RM-MOD-03: [Контракт с внешним поставщиком модели., External model provider contract.]
+          RM-SEC-02:
+            - Контроль передачи и возврата через периметр.
+            - Enforce disclosure and return through the perimeter.
+        options: [transfer]
+        deps:
+          - [GOV-06, uses_result]
+      - when:
+          data: restricted
+        required:
+          RM-DPR-01:
+            - Определение правил обработки защищаемых данных.
+            - Determine applicable restrictions on protected data.
+    recommended:
+      RM-OPS-01: [Разделить задержку модели и время проверок., Track model latency separately from controls.]
+    route:
+      - - [Запрос, Request]
+        - [Инициатор и допустимый контекст., Identify the requester and allowed context.]
+        - RM-SEC-01
+      - - [Контроль входа, Input checks]
+        - [Запрет закрывает вызов модели., Denial stops the invocation.]
+        - RM-AIC-01
+      - - [Вызов модели, Model call]
+        - [Только допущенный маршрут., Use the admitted route.]
+        - RM-MOD-06
+      - - [Контроль выхода, Output checks]
+        - [Проверка до раскрытия результата., Check before exposing the result.]
+        - RM-AIC-02
+      - - [Решение и аудит, Decision and audit]
+        - [Связь результата с версией политики., Bind the result to the policy version.]
+        - RM-TRS-04
+  INF-01:
+    deps:
+      - [CORE-01, calls]
+    required:
+      RM-APP-02:
+        - Вход сотрудника и показ допущенного ответа.
+        - Employee interface and admitted response delivery.
+      RM-PLT-03:
+        - История диалога с правом на каждый разговор.
+        - Conversation history with per-conversation access.
+    route:
+      - - [Открыть разговор, Open chat]
+        - [Права на историю и актуальный контекст., Authorize history and assemble context.]
+        - RM-APP-02
+      - - [Проверить вход, Check input]
+        - [Запрос и контекст до модели., Request and context before the model.]
+        - RM-AIC-01
+      - - [Вызвать модель, Call the model]
+        - [Разрешённые модель и маршрут., Admitted model and route.]
+        - RM-MOD-06
+      - - [Проверить ответ, Check response]
+        - [До выдачи и сохранения., Before delivery and storage.]
+        - RM-AIC-02
+      - - [Выдать и сохранить, Deliver and store]
+        - [История и аудит раздельно., Conversation history and audit remain separate.]
+        - RM-PLT-03
+  INF-02:
+    deps:
+      - [CORE-01, calls]
+    required:
+      RM-APP-02: [Разовый запрос сотрудника., Single employee request.]
+  INF-03:
+    deps:
+      - [CORE-01, calls]
+    required:
+      RM-INT-01:
+        - Ограниченный машинный вход для сервисного вызова.
+        - Scoped entry point for a service invocation.
+  INF-04:
+    deps:
+      - [CORE-01, calls]
+    required:
+      RM-DAT-04: [Стабильная версия входа и результата., Versioned inputs and outputs.]
+      RM-PLT-04: [Очередь задания и повтор без дублирования., Job queue and controlled retry.]
+      RM-MOD-08: [Лимиты задания и управление очередью., Job limits and queue controls.]
+    route:
+      - - [Подать набор, Submit dataset]
+        - [Версия входа и идентичность задания., Input version and job identity.]
+        - RM-DAT-04
+      - - [Принять задание, Admit job]
+        - ['Квота, состояние и ключ повтора.', 'Quota, state and retry key.']
+        - RM-PLT-04
+      - - [Выполнить инференс, Run inference]
+        - [По общему защищённому контракту., Follow the guarded invocation contract.]
+        - RM-MOD-06
+      - - [Опубликовать результат, Publish result]
+        - [Проверка до передачи потребителю., Check before downstream delivery.]
+        - RM-AIC-02
+  GOV-05:
+    required:
+      RM-GOV-03: [Опубликованная версия правил допуска и раскрытия., Published admission and disclosure policy.]
+  SEC-01:
+    required:
+      RM-SEC-01: [Проверяемая идентичность и актуальные права., Verifiable identity and current authority.]
+  GOV-06:
+    required:
+      RM-GOV-04:
+        - Запись о допустимости поставщика и ответственности.
+        - Record provider admission and responsibility.
+  GOV-09:
+    deps:
+      - [SEC-01, uses_result]
+    required:
+      RM-GOV-02: [Отдельные идентичности агента и исполнителя., Distinct agent and executor identities.]
+      RM-GOV-03: [Условия делегирования и отзыв полномочий., Delegation constraints and revocation.]
+  KNW-01:
+    options: [search]
+    required:
+      RM-DAT-04: [Допущенная версия корпуса и индекса., An admitted corpus and index version.]
+      RM-DAT-07:
+        - Подготовка индекса под выбранный способ поиска.
+        - Build the index for the selected retrieval method.
+    variants:
+      - when:
+          search: vector
+        required:
+          RM-MOD-09:
+            - Векторные представления для выбранного способа поиска.
+            - Embeddings for the selected retrieval method.
+  KNW-02:
+    deps:
+      - [KNW-01, uses_result]
+    required:
+      RM-DAT-07: [Извлечение по готовому индексу., Retrieve from the existing index.]
+      RM-DPR-06:
+        - Проверка доступа к фрагментам до передачи модели.
+        - Authorize fragments before providing them to the model.
+  KNW-03:
+    deps:
+      - [KNW-02, calls]
+      - [CORE-01, calls]
+    required:
+      RM-AGT-03: [Сборка допустимого контекста с происхождением., Assemble permitted context with provenance.]
+      RM-APP-01: [Точка выдачи ответа с проверяемыми источниками., Deliver the answer with traceable sources.]
+    route:
+      - - [Запрос к источникам, Ask the sources]
+        - [Назначение и область доступа сотрудника., Determine purpose and access scope.]
+        - RM-SEC-01
+      - - [Поиск, Retrieve]
+        - [Используется допущенная версия индекса., Use the admitted index version.]
+        - RM-DAT-07
+      - - [Отбор контекста, Authorize context]
+        - [Права на фрагменты до LLM., Check fragment access before the LLM.]
+        - RM-DPR-06
+      - - [Вызов модели, Call model]
+        - [С допущенными источниками., With the admitted source excerpts.]
+        - RM-MOD-06
+      - - [Проверить ответ, Check answer]
+        - [Выдача и связь с источниками., Verify delivery and source grounding.]
+        - RM-AIC-02
+  AGT-01:
+    deps:
+      - [CORE-01, calls]
+      - [GOV-09, uses_result]
+    required:
+      RM-AGT-02: [Управление запуском и контекстом агента., Manage the agent run and context.]
+      RM-AGT-04: [Предложение и маршрутизация чтения., Route and scope proposed reads.]
+      RM-ACT-01: [Решение о точной операции., Decide on the exact operation.]
+      RM-ACT-02: [Исполнение решения у ресурса., Enforce the decision at the resource.]
+      RM-INT-02: [Вызов допущенного ресурса через адаптер., Invoke the admitted resource through an adapter.]
+  AGT-03:
+    options: [executor]
+    deps:
+      - [CORE-01, calls]
+      - [GOV-09, uses_result]
+      - [REL-02, uses_result]
+    required:
+      RM-AGT-02: [Запуск и цикл агентного исполнения., Manage the agent run and loop.]
+      RM-AGT-04: [Канонические параметры предлагаемого действия., Normalize the proposed action parameters.]
+      RM-ACT-01:
+        - Решение по актуальным правам и точному ресурсу.
+        - Decide on current authority and the exact resource.
+      RM-ACT-02: [Принуждение допуска у фактического исполнителя., Enforce admission at the actual executor.]
+      RM-AIC-04: [Согласование записи с привязкой к параметрам., Bind approval to the write parameters.]
+      RM-INT-02: [Защищённый адаптер инструментальной операции., Protected tool operation adapter.]
+      RM-AGT-05:
+        - Состояние операции и сверка перед повтором.
+        - Persist operation state and reconcile before retry.
+    variants:
+      - when:
+          executor: code
+        deps:
+          - [DEV-08, uses_result]
+        required:
+          RM-ACT-03: [Код и команды исполняются в допущенной изоляции., Run code and commands in admitted isolation.]
+    route:
+      - - [Запустить агента, Start the run]
+        - [Закреплены версия и полномочия., Pin version and authority.]
+        - RM-AGT-02
+      - - [Проверить предложение, Check proposal]
+        - [Выход модели до маршрутизации., Check model output before routing.]
+        - RM-AIC-02
+      - - [Допустить действие, Admit action]
+        - [G7 проверяет права и параметры., G7 checks authority and arguments.]
+        - RM-ACT-02
+      - - [Выполнить запись, Apply write]
+        - [У фактического ресурса., At the actual resource.]
+        - RM-INT-02
+      - - [Проверить эффект, Verify effect]
+        - [Возврат через проверку и сверку., Check the returned result and reconcile.]
+        - RM-AGT-05
+  DEV-08:
+    required:
+      RM-ACT-03:
+        - Версия ограничений файлов, сети, команд и ресурсов.
+        - Versioned restrictions on files, network, commands and resources.
+      RM-SEC-02: [Фактически закрытые пути сетевого обхода., Enforced network boundaries.]
+  REL-02:
+    deps:
+      - [EVA-02, uses_result]
+    required:
+      RM-DEV-09: [Решение о выпуске точного манифеста., Admit the exact manifest for release.]
+      RM-TRS-05: [Происхождение проверенной версии., Provenance for the verified version.]
+  EVA-02:
+    required:
+      RM-DEV-07: [Независимый результат оценки., Independent evaluation evidence.]
+      RM-DAT-05: [Версия критериев и контрольного набора., Versioned criteria and evaluation set.]
+  DAT-08:
+    required:
+      RM-DAT-04: [Допущенная версия и происхождение набора., Admitted dataset version and provenance.]
+  MOD-04:
+    deps:
+      - [DAT-08, uses_result]
+      - [EVA-02, triggers]
+    required:
+      RM-MOD-01: [Допущенная исходная модель., Admitted base model.]
+      RM-DEV-04: [Воспроизводимое задание адаптации., Reproducible adaptation job.]
+      RM-DEV-05: [Связь запуска с кодом и данными., Link the run to code and data.]
+      RM-MOD-05: [Версия кандидата и базовой модели., Candidate and base model versions.]
+    route:
+      - - [Принять входы, Admit inputs]
+        - [Версии модели и примеров., Base model and example versions.]
+        - RM-DAT-04
+      - - [Выполнить адаптацию, Adapt]
+        - [Код и параметры задания., Job code and parameters.]
+        - RM-DEV-04
+      - - [Сохранить кандидата, Record candidate]
+        - [Вес или адаптер связан с источником., Link the weights or adapter to the base.]
+        - RM-MOD-05
+      - - [Открыть оценку, Trigger evaluation]
+        - [Независимая проверка версии., Independently assess the candidate version.]
+        - RM-DEV-07
+  MOD-09:
+    options: [training]
+    deps:
+      - [DAT-08, uses_result]
+      - [EVA-02, triggers]
+    required:
+      RM-DEV-04: [Управление заданием обучения., Manage the training job.]
+      RM-DEV-05:
+        - Метрики, параметры и версии эксперимента.
+        - Capture experiment metrics, parameters and versions.
+      RM-PLT-02: [Выделение вычислительных ресурсов., Schedule compute resources.]
+      RM-MOD-05: [Регистрация кандидата с происхождением., Register the candidate and its provenance.]
+    variants:
+      - when:
+          training: multi
+        required:
+          RM-HW-02:
+            - Ресурсы ускорения по профилю многоузловой нагрузки.
+            - Accelerator resources for the selected multi-node workload.
+          RM-HW-05: [Связность вычислительных узлов., Connectivity among compute nodes.]
+          RM-DEV-11:
+            - Состав участников, обмен и восстановление обучения.
+            - Worker membership, exchange, and distributed execution.
+          RM-DEV-12: [Согласованное состояние весов и оптимизатора., Consistent weights and optimizer state.]
+    route:
+      - - [Подготовить корпус, Prepare corpus]
+        - [Версия и происхождение., Version and provenance.]
+        - RM-DAT-04
+      - - [Выделить ресурсы, Schedule resources]
+        - [Топология вычислений по профилю., Topology appropriate to the workload.]
+        - RM-PLT-02
+      - - [Выполнить обучение, Train]
+        - [Журнал задания и параметры., Job history and parameters.]
+        - RM-DEV-04
+      - - [Сохранить состояние, Record state]
+        - [Контрольные точки по режиму исполнения., Checkpoints according to execution mode.]
+        - RM-DEV-05
+      - - [Передать кандидата, Deliver candidate]
+        - [Версия и результаты задания., Candidate version and run evidence.]
+        - RM-MOD-05
+  MOD-12:
+    deps:
+      - [DAT-08, uses_result]
+      - [EVA-02, triggers]
+    required:
+      RM-DEV-01: [Версия спецификации архитектуры и кода., Versioned architecture specification and code.]
+      RM-DEV-02: [Рабочая среда сравнительных экспериментов., Workspace for comparative experiments.]
+      RM-DEV-04: [Воспроизводимый прототип обучения., Reproducible training prototype.]
+      RM-DEV-05: ['Трасса гипотез, параметров и сравнений.', 'Trace hypotheses, parameters, and comparisons.']
+    route:
+      - - [Гипотеза, Hypothesis]
+        - [Критерии и версия архитектуры., Criteria and architecture version.]
+        - RM-DEV-01
+      - - [Эксперименты, Experiments]
+        - [Условия сравнения и затраты., Comparison conditions and costs.]
+        - RM-DEV-05
+      - - [Прототип, Prototype]
+        - [Воспроизводимое задание., Reproducible job.]
+        - RM-DEV-04
+      - - [Квалификация, Qualification]
+        - [Отдельная оценка кандидата., Separate candidate assessment.]
+        - RM-DEV-07
+  RET-02:
+    deps:
+      - [SEC-01, uses_result]
+    required:
+      RM-GOV-01: [Учёт выводимого актива и зависимостей., Track the retiring asset and dependencies.]
+      RM-TRS-07: [Отзыв полномочий и остановка новых операций., Revoke authority and stop new operations.]
+      RM-OPS-07: [Протокол изменения маршрутов и конфигурации., Track route and configuration changes.]
+      RM-SEC-07: [Допустимое сохранение свидетельств., Retain permitted evidence.]
+    route:
+      - - [Определить область, Identify scope]
+        - [Зависимости и действующие маршруты., Dependencies and active routes.]
+        - RM-GOV-01
+      - - [Отозвать доступ, Revoke access]
+        - [Закрыть новые операции., Stop new operations.]
+        - RM-TRS-07
+      - - [Отключить маршруты, Disable routes]
+        - [Проверить производные данные., Check derivative data.]
+        - RM-OPS-07
+      - - [Сохранить свидетельства, Retain evidence]
+        - [Завершить G9 по политике., Close G9 under policy.]
+        - RM-SEC-07

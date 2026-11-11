@@ -20,7 +20,7 @@ jobs:
       - name: Validate model
         run: python tools/validate.py
       - name: Build map
-        run: python tools/build.py
+        run: python tools/build.py --no-routes
         env:
           AINO_REPOSITORY: ${{ github.server_url }}/${{ github.repository }}
       - uses: actions/upload-artifact@v4

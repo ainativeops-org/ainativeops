@@ -1,0 +1,270 @@
+# Процесс на карте / Process on the map: FLOW-MODERNIZE
+# workflow: узлы и переходы схемы; SVG схемы строит tools/build.py через Graphviz.
+# workflow: diagram nodes and edges; tools/build.py renders the SVG with Graphviz.
+name:
+  ru: Модернизация ИТ-системы с помощью ИИ
+  en: AI-assisted Application Modernization
+group: DEV
+owner:
+  - Владелец действующей системы совместно с владельцами данных и интеграций.
+  - Existing system owner with data and integration owners.
+start:
+  - 'Для работающей системы согласована причина изменения: риск поддержки, стоимость, производительность или новая потребность.'
+  - 'A running system has an agreed reason for change: support risk, cost, performance or a new requirement.'
+result:
+  - Новая версия обслуживает согласованный объём нагрузки; совместимость, перенос данных и оставшиеся ограничения подтверждены.
+  - The new version serves the agreed workload; compatibility, data migration and residual limitations are verified.
+check:
+  - Сверены данные, контракты и показатели старой и новой систем. Ошибка переключения в репетиции приводит к безопасному восстановлению либо явной компенсации.
+  - Reconcile data, contracts and measures between old and new systems. A rehearsed cutover failure leads to safe recovery or explicit compensation.
+maturity:
+  - Практика изменения действующих систем; сложность определяется данными и обратимостью.
+  - Established change practice; complexity depends on data and reversibility.
+calls:
+  - id: FLOW-ADMISSION
+    when:
+      - Когда к переключению подготовлена новая конфигурация ИИ-системы.
+      - When a new AI system configuration is ready for cutover.
+  - id: FLOW-RECOVERY
+    when:
+      - Если безопасное восстановление выходит за пределы штатного отката версии.
+      - When safe restoration exceeds routine version rollback.
+order: 2
+protection:
+  - Каждый вызов модели проходит проверку идентичности и прав, защиту входа и выхода и аудит в разрешённом объёме. Вызовы инструментов допускаются отдельно; код исполняется в изолированной среде. Согласование и ограничения раскрытия задаются политикой.
+  - Every model call uses identity and authorization checks, input and output protections, and permitted audit retention. Tool calls are authorized separately; code runs in a sandbox. Approval and disclosure restrictions follow policy.
+parts:
+  - CORE-01
+  - FLOW-MODERNIZE--SCOPE
+  - FLOW-MODERNIZE--INVENTORY
+  - FLOW-MODERNIZE--BASELINE
+  - FLOW-MODERNIZE--PLAN
+  - FLOW-MODERNIZE--READINESS
+  - FLOW-MODERNIZE--IMPLEMENT
+  - FLOW-MODERNIZE--SHADOW
+  - FLOW-MODERNIZE--CUTOVER
+tags: [AI-assisted Application Modernization]
+path: process-flow-modernize
+workflow:
+  summary:
+    - 'Для работающей системы согласована причина изменения: риск поддержки, стоимость, производительность или новая потребность. Новая версия обслуживает согласованный объём нагрузки; совместимость, перенос данных и оставшиеся ограничения подтверждены.'
+    - 'A running system has an agreed reason for change: support risk, cost, performance or a new requirement. The new version serves the agreed workload; compatibility, data migration and residual limitations are verified.'
+  synthesis:
+    - Последовательность, условия переходов и сопоставление компонентов — проектный синтез AiNativeOps. Источники подтверждают отдельные практики в указанной области, а не всю схему.
+    - The sequence, conditions and component mapping are AiNativeOps design synthesis. Sources support individual practices within their stated scope, not the entire diagram.
+  basis:
+    - source: P20-MODERNIZE
+      claim:
+        - Анализ приложений, планирование модернизации, преобразование и развёртывание; эквивалентность определяется критериями конкретной системы.
+        - Covers application analysis, modernization planning, transformation, and deployment; the criteria of the specific system define equivalence.
+    - source: UBER-SOFTWARE-FACTORY
+      claim:
+        - Агентные задачи разработки и CI, человеческое review и эскалации, декомпозиция основной моделью и выполнение подагентами.
+        - Covers agentic development and CI tasks, human review and escalations, and task decomposition by a primary model with execution by subagents.
+    - source: SLSA
+      claim:
+        - Происхождение связывает артефакт с материалами и способом его построения.
+        - Provenance links an artifact to its materials and to the way it was built.
+    - source: AZURE-SAFE-ROLLOUT
+      claim:
+        - Изолированная проверка новой версии, shadow-трафик и постепенное переключение production-трафика. Критерии отката задаёт организация.
+        - Covers isolated testing of a new version, shadow traffic, and gradual shifting of production traffic. The organization defines the rollback criteria.
+  nodes:
+    - id: scope
+      label: [Цель и окно изменения, Change goal and window]
+      detail:
+        - Задать исходную проблему, критичные функции, допустимый перерыв, ограничения данных и владельца решения о переключении.
+        - Define the problem, critical functions, tolerable interruption, data restrictions and cutover authority.
+      kind: step
+      components:
+        architecture: [b_regchange, b_goal, b_np, g8]
+        infrastructure: [business-apps, metrics-alerts]
+        stack: [RM-OPS-07, RM-OPS-01, RM-GOV-04]
+    - id: inventory
+      label: [Карта наследия и зависимостей, Legacy and dependency inventory]
+      detail:
+        - Снять версии, схемы, интеграции, права и невидимые зависимости по трассам. Если ИИ читает код или логи, оставить только разрешённые фрагменты и провести каждый вызов через входные и выходные guardrails.
+        - Inventory versions, schemas, integrations, permissions and hidden dependencies using traces. If AI reads code or logs, retain only authorized fragments and apply input and output guardrails to every invocation.
+      kind: step
+      components:
+        architecture: [mt_tb, t_repo, t_audit, v4, t_input, t_infer, t_result]
+        infrastructure:
+          - git-repository
+          - context-manager
+          - log-metric-store
+          - data-discovery
+          - input-guardrails
+          - llm-gateway
+          - output-guardrails
+        stack:
+          - RM-DEV-01
+          - RM-AGT-03
+          - RM-OPS-02
+          - RM-DPR-01
+          - RM-OPS-07
+          - RM-AIC-01
+          - RM-MOD-06
+          - RM-AIC-02
+    - id: baseline
+      label: [Эталон текущего поведения, Current behavior baseline]
+      detail:
+        - Зафиксировать выборки, контракты, SLO и известные расхождения. Отделить дефекты, которые исправляем, от поведения, которое обязано сохраниться, и запретить запись в продуктивные системы из теста.
+        - Pin datasets, contracts, SLOs and known discrepancies. Separate intentional fixes from behavior that must remain and prohibit test writes to production systems.
+      kind: step
+      components:
+        architecture: [v1, g4, mt_indep, t_prod]
+        infrastructure: [eval-datasets, eval-red-teaming, log-metric-store]
+        stack: [RM-DAT-05, RM-DEV-07, RM-OPS-01, RM-OPS-07]
+    - id: plan
+      label: [План совместимости и миграции, Compatibility and migration plan]
+      detail:
+        - Выбрать последовательность совместимых изменений интерфейсов и данных. Определить сверку, контрольную точку, момент необратимости, процедуру отката или компенсации и ограничение параллельной работы.
+        - Choose a sequence of compatible API and data changes. Define reconciliation, checkpoints, the point of irreversibility, rollback or compensation and the parallel-run limit.
+      kind: step
+      components:
+        architecture: [v4, b_regchange, mt_assess, mt_residual]
+        infrastructure: [git-repository, archive-backup, cd-deployment]
+        stack: [RM-DEV-01, RM-PLT-05, RM-OPS-07, RM-OPS-08, RM-DEV-10]
+    - id: readiness
+      label: ['Миграция и возврат безопасны?', 'Are migration and recovery safe?']
+      detail:
+        - Проверить на копии восстановление, повтор операции, разрешения и измеримое окно простоя. Зафиксировать критерии сверки и согласие владельцев на действия после необратимой точки.
+        - Rehearse restore, replay, permissions and the measurable downtime window on a copy. Record reconciliation criteria and owner approval for steps beyond the point of no return.
+      kind: decision
+      components:
+        architecture: [g2, mt_residual, mt_ev, b_ownrisk]
+        infrastructure: [archive-backup, eval-red-teaming, rule-based-checks]
+        stack: [RM-OPS-08, RM-DEV-07, RM-AIC-04, RM-GOV-04]
+    - id: implement
+      label: [Подготовка совместимой версии, Prepare the compatible version]
+      detail:
+        - 'Собрать изменение и миграционные операции в CI. Агент меняет код и тесты только в изолированной среде: каждый модельный вызов проходит входные и выходные guardrails, а операции по коду, данным и CI проверяет PEP.'
+        - 'Build the change and migration operations in CI. Agents edit code and tests only in the sandbox: every model call passes input and output guardrails, and PEP checks code, data and CI operations.'
+      kind: step
+      components:
+        architecture: [v2, v3, t_harness, t_gw, s_scan, t_input, t_infer, t_result]
+        infrastructure:
+          - job-sandbox
+          - agent-runtime
+          - pep
+          - ci-runner
+          - artifact-registry
+          - input-guardrails
+          - llm-gateway
+          - output-guardrails
+        stack:
+          - RM-ACT-03
+          - RM-AGT-02
+          - RM-ACT-02
+          - RM-DEV-06
+          - RM-DEV-08
+          - RM-AIC-01
+          - RM-MOD-06
+          - RM-AIC-02
+    - id: shadow
+      label: ['Параллельная проверка сошлась?', 'Does parallel validation reconcile?']
+      detail:
+        - Проверить копию нагрузки без повторных внешних эффектов, сопоставить строки и бизнес-результаты, задержку и ошибки с эталоном. Для ИИ-функций проверять кандидата только по разрешённому маршруту с входными и выходными guardrails.
+        - Run mirrored workload without duplicating external effects. Reconcile records, business results, latency and errors against baseline. Exercise AI features only through authorized routes with input and output guardrails.
+      kind: decision
+      components:
+        architecture: [o_eval, mt_indep, v4, s_runtime, t_input, t_infer, t_result]
+        infrastructure:
+          - eval-red-teaming
+          - eval-datasets
+          - rule-based-checks
+          - metrics-alerts
+          - input-guardrails
+          - llm-gateway
+          - output-guardrails
+        stack: [RM-DEV-07, RM-DAT-05, RM-OPS-01, RM-ACT-02, RM-AIC-01, RM-MOD-06, RM-AIC-02]
+    - id: cutover
+      label: ['Переключение в допустимых пределах?', 'Is cutover within bounds?']
+      detail:
+        - Проверить разрешение на точный манифест, провести малую волну переключения и сверить данные. Если в ней вызывается модель, входные и выходные guardrails сохраняются и для старой, и для новой версии. Остановить дальнейшее движение при нарушении целостности, доступа или SLO; сохранить сведения о уже совершённых действиях.
+        - Verify authorization for the exact manifest, cut over a small cohort and reconcile data. When it invokes a model, input and output guardrails apply on both versions. Stop further rollout on integrity, access or SLO violations and record effects already committed.
+      kind: decision
+      components:
+        architecture: [g6, o_release, g7, s_change, t_audit]
+        infrastructure: [release-gate, cd-deployment, metrics-alerts, audit-log]
+        stack: [RM-DEV-09, RM-DEV-10, RM-OPS-01, RM-OPS-07, RM-TRS-04]
+    - id: rollback
+      label: [Откат или компенсация, Rollback or compensation]
+      detail:
+        - Закрыть новые записи и переключить только на совместимую ранее допущенную конфигурацию. После точки необратимости изолировать затронутые данные и применить утверждённую компенсацию или передать управление восстановлению.
+        - Stop new writes and switch only to a compatible previously admitted configuration. Beyond the point of no return, isolate affected data and apply approved compensation or hand over to recovery.
+      kind: step
+      components:
+        architecture: [s_resp, s_change, mt_ev]
+        infrastructure: [cd-deployment, archive-backup, kill-switch, audit-log]
+        stack: [RM-DEV-10, RM-OPS-08, RM-TRS-07, RM-TRS-04]
+    - id: stable
+      label: [Изменение стабилизировано, Change stabilized]
+      detail:
+        - Новая версия подтверждена на согласованной нагрузке. Отключение старого маршрута выполняется по плану после окна возврата; сверка и границы поддержки переданы владельцу.
+        - The new version is verified on the agreed load. Retire the old route after the rollback window per plan; hand reconciliation and support limits to the owner.
+      kind: outcome
+      components:
+        architecture: [o_ops, mt_review, g8]
+        infrastructure: [cd-deployment, metrics-alerts, audit-log]
+        stack: [RM-DEV-10, RM-OPS-01, RM-OPS-07, RM-TRS-04]
+    - id: hold
+      label: [Миграция остановлена, Migration stopped]
+      detail:
+        - Сохранить подтверждённую безопасную конфигурацию или зарегистрировать необходимость восстановления. Зафиксировать нерешённые расхождения и состояние данных для владельца.
+        - Retain the verified safe configuration or record the need for recovery. Preserve unresolved discrepancies and data state for the owner.
+      kind: outcome
+      components:
+        architecture: [b_ownproc, s_resp, t_audit]
+        infrastructure: [audit-log, archive-backup]
+        stack: [RM-TRS-04, RM-OPS-07, RM-OPS-08]
+  edges:
+    - from: scope
+      to: inventory
+      label: [Объём согласован, Scope agreed]
+    - from: inventory
+      to: baseline
+      label: [Зависимости описаны, Dependencies recorded]
+    - from: inventory
+      to: hold
+      label: [Критичный доступ или связь не подтверждены, Critical access or dependency unverified]
+    - from: baseline
+      to: plan
+      label: [Эталон зафиксирован, Baseline pinned]
+    - from: plan
+      to: readiness
+      label: [План и критерии определены, Plan and criteria defined]
+    - from: readiness
+      to: implement
+      label: [Репетиция и допуск пройдены, Rehearsal and admission pass]
+    - from: readiness
+      to: plan
+      label: [Нужна более обратимая схема, More reversible design needed]
+    - from: readiness
+      to: hold
+      label: [Риск не принят, Risk not accepted]
+    - from: implement
+      to: shadow
+      label: [Точная сборка готова, Exact build available]
+    - from: implement
+      to: hold
+      label: [Операция выходит за полномочия, Operation exceeds authority]
+    - from: shadow
+      to: cutover
+      label: [Совместимость подтверждена, Compatibility confirmed]
+    - from: shadow
+      to: plan
+      label: [Устранимое расхождение в лимите, 'Bounded, fixable discrepancy']
+    - from: shadow
+      to: hold
+      label: [Критический дефект или исчерпан лимит, Critical defect or limit reached]
+    - from: cutover
+      to: stable
+      label: [Данные и SLO подтверждены, Data and SLOs verified]
+    - from: cutover
+      to: rollback
+      label: [Порог или целостность нарушены, Threshold or integrity breached]
+    - from: rollback
+      to: hold
+      label: ['Прогресс остановлен, статус записан', Promotion stopped and state recorded]
+  main: [scope, inventory, baseline, plan, readiness, implement, shadow, cutover, stable]

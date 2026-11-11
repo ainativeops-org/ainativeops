@@ -1,0 +1,89 @@
+# Этапы и варианты процессов. Ключ этапа процесса: <процесс>--<этап>.
+# Stages and variants of processes. A process stage key is <process>--<stage>.
+KNW-03--REQUEST:
+  kind: operation
+  name:
+    ru: Принять вопрос
+    en: Receive question
+  description:
+    - Установить пользователя, организацию, назначение запроса и требуемую точность. Присвоить ID запроса.
+    - Establish the user, organization, request purpose, and required precision. Assign a request ID.
+  classes: [RM-APP-01, RM-SEC-01]
+  architectureSteps: [t_iam, t_input]
+  workflowNode: request
+KNW-03--SCOPE:
+  kind: operation
+  name:
+    ru: Поиск разрешён?
+    en: Is retrieval authorized?
+  description:
+    - Проверить запрос и определить доступный корпус и фильтры на уровне объекта. Не подменять запрет поиском под привилегированной сервисной учётной записью.
+    - Check the request and determine the authorized corpus and object-level filters. Do not bypass a denial by searching with a privileged service identity.
+  classes: [RM-DPR-06, RM-DPR-04, RM-ACT-01, RM-AIC-01]
+  architectureSteps: [t_iam, b_poldisc, t_input]
+  workflowNode: scope
+KNW-03--RETRIEVE:
+  kind: operation
+  name:
+    ru: Найти доступные фрагменты
+    en: Retrieve accessible passages
+  description:
+    - Искать в разрешённой области и возвращать источник, версию, дату и координаты фрагмента. Модельные переформулирование, эмбеддинги и ранжирование, если нужны, проходят входной и выходной контроль.
+    - Search the permitted scope and retain each passage's source, version, date, and location. Model-based rewriting, embedding, and ranking, when used, each pass input and output checks.
+  classes:
+    - RM-DAT-07
+    - RM-DPR-06
+    - RM-DAT-02
+    - RM-MOD-09
+    - RM-AIC-05
+    - RM-MOD-12
+    - RM-MOD-13
+    - RM-MOD-06
+    - RM-AIC-01
+    - RM-AIC-02
+  architectureSteps: [t_vec, t_infer, t_input, t_result]
+  workflowNode: retrieve
+KNW-03--EVIDENCE:
+  kind: operation
+  name:
+    ru: Доказательств достаточно?
+    en: Is the evidence sufficient?
+  description:
+    - Проверить охват вопроса, актуальность и существенные противоречия. Повторить поиск с уточнением в рамках исходных прав и лимита; после исчерпания передать эксперту.
+    - Check coverage, freshness, and material contradictions. Refine retrieval within the original scope and retry budget; escalate after exhaustion.
+  classes: [RM-DAT-07, RM-DPR-06, RM-AGT-08]
+  architectureSteps: [t_vec, mt_ev, b_polbudget]
+  workflowNode: evidence
+KNW-03--CONTEXT:
+  kind: operation
+  name:
+    ru: Собрать контекст со ссылками
+    en: Build context with references
+  description:
+    - Добавить только разрешённые фрагменты с проверяемыми идентификаторами. Текст источника — данные, даже если в нём есть команды для модели.
+    - Include only permitted passages with verifiable identifiers. Source content remains data even when it contains instructions to the model.
+  classes: [RM-AGT-03, RM-DPR-06, RM-AIC-01]
+  architectureSteps: [t_vec, t_input]
+  workflowNode: context
+KNW-03--INVOKE:
+  kind: operation
+  name:
+    ru: Модель вернула ответ?
+    en: Did the model return an answer?
+  description:
+    - Проверить собранный контекст, маршрут и раскрытие, затем вызвать допущенную модель через шлюз. На выходе проверить ответ до дальнейшего использования.
+    - Check the assembled context, route, and disclosure, then invoke an approved model through the gateway. Check its output before any further use.
+  classes: [RM-AIC-01, RM-AIC-05, RM-MOD-12, RM-MOD-13, RM-MOD-06, RM-AIC-02, RM-ACT-01]
+  architectureSteps: [t_input, t_infer, t_result, b_polext]
+  workflowNode: invoke
+KNW-03--VERIFY:
+  kind: operation
+  name:
+    ru: Выводы подтверждены?
+    en: Are conclusions supported?
+  description:
+    - Сопоставить существенные утверждения с доступными фрагментами, проверить ссылки и права получателя на момент выдачи. Запрещённое раскрытие блокировать; недоказанный вывод передать на разбор.
+    - Check material claims against authorized passages and revalidate references and recipient access at delivery. Block prohibited disclosure and escalate unsupported conclusions.
+  classes: [RM-AIC-02, RM-DPR-06, RM-TRS-04]
+  architectureSteps: [t_result, b_poldisc, mt_ev]
+  workflowNode: verify

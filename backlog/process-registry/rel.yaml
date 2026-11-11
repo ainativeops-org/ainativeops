@@ -1,0 +1,91 @@
+# Реестр процессов · Выпуск / Process registry · Release
+REL-01:
+  name:
+    ru: Сборка пакета и подтверждение происхождения
+    en: Release build and provenance
+  start:
+    - Исходники, зависимости и артефакты допущены к сборке.
+    - Sources, dependencies and artifacts are admitted to the build.
+  result:
+    - Идентифицируемый пакет с манифестом материалов и результатами проверок.
+    - An identifiable package with a bill of materials and check results.
+  check:
+    - Подмена материала или хеша пакета разрывает связь с испытаниями. Подпись происхождения не подтверждает качество.
+    - Substituting a material or the package hash breaks the link to test results. A provenance signature does not confirm quality.
+  gates: G5
+  classes: [RM-DEV-06, RM-DEV-08, RM-SEC-04, RM-TRS-05, RM-TRS-06]
+REL-02:
+  name:
+    ru: Допуск версии к выпуску
+    en: Release approval
+  start:
+    - Есть точный пакет, результаты независимой оценки и план отката.
+    - The exact package, independent evaluation results and a rollback plan are available.
+  result:
+    - Решение о допуске конкретной версии и свидетельство решения.
+    - An admission decision for the specific version and evidence of the decision.
+  check:
+    - Выпуск заблокирован при неподходящем артефакте, отсутствии обязательной проверки или просроченном решении.
+    - Release is blocked if the artifact does not match, a mandatory check is missing or the decision has expired.
+  gates: G6
+  classes: [RM-DEV-07, RM-DEV-09, RM-GOV-04, RM-TRS-01, RM-TRS-05]
+REL-03:
+  name:
+    ru: Развёртывание и постепенное включение
+    en: Deployment and progressive rollout
+  start:
+    - Точная версия получила решение о допуске к размещению.
+    - The exact version has received a deployment admission decision.
+  result:
+    - Развёрнутая конфигурация и зарегистрированная доля или область использования.
+    - A deployed configuration and a registered traffic share or scope of use.
+  check:
+    - Сверить фактическую версию, права и метрики включения. Проверочный трафик не повторяет операции записи.
+    - Reconcile the actual version, permissions and rollout metrics. Test traffic does not repeat write operations.
+  gates: G6
+  classes: [RM-DEV-10, RM-PLT-05, RM-MOD-06, RM-OPS-01, RM-OPS-05]
+REL-04:
+  name:
+    ru: Откат рабочей конфигурации
+    en: Deployment rollback
+  start:
+    - Превышены пороги риска, ошибки или деградации.
+    - Risk, error or degradation thresholds are exceeded.
+  result:
+    - Возврат к допущенной конфигурации или безопасная остановка.
+    - A return to an admitted configuration or a safe stop.
+  check:
+    - Проверить совместимость данных, актуальные права и сверку совершённых действий. Откат версии не отменяет уже выполненную операцию.
+    - Check data compatibility, current permissions and reconciliation of completed actions. A version rollback does not undo an operation already performed.
+  gates: G6 G8
+  classes: [RM-DEV-10, RM-OPS-07, RM-OPS-05, RM-TRS-07]
+REL-05:
+  name:
+    ru: Передача артефакта за границу домена
+    en: Cross-domain artifact delivery
+  start:
+    - Внешнему получателю передаются веса, адаптер, набор или пакет приложения.
+    - Weights, an adapter, a dataset or an application package are transferred to an external recipient.
+  result:
+    - Допущенная передача и подтверждение состава и получателя.
+    - An admitted transfer and confirmation of contents and recipient.
+  check:
+    - Проверить права на передачу, целостность, правила раскрытия и использование получателем по профилю.
+    - Check transfer rights, integrity, disclosure rules and the recipient's use according to the profile.
+  gates: G1 G5 G6*
+  classes: [RM-DEV-08, RM-TRS-05, RM-SEC-02, RM-GOV-03, RM-TRS-04]
+REL-06:
+  name:
+    ru: Управление изменением рабочей конфигурации
+    en: Production configuration change control
+  start:
+    - Меняются модель, данные, инструкции, инструмент, память, среда или политика.
+    - The model, data, instructions, a tool, memory, environment or policy changes.
+  result:
+    - Оценка влияния, повторённые проверки и решение по изменению.
+    - An impact assessment, repeated checks and a decision on the change.
+  check:
+    - Определить затронутые версии и маршруты. Для выпуска новой версии нужен действующий допуск, привязанный к ней.
+    - Identify affected versions and routes. Releasing a new version requires a valid admission bound to it.
+  gates: G8 G6*
+  classes: [RM-OPS-07, RM-GOV-01, RM-GOV-04, RM-DEV-07, RM-TRS-05]

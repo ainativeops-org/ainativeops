@@ -1,0 +1,28 @@
+# Маршрут / Route: Расследование и устранение инцидента безопасности ИИ / AI Security Incident Response
+# Шаг = [элемент, [участники]] / Step = [element, [participants]]
+order: 25
+name:
+  ru: Расследование и устранение инцидента безопасности ИИ
+  en: AI Security Incident Response
+routes:
+  stack:
+    - [RM-SEC-05, [RM-OPS-04, RM-TRS-04, RM-GOV-04, RM-SEC-07, RM-TRS-05, RM-TRS-06, RM-ACT-02, RM-TRS-07]]
+    - [RM-TRS-07, [RM-MOD-12, RM-MOD-13, RM-ACT-02, RM-GOV-02, RM-SEC-02, RM-MOD-06, RM-AIC-01, RM-AIC-02, RM-TRS-04, RM-MOD-07, RM-AIC-05, RM-OPS-06]]
+    - [RM-AGT-05, [RM-INT-02, RM-ACT-02, RM-TRS-04, RM-TRS-07]]
+    - [RM-SEC-04, [RM-SEC-06, RM-TRS-03, RM-GOV-02, RM-OPS-07]]
+    - [RM-DEV-07, [RM-DEV-09, RM-GOV-04, RM-TRS-06]]
+    - [RM-DEV-10, [RM-MOD-06, RM-SEC-05, RM-OPS-01]]
+    - [RM-SEC-07, [RM-TRS-04, RM-TRS-05, RM-OPS-07]]
+  infrastructure:
+    - [siem-soc, [log-metric-store, audit-log, evidence-store, provenance-registry, integrity-monitoring, archive-backup, pep, kill-switch]]
+    - [kill-switch, [request-classifier, model-call-planner, pep, agent-iam, egress-proxy, llm-gateway, input-guardrails, output-guardrails, audit-log, inference-servers, inference-quotas, usage-billing]]
+    - [checkpoint-store, [mcp-servers, erp-crm, pep, audit-log]]
+    - [artifact-registry, [sast-sca-secrets, agent-iam, secrets-manager, pep]]
+    - [release-gate, [eval-red-teaming, integrity-monitoring, audit-log]]
+    - [cd-deployment, [llm-gateway, siem-soc, metrics-alerts]]
+    - [audit-log, [provenance-registry, archive-backup]]
+  architecture:
+    - [b_regincident, [t_route, t_plan, s_detect, t_siem, t_input, t_infer, t_result, t_audit, t_base]]
+    - [s_detect, [b_np, mt_tb, s_resp, s_runtime]]
+    - [s_resp, [s_runtime, t_gw, mt_ev, t_audit, g7, s_change, g8, g6, o_ops, t_siem]]
+    - [b_regincident, [s_resp, mt_ev]]

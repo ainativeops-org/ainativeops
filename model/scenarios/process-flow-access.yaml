@@ -1,0 +1,22 @@
+# Маршрут / Route: Предоставление и пересмотр полномочий сотрудников и агентов / Human and Agent Access Lifecycle
+# Шаг = [элемент, [участники]] / Step = [element, [participants]]
+order: 23
+name:
+  ru: Предоставление и пересмотр полномочий сотрудников и агентов
+  en: Human and Agent Access Lifecycle
+routes:
+  stack:
+    - [RM-SEC-01, [RM-GOV-02, RM-TRS-04, RM-GOV-03, RM-ACT-01, RM-AIC-04, RM-ACT-02, RM-TRS-03, RM-OPS-06]]
+    - [RM-GOV-03, [RM-GOV-04, RM-ACT-01, RM-TRS-04]]
+    - [RM-ACT-01, [RM-ACT-02, RM-SEC-01, RM-TRS-04]]
+    - [RM-GOV-02, [RM-SEC-01, RM-TRS-04]]
+  infrastructure:
+    - [iam-sso, [agent-iam, secrets-manager, usage-billing]]
+    - [pdp, []]
+    - [pep, []]
+    - [audit-log, []]
+  architecture:
+    - [b_polagent, [t_iam, g0, mt_tb, s_runtime]]
+    - [b_ownproc, [b_polagent, t_iam, b_owndata, mt_indep]]
+    - [t_iam, [t_gw, s_runtime, g7]]
+    - [t_audit, [t_iam, mt_review]]

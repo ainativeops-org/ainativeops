@@ -1,0 +1,581 @@
+# Этапы и варианты процессов. Ключ этапа процесса: <процесс>--<этап>.
+# Stages and variants of processes. A process stage key is <process>--<stage>.
+CORE-01:
+  kind: subprocess
+  name:
+    ru: Защищённый вызов модели
+    en: Guarded model invocation
+  description:
+    - Защищённый вызов модели. Повторно используемый маршрут внутри основного процесса.
+    - Guarded model invocation. A reusable route within the main process.
+  start:
+    - Потребитель подаёт запрос и контекст по разрешённому маршруту.
+    - A consumer submits a request and context through a permitted route.
+  result:
+    - Проверенный результат или безопасный отказ с коррелированным аудитом.
+    - A checked result or a safe denial with correlated audit.
+  check:
+    - Запрещённый вход не вызывает модель. Выход проверяется перед передачей любому потребителю; при недоступном обязательном контроле нет обхода.
+    - Prohibited input does not invoke the model. Output is checked before it reaches any consumer; when a mandatory control is unavailable, nothing bypasses it.
+  classes:
+    - RM-SEC-01
+    - RM-AIC-01
+    - RM-GOV-03
+    - RM-AIC-05
+    - RM-MOD-12
+    - RM-MOD-13
+    - RM-MOD-06
+    - RM-MOD-07
+    - RM-AIC-02
+    - RM-TRS-04
+    - RM-SEC-02
+    - RM-MOD-03
+  alternative: false
+  option: placement
+  paths:
+    local: core-local
+    external: core-external
+FLOW-HYBRID:
+  kind: subprocess
+  name:
+    ru: Гибридный инференс по политикам
+    en: Policy-controlled hybrid inference
+  description:
+    - Гибридный инференс по политикам. Повторно используемый маршрут внутри основного процесса.
+    - Policy-controlled hybrid inference. A reusable route within the main process.
+  classes:
+    - RM-APP-01
+    - RM-SEC-01
+    - RM-DPR-01
+    - RM-AIC-01
+    - RM-GOV-03
+    - RM-AIC-05
+    - RM-MOD-12
+    - RM-MOD-13
+    - RM-MOD-06
+    - RM-ACT-01
+    - RM-AGT-08
+    - RM-MOD-07
+    - RM-MOD-01
+    - RM-DEV-08
+    - RM-AIC-02
+    - RM-TRS-04
+    - RM-OPS-01
+    - RM-OPS-06
+    - RM-DPR-02
+    - RM-TRS-02
+    - RM-SEC-02
+    - RM-MOD-03
+    - RM-TRS-03
+    - RM-DPR-03
+  alternative: false
+  option: placement
+  paths:
+    local: hybrid-local
+    external: hybrid-external
+  workflow:
+    summary:
+      - Выполнить корпоративный запрос через разрешённую внутреннюю или внешнюю модель. Маршрут зависит от категории данных, прав, требований к ответу, бюджета и доступности. Результат — проверенный ответ либо объяснимый отказ.
+      - Execute an enterprise request using an authorized internal or external model. Routing depends on data category, permissions, response requirements, budget, and availability. The outcome is a checked answer or an explained denial.
+    basis:
+      - source: UBER-GATEWAY
+        claim:
+          - Uber описывает единый доступ к собственным и внешним моделям, обработку PII, авторизацию и аудит.
+          - Uber documents unified access to its own and external models, PII handling, authorization, and audit.
+      - source: AWS-MULTI-GATEWAY
+        claim:
+          - AWS описывает маршрутизацию, guardrails, контроль доступа, retry и failover между размещениями моделей.
+          - AWS documents routing, guardrails, access controls, retry, and failover across model deployments.
+    synthesis:
+      - Развилки, условия допустимости, лимит повторов и конечные исходы — проектная схема AiNativeOps. Внешний маршрут не становится допустимым из-за отказа внутреннего; отказ guardrails не запускает fallback.
+      - The branches, eligibility rules, retry limit, and terminal outcomes are an AiNativeOps design. Internal unavailability does not authorize external use; a guardrail denial does not trigger fallback.
+    nodes:
+      - id: request
+        label: [Запрос и идентичность, Request and identity]
+        kind: step
+        components:
+          architecture: [t_iam]
+          infrastructure: [business-apps, iam-sso]
+          stack: [RM-APP-01, RM-SEC-01]
+        detail:
+          - Установить вызывающего, назначение запроса и ограничения сервиса. Неавторизованный запрос завершить отказом.
+          - Establish the caller, request purpose, and service constraints. Deny an unauthorized request.
+      - id: input
+        label: [Допуск данных и запроса, Admit data and request]
+        kind: decision
+        components:
+          architecture: [t_input, b_poldisc]
+          infrastructure: [data-discovery, input-guardrails]
+          stack: [RM-DPR-01, RM-AIC-01]
+        detail:
+          - Определить категорию данных, проверить запрос и применимые правила обработки до обращения к модели.
+          - Classify the data and check the request and handling policy before any model call.
+      - id: route
+        label: [Выбор допустимого маршрута, Select an eligible route]
+        kind: decision
+        components:
+          architecture: [t_infer, b_polext, b_polbudget]
+          infrastructure: [llm-gateway, pdp, rate-limits-budgets]
+          stack: [RM-MOD-06, RM-ACT-01, RM-GOV-03, RM-AGT-08]
+        detail:
+          - Сначала исключить запрещённые модели и направления передачи данных. Среди допустимых выбрать размещение по требованиям качества, задержки, бюджета и доступности. Повторный выбор заново проверяет эти условия.
+          - First exclude prohibited models and data destinations. Select among eligible deployments using quality, latency, budget, and availability requirements. Re-evaluate these conditions on every reselection.
+      - id: local
+        label: [Внутренний инференс, Internal inference]
+        kind: step
+        components:
+          architecture: [t_infer, t_base]
+          infrastructure: [inference-servers, artifact-registry]
+          stack: [RM-MOD-07, RM-MOD-01, RM-DEV-08]
+        detail:
+          - Вызвать допущенную версию через шлюз. Сервис исполнения использует развёрнутую модель и её ресурсы; внешний провайдер для этой ветви не требуется.
+          - Invoke the approved version through the gateway. The serving service uses the deployed model and its resources; this branch does not require an external provider.
+      - id: external
+        label: [Внешний инференс, External inference]
+        kind: step
+        components:
+          architecture: [t_ext, b_poldisc]
+          infrastructure: [tokenization, token-vault, egress-proxy, external-llm-api, secrets-manager]
+          stack: [RM-MOD-03, RM-DPR-02, RM-TRS-02, RM-SEC-02, RM-TRS-03]
+        detail:
+          - Передать только разрешённый контекст через контролируемый egress. Если политика требует, заменить чувствительные значения и сохранить отображение внутри контура. Ответ также проходит через egress.
+          - Send only authorized context through controlled egress. When policy requires it, replace sensitive values and keep the mapping internally. The response also passes through egress.
+      - id: check
+        label: [Проверка результата, Check the result]
+        kind: decision
+        components:
+          architecture: [t_result]
+          infrastructure: [output-guardrails, role-based-detokenization]
+          stack: [RM-AIC-02, RM-DPR-03]
+        detail:
+          - Проверить безопасность и контракт результата. Восстановление скрытых значений разрешать только для уполномоченного получателя. Заблокированный ответ не пересылать другой модели для обхода проверки.
+          - Check output safety and the response contract. Restore concealed values only for an authorized recipient. Do not send a blocked answer to another model to bypass the check.
+      - id: fallback
+        label: ['Допустим ли повтор?', 'Is a retry allowed?']
+        kind: decision
+        components:
+          architecture: [s_runtime, b_polbudget]
+          infrastructure: [llm-gateway, rate-limits-budgets, metrics-alerts]
+          stack: [RM-MOD-06, RM-AGT-08, RM-OPS-01]
+        detail:
+          - Рассматривать повтор только для технического отказа. Проверить оставшееся время и бюджет; при разрешённом повторе вернуться к policy-проверке маршрута.
+          - Consider retry only after a technical failure. Check remaining time and budget; an allowed retry returns to route policy evaluation.
+      - id: answer
+        label: [Проверенный ответ, Checked answer]
+        kind: outcome
+        components:
+          architecture: [t_audit]
+          infrastructure: [business-apps, audit-log, metrics-alerts]
+          stack: [RM-APP-01, RM-TRS-04, RM-OPS-06]
+        detail:
+          - Выдать проверенный результат и записать выбранную версию, направление, решение политики и эксплуатационные метрики без избыточного сохранения содержимого.
+          - Return the checked result and record the chosen version, destination, policy decision, and operational metrics without excessive content retention.
+      - id: denied
+        label: [Отказ по политике, Policy denial]
+        kind: outcome
+        components:
+          architecture: [t_audit]
+          infrastructure: [audit-log]
+          stack: [RM-TRS-04]
+        detail:
+          - Завершить запрос с понятным основанием отказа. Не выполнять запрещённый вызов и не искать обходной маршрут.
+          - End with an understandable denial reason. Do not make the prohibited call or search for a bypass.
+      - id: unavailable
+        label: [Нет доступного маршрута, No available route]
+        kind: outcome
+        components:
+          architecture: [t_audit]
+          infrastructure: [business-apps, audit-log, metrics-alerts]
+          stack: [RM-APP-01, RM-TRS-04, RM-OPS-01]
+        detail:
+          - Сообщить о недоступности или исчерпании лимита и зафиксировать исход для эксплуатации. Не подменять техническую ошибку выдуманным ответом.
+          - Report unavailability or an exhausted limit and record the operational outcome. Do not replace a technical failure with an invented answer.
+    edges:
+      - from: request
+        to: input
+        label: [Полномочия подтверждены, Caller authorized]
+      - from: request
+        to: denied
+        label: [Нет полномочий, Unauthorized]
+      - from: input
+        to: route
+        label: [Запрос допустим, Request allowed]
+      - from: input
+        to: denied
+        label: [Нарушение политики, Policy violation]
+      - from: route
+        to: local
+        label: [Разрешена внутренняя модель, Internal model allowed]
+      - from: route
+        to: external
+        label: [Разрешена внешняя передача, External transfer allowed]
+      - from: route
+        to: denied
+        label: [Нет разрешённых кандидатов, No authorized candidates]
+      - from: route
+        to: unavailable
+        label: [Допустимые модели недоступны, Eligible models unavailable]
+      - from: local
+        to: check
+        label: [Получен ответ, Response received]
+      - from: external
+        to: check
+        label: [Получен ответ, Response received]
+      - from: local
+        to: fallback
+        label: [Технический отказ, Technical failure]
+      - from: external
+        to: fallback
+        label: [Технический отказ, Technical failure]
+      - from: fallback
+        to: route
+        label: [Повтор в лимите; новая проверка, Retry within limit; re-evaluate]
+      - from: fallback
+        to: unavailable
+        label: [Лимит исчерпан / повтор запрещён, Limit exhausted / retry disallowed]
+      - from: check
+        to: answer
+        label: [Проверки пройдены, Checks passed]
+      - from: check
+        to: denied
+        label: [Выдача запрещена, Delivery prohibited]
+INF-02:
+  kind: subprocess
+  name:
+    ru: Разовый защищённый запрос
+    en: Single guarded request
+  description:
+    - Разовый защищённый запрос. Повторно используемый маршрут внутри основного процесса.
+    - Single guarded request. A reusable route within the main process.
+  start:
+    - Человек отправляет отдельный запрос без использования предыдущих сообщений.
+    - A person sends a standalone request that does not use previous messages.
+  result: [Один проверенный ответ или отказ., One checked answer or a denial.]
+  check:
+    - Проверяются запрос, маршрут и результат. Из другого разговора ничего не подставляется.
+    - The request, route and result are checked. Nothing is inserted from another conversation.
+  classes:
+    - RM-APP-02
+    - RM-SEC-01
+    - RM-AIC-01
+    - RM-GOV-03
+    - RM-AIC-05
+    - RM-MOD-12
+    - RM-MOD-13
+    - RM-MOD-06
+    - RM-MOD-07
+    - RM-AIC-02
+    - RM-TRS-04
+    - RM-OPS-01
+    - RM-SEC-02
+    - RM-MOD-03
+  alternative: true
+  option: placement
+  paths:
+    local: single-turn
+    external: single-turn-external
+INF-03:
+  kind: subprocess
+  name:
+    ru: Защищённый вызов из приложения
+    en: Guarded application call
+  description:
+    - Защищённый вызов из приложения. Повторно используемый маршрут внутри основного процесса.
+    - Guarded application call. A reusable route within the main process.
+  start:
+    - Сервис с собственной идентичностью вызывает разрешённый API модели.
+    - A service with its own identity calls a permitted model API.
+  result:
+    - Ответ по контракту вызывающего сервиса.
+    - A response that follows the calling service's contract.
+  check:
+    - Запрос вне области прав, тайм-аут и ответ вне схемы обрабатываются как задано политикой.
+    - A request outside the granted permissions, a timeout and a response that violates the schema are handled as the policy specifies.
+  classes:
+    - RM-INT-01
+    - RM-SEC-01
+    - RM-APP-01
+    - RM-AIC-01
+    - RM-GOV-03
+    - RM-AIC-05
+    - RM-MOD-12
+    - RM-MOD-13
+    - RM-MOD-06
+    - RM-MOD-07
+    - RM-AIC-02
+    - RM-TRS-04
+    - RM-SEC-02
+    - RM-MOD-03
+  alternative: true
+  option: placement
+  paths:
+    local: api-local
+    external: api-external
+AGT-01:
+  kind: subprocess
+  name:
+    ru: Агентное чтение без изменения системы
+    en: Read-only agent task
+  description:
+    - Агентное чтение без изменения системы. Повторно используемый маршрут внутри основного процесса.
+    - Read-only agent task. A reusable route within the main process.
+  start:
+    - Пользователь делегирует задачу, требующую разрешённого чтения.
+    - A user delegates a task that requires permitted read access.
+  result:
+    - Проверенный результат со ссылками на обращения к инструментам.
+    - A checked result with references to the tool calls.
+  check:
+    - Для чтения проверяются субъект, ресурс и цель. Результат инструмента проходит контроль перед контекстом.
+    - For each read, the subject, resource and purpose are checked. The tool result passes a check before it enters the context.
+  classes:
+    - RM-INT-01
+    - RM-SEC-01
+    - RM-AGT-02
+    - RM-AGT-08
+    - RM-AGT-03
+    - RM-AIC-01
+    - RM-AIC-05
+    - RM-MOD-12
+    - RM-MOD-06
+    - RM-MOD-07
+    - RM-AIC-02
+    - RM-AGT-04
+    - RM-ACT-02
+    - RM-ACT-01
+    - RM-AIC-04
+    - RM-INT-02
+    - RM-TRS-04
+    - RM-MOD-03
+    - RM-SEC-02
+  alternative: true
+  option: placement
+  paths:
+    local: agent-read
+    external: agent-read-external
+TRAIN-DISTRIBUTED:
+  kind: subprocess
+  name:
+    ru: Распределённое обучение
+    en: Distributed training
+  description:
+    - Распределённое обучение. Повторно используемый маршрут внутри основного процесса.
+    - Distributed training. A reusable route within the main process.
+  classes:
+    - RM-DAT-04
+    - RM-PLT-02
+    - RM-HW-02
+    - RM-DEV-04
+    - RM-DEV-11
+    - RM-DEV-12
+    - RM-DEV-05
+    - RM-MOD-05
+    - RM-DEV-07
+  alternative: true
+  path: training
+IT-REPAIR:
+  kind: subprocess
+  name:
+    ru: Исправление дефекта или сбоя CI
+    en: Defect or CI repair
+  description:
+    - Исправление дефекта или сбоя CI. Повторно используемый маршрут внутри основного процесса.
+    - Defect or CI repair. A reusable route within the main process.
+  classes:
+    - RM-APP-03
+    - RM-AGT-01
+    - RM-AGT-08
+    - RM-GOV-02
+    - RM-AGT-03
+    - RM-AGT-07
+    - RM-DPR-06
+    - RM-AGT-02
+    - RM-AGT-05
+    - RM-ACT-03
+    - RM-AIC-05
+    - RM-MOD-12
+    - RM-MOD-06
+    - RM-AIC-01
+    - RM-AGT-04
+    - RM-ACT-02
+    - RM-DEV-01
+    - RM-ACT-04
+    - RM-DEV-06
+    - RM-SEC-04
+    - RM-DEV-08
+    - RM-DEV-07
+    - RM-TRS-05
+    - RM-DEV-09
+    - RM-TRS-01
+    - RM-DEV-10
+    - RM-APP-01
+    - RM-INT-01
+    - RM-OPS-02
+  alternative: false
+  path: it-repair
+  workflow:
+    summary:
+      - Исправить дефект или сбой CI с помощью агентов. Основной агент планирует работу, исполнители действуют в ограниченной среде, а проверки и ревью решают судьбу точной версии изменения. Исход — допущенное изменение либо эскалация.
+      - Resolve a defect or CI failure with agents. The lead agent plans, executors work within a constrained environment, and checks and review determine whether the exact change version can proceed. The outcome is an admitted change or escalation.
+    basis:
+      - source: UBER-SOFTWARE-FACTORY
+        claim:
+          - Uber описывает агентные задачи исправления CI, подготовки PR и review с человеческими проверками; основная модель декомпозирует и оценивает, подагенты выполняют задачи.
+          - Uber documents agent workflows for CI repair, PR preparation, and review with human checks; a lead model decomposes and evaluates while subagents execute.
+    synthesis:
+      - Эта последовательность, изолированная среда, критерии независимых проверок, лимит доработок и допуск точной версии — проект AiNativeOps. Две разные модели допустимы, но не обязательны; оценка основной моделью не заменяет CI и человеческое ревью.
+      - This sequence, sandbox, independent check criteria, rework limit, and exact-version admission are an AiNativeOps design. Two distinct models are possible but not mandatory; lead-model evaluation does not replace CI and human review.
+    nodes:
+      - id: task
+        label: [Задача и критерии исправления, Task and fix criteria]
+        kind: step
+        components:
+          architecture: [v1, b_reqprod]
+          infrastructure: [git-repository, business-apps]
+          stack: [RM-DEV-01, RM-APP-01]
+        detail:
+          - Зафиксировать дефект или сбой, ожидаемое поведение, область изменения и критерии проверки.
+          - Record the defect or failure, expected behavior, change scope, and acceptance checks.
+      - id: admit
+        label: [Полномочия и изолированная среда, Authority and sandbox]
+        kind: decision
+        components:
+          architecture: [s_prep, b_polagent]
+          infrastructure: [agent-iam, job-sandbox, pep, pdp]
+          stack: [RM-GOV-02, RM-ACT-03, RM-ACT-02, RM-ACT-01]
+        detail:
+          - Разрешить ограниченную задачу, инструменты и ресурсы; выделить изолированное рабочее окружение. Недопустимые действия передать владельцу задачи.
+          - Authorize a bounded task, tools, and resources; provision an isolated workspace. Escalate prohibited actions to the task owner.
+      - id: context
+        label: [Контекст репозитория и CI, Repository and CI context]
+        kind: step
+        components:
+          architecture: [t_repo, t_ci]
+          infrastructure: [git-repository, zero-trust-git, context-manager]
+          stack: [RM-DEV-01, RM-ACT-04, RM-AGT-03]
+        detail:
+          - Получить разрешённый код, воспроизведение ошибки и результаты CI; защитить границы чтения и записи.
+          - Obtain authorized code, failure reproduction, and CI results; enforce read and write boundaries.
+      - id: plan
+        label: [План и делегирование, Plan and delegate]
+        kind: step
+        components:
+          architecture: [t_eng, t_harness]
+          infrastructure: [agent-orchestrator, input-guardrails, llm-gateway, output-guardrails]
+          stack: [RM-AGT-01, RM-AIC-01, RM-MOD-06, RM-AIC-02]
+        detail:
+          - Основной агент формирует проверяемый план и ограниченные задания исполнителям. Модельные вызовы проходят защитные проверки, а контекст полномочий сохраняется.
+          - The lead agent forms a verifiable plan and bounded executor tasks. Model calls pass through safeguards and retain authority context.
+      - id: execute
+        label: [Изменение в изолированной среде, Change in the sandbox]
+        kind: step
+        components:
+          architecture: [v2, t_eng, t_gw]
+          infrastructure:
+            - agent-runtime
+            - job-sandbox
+            - tool-router
+            - pep
+            - llm-gateway
+            - input-guardrails
+            - output-guardrails
+          stack: [RM-AGT-02, RM-ACT-03, RM-AGT-04, RM-ACT-02, RM-MOD-06, RM-AIC-01, RM-AIC-02]
+        detail:
+          - Исполнитель меняет код только в допущенной области. Каждый инструмент проверяет право на конкретную операцию; модельный вызов остаётся защищённым независимо от уровня делегирования.
+          - The executor edits only the authorized scope. Each tool call checks the exact operation; model invocations remain guarded at every delegation level.
+      - id: checks
+        label: ['Тесты и проверки пройдены?', 'Do tests and checks pass?']
+        kind: decision
+        components:
+          architecture: [v3, s_scan, o_eval]
+          infrastructure: [ci-runner, sast-sca-secrets, rule-based-checks]
+          stack: [RM-DEV-06, RM-SEC-04, RM-DEV-07]
+        detail:
+          - Выполнить воспроизведение, тесты и проверки безопасности вне самооценки исполнителя. Сохранить свидетельства для точного изменения.
+          - Run reproduction, tests, and security checks independently of executor self-assessment. Retain evidence for the exact change.
+      - id: review
+        label: [Ревью и допуск версии, Review and version admission]
+        kind: decision
+        components:
+          architecture: [o_eval, o_release, b_ownrisk]
+          infrastructure: [git-repository, eval-red-teaming, release-gate]
+          stack: [RM-DEV-01, RM-DEV-07, RM-AIC-04, RM-DEV-09]
+        detail:
+          - Проверить PR и свидетельства, получить решение ответственного и допуск точной версии. Изменение кода после проверки требует повторных проверок.
+          - Review the PR and evidence, obtain the responsible reviewer decision, and admit the exact version. Subsequent code changes require checks again.
+      - id: rework
+        label: ['Доработка в лимите?', 'Rework within limits?']
+        kind: decision
+        components:
+          architecture: [s_change, b_polbudget]
+          infrastructure: [agent-orchestrator, rate-limits-budgets, checkpoint-store]
+          stack: [RM-AGT-01, RM-AGT-08, RM-AGT-05]
+        detail:
+          - Разрешить ограниченный цикл исправления по замечаниям. При исчерпании бюджета, расширении полномочий или неясной причине сбоя передать задачу человеку.
+          - Allow a bounded correction loop using review feedback. Escalate on exhausted budget, required authority expansion, or an unclear failure cause.
+      - id: release
+        label: [Допущенное изменение, Admitted change]
+        kind: outcome
+        components:
+          architecture: [o_release, o_ops]
+          infrastructure: [git-repository, release-gate, cd-deployment, metrics-alerts]
+          stack: [RM-DEV-01, RM-DEV-09, RM-DEV-10, RM-OPS-01]
+        detail:
+          - Сохранить согласованный PR и допуск версии. Развёртывание выполняется по принятой процедуре выпуска с наблюдением; наличие PR само по себе не разрешает выкладку.
+          - Retain the approved PR and version admission. Deployment follows the approved release procedure with monitoring; a PR alone does not authorize deployment.
+      - id: escalate
+        label: [Эскалация владельцу, Escalate to the owner]
+        kind: outcome
+        components:
+          architecture: [b_ownproc, t_audit]
+          infrastructure: [business-apps, audit-log]
+          stack: [RM-APP-01, RM-TRS-04]
+        detail:
+          - Передать состояние задачи, проверенные факты и причину остановки. Не выполнять недопущенные изменения ради завершения процесса.
+          - Hand over task state, verified facts, and the stop reason. Do not make unauthorized changes just to finish.
+    edges:
+      - from: task
+        to: admit
+        label: [Критерии зафиксированы, Criteria recorded]
+      - from: admit
+        to: context
+        label: [Задание допущено, Task admitted]
+      - from: admit
+        to: escalate
+        label: [Недостаточно полномочий, Insufficient authority]
+      - from: context
+        to: plan
+        label: [Контекст доступен, Context available]
+      - from: context
+        to: escalate
+        label: [Нет необходимого контекста, Required context unavailable]
+      - from: plan
+        to: execute
+        label: [Ограниченные задания, Bounded tasks]
+      - from: execute
+        to: checks
+        label: [Изменение подготовлено, Change prepared]
+      - from: execute
+        to: escalate
+        label: [Недопустимая операция, Prohibited operation]
+      - from: checks
+        to: review
+        label: [Проверки пройдены, Checks passed]
+      - from: checks
+        to: rework
+        label: [Проверки не пройдены, Checks failed]
+      - from: review
+        to: release
+        label: [Версия одобрена, Version approved]
+      - from: review
+        to: rework
+        label: [Требуются исправления, Corrections required]
+      - from: review
+        to: escalate
+        label: [Выпуск не разрешён, Release not authorized]
+      - from: rework
+        to: plan
+        label: [Лимит и полномочия сохранены, Budget and authority remain]
+      - from: rework
+        to: escalate
+        label: [Лимит / расширение риска, Limit / increased risk]

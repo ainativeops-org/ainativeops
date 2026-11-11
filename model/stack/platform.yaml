@@ -2,22 +2,22 @@
 # Ключ RM-… после версии 1.0 не меняется и не переиспользуется. / An RM-… key is frozen after 1.0 and never reused.
 RM-PLT-01:
   name:
-    ru: ОС и контейнеры
-    en: OS and containers
+    ru: Среда системного исполнения
+    en: System execution environment
   desc:
-    ru: Базовые образы ОС, контейнерные среды и ограничения исполнения. Версии и обновления подчинены управлению конфигурацией.
-    en: Base OS images, container runtimes and execution limits. Versions and updates follow configuration management.
+    ru: Предоставляет системное окружение для нагрузки с явно заданными версиями, интерфейсами и ресурсами. Для конкретного размещения указывает границу изоляции и применимые средства, включая ОС, контейнеры или виртуальные машины.
+    en: Provides a system environment for workloads with specified versions, interfaces and resources. Each deployment defines its isolation boundary and applicable mechanisms, including operating systems, containers or virtual machines.
 RM-PLT-02:
   name:
-    ru: Kubernetes · планировщик GPU
-    en: Kubernetes · GPU scheduler
+    ru: Планировщик вычислительных нагрузок
+    en: Compute workload scheduler
   desc:
-    ru: Размещение сервисов и пакетных заданий, очереди CPU/GPU и квоты проектов. Изоляция EXP, EVAL и PROD задаётся профилем среды.
-    en: Places services and batch jobs, manages CPU and GPU queues and project quotas. The environment profile sets the isolation of EXP, EVAL and PROD.
+    ru: Размещает сервисы и задания с учётом доступных CPU, ускорителей, памяти, очередей и квот. Использует требования среды к размещению и ограничения изоляции. Выделение ускорителя и изоляция между владельцами проверяются по конфигурации платформы.
+    en: Places services and jobs according to available CPU, accelerators, memory, queues and quotas. Applies environment placement and isolation constraints. Accelerator allocation and tenant isolation are verified against the platform configuration.
 RM-PLT-03:
   name:
-    ru: OLTP СУБД
-    en: OLTP databases
+    ru: Транзакционные СУБД
+    en: Transactional databases
   desc:
     ru: Хранят транзакционные данные приложений, метаданные и состояния сервисов. Выбор согласованности и отказоустойчивости определяется контрактом сервиса; области доступа разделяются по средам и проектам.
     en: Store transactional application data, metadata and service state. The service contract defines consistency and fault tolerance; access scopes are split by environment and project.
@@ -30,8 +30,8 @@ RM-PLT-04:
     en: Job and event brokers with delivery, retry and consumer isolation control. External effects are protected from repeated execution at the operation level.
 RM-PLT-05:
   name:
-    ru: IaC и GitOps
-    en: IaC and GitOps
+    ru: Управление конфигурацией инфраструктуры
+    en: Infrastructure configuration management
   desc:
-    ru: Инфраструктура как код, версии окружений и воспроизводимое развёртывание. Изменения проходят контроль доступа и проверку перед применением.
-    en: Infrastructure as code, environment versions and reproducible deployment. Changes pass access control and checks before they are applied.
+    ru: Хранит версионированное желаемое состояние инфраструктуры и применяет утверждённые изменения. Сопоставляет фактическое состояние с заявленным. Инфраструктура как код и GitOps могут реализовать этот контур при соблюдении требований профиля.
+    en: Stores versioned desired infrastructure state and applies approved changes. Compares observed and declared state. Infrastructure as code and GitOps can implement this control where they satisfy profile requirements.

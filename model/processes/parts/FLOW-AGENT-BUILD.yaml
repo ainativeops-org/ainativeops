@@ -1,0 +1,144 @@
+# Этапы и варианты процессов. Ключ этапа процесса: <процесс>--<этап>.
+# Stages and variants of processes. A process stage key is <process>--<stage>.
+FLOW-AGENT-BUILD--MISSION:
+  kind: operation
+  name:
+    ru: Миссия и критерии задачи
+    en: Mission and task criteria
+  description:
+    - Задать пользователям понятную цель, качественный результат, условия отказа и перечень недопустимых эффектов. Разделить совет, чтение и изменение системы.
+    - Define the user-facing purpose, successful outcome, refusal conditions and prohibited effects. Distinguish advice, reads and system changes.
+  classes: [RM-APP-01, RM-GOV-03, RM-GOV-04]
+  architectureSteps: [g0, b_goal, b_np, b_polagent]
+  workflowNode: mission
+FLOW-AGENT-BUILD--AUTHORITY:
+  kind: operation
+  name:
+    ru: Полномочия заданы для операций?
+    en: Is authority defined per operation?
+  description:
+    - Зафиксировать субъект, действие, ресурс, цель, срок, право делегирования и условие согласования. Владелец ресурса утверждает минимальные полномочия; при отсутствии владельца или правила — отказ.
+    - Record identity, action, resource, purpose, expiry, delegation and approval conditions. The resource owner approves least authority; deny operations without an owner or rule.
+  classes: [RM-GOV-02, RM-ACT-01, RM-ACT-02, RM-ACT-03, RM-AIC-04]
+  architectureSteps: [b_polagent, mt_tb, s_prep, g2]
+  workflowNode: authority
+FLOW-AGENT-BUILD--DESIGN:
+  kind: operation
+  name:
+    ru: Контракты Harness и инструментов
+    en: Harness and tool contracts
+  description:
+    - Спроектировать планирование, контекст, состояние задачи, память по необходимости, схемы инструментов и границы чтения. Для изменений определить проверку результата, ключ идемпотентности, согласование и компенсацию. Каждый модельный вызов получает входные и выходные guardrails до передачи результата дальше.
+    - Design planning, context, task state, optional memory, tool schemas and read boundaries. Define effect verification, idempotency, approval and compensation for mutations. Every model call uses input and output guardrails before its result proceeds.
+  classes:
+    - RM-AGT-01
+    - RM-AGT-03
+    - RM-AGT-07
+    - RM-AGT-04
+    - RM-AGT-05
+    - RM-ACT-02
+    - RM-AIC-01
+    - RM-AIC-05
+    - RM-MOD-12
+    - RM-MOD-06
+    - RM-AIC-02
+  architectureSteps: [t_harness, t_gw, mt_tb, s_runtime, t_input, t_infer, t_result]
+  workflowNode: design
+FLOW-AGENT-BUILD--IMPLEMENT:
+  kind: operation
+  name:
+    ru: Сборка ограниченного агента
+    en: Build the constrained agent
+  description:
+    - Версионировать агент, инструкции, модельные маршруты и схемы инструментов. Реализовать допуск PEP перед каждым инструментом и проверку результата до добавления в контекст. Вызовы модели реализации и самого кандидата проходят входные и выходные guardrails.
+    - Version the agent, instructions, model routes and tool schemas. Enforce PEP before each tool call and check tool results before adding them to context. Apply input and output guardrails to implementation and candidate model calls.
+  classes:
+    - RM-AGT-02
+    - RM-INT-02
+    - RM-ACT-03
+    - RM-ACT-02
+    - RM-DEV-06
+    - RM-DEV-08
+    - RM-AIC-01
+    - RM-AIC-05
+    - RM-MOD-12
+    - RM-MOD-06
+    - RM-AIC-02
+  architectureSteps: [v2, v3, t_harness, t_gw, t_input, t_infer, t_result]
+  workflowNode: implement
+FLOW-AGENT-BUILD--SIMULATE:
+  kind: operation
+  name:
+    ru: Симуляция действий и отказов
+    en: Simulate actions and failures
+  description:
+    - 'Прогнать агента на подменённых ресурсах: внедрённые инструкции, чужая запись, отказ инструмента, отмена, повтор и выход за бюджет. Все модельные вызовы проходят входные и выходные guardrails, реальные внешние действия отключены.'
+    - 'Run the agent against simulated resources: injected instructions, unauthorized records, tool failure, cancellation, replay and budget exhaustion. Every model call passes input and output guardrails; real external effects are disabled.'
+  classes:
+    - RM-ACT-03
+    - RM-DEV-07
+    - RM-ACT-02
+    - RM-AGT-08
+    - RM-AGT-05
+    - RM-AIC-01
+    - RM-AIC-05
+    - RM-MOD-12
+    - RM-MOD-13
+    - RM-MOD-06
+    - RM-AIC-02
+  architectureSteps: [g7, o_eval, t_harness, s_runtime, t_input, t_infer, t_result]
+  workflowNode: simulate
+FLOW-AGENT-BUILD--EVALUATE:
+  kind: operation
+  name:
+    ru: Границы подтверждены независимо?
+    en: Are boundaries independently verified?
+  description:
+    - Проверить полезность, запреты, результат действия и отказоустойчивость по закреплённому набору и журналам ресурсов. Вызов кандидата или ИИ-контролёра всегда проходит входные и выходные guardrails. Судья не изменяет политику и не допускает выпуск.
+    - Check usefulness, denials, effects and resilience against pinned tests and resource logs. Candidate and AI controller invocations always pass input and output guardrails. The AI controller cannot change policy or admit release.
+  classes:
+    - RM-DEV-07
+    - RM-DAT-05
+    - RM-AIC-03
+    - RM-TRS-04
+    - RM-AIC-01
+    - RM-AIC-05
+    - RM-MOD-12
+    - RM-MOD-13
+    - RM-MOD-06
+    - RM-AIC-02
+  architectureSteps: [o_eval, g4, mt_indep, mt_ev, t_ctl, t_input, t_infer, t_result]
+  workflowNode: evaluate
+FLOW-AGENT-BUILD--ADMIT:
+  kind: operation
+  name:
+    ru: Точная конфигурация допущена?
+    en: Is the exact configuration admitted?
+  description:
+    - Владелец утверждает версии артефакта, инструкции, модель, набор инструментов, политики, права, лимиты и условия остановки. Допуск связывается с хешем; изменение связанного элемента требует оценки влияния.
+    - The owner approves versions of the artifact, instructions, model, tools, policies, permissions, limits and stop criteria. Admission binds to a digest; changes to bound elements require impact assessment.
+  classes: [RM-DEV-09, RM-TRS-05, RM-DEV-08, RM-TRS-06, RM-AIC-04]
+  architectureSteps: [o_pack, o_release, g6, b_ownrisk]
+  workflowNode: admit
+FLOW-AGENT-BUILD--PILOT:
+  kind: operation
+  name:
+    ru: Пилот работает в заданных пределах?
+    en: Does the pilot stay within bounds?
+  description:
+    - Проверить ограниченную группу, лимиты, разрешённые операции и отзыв. Каждый модельный вызов идёт через входные и выходные guardrails, каждое действие — через PEP. При нарушении закрыть маршрут и сверить эффекты до повтора.
+    - Check a bounded cohort, limits, allowed operations and revocation. Every model call uses input and output guardrails; every action uses PEP. On a violation, close the route and reconcile effects before any replay.
+  classes:
+    - RM-DEV-10
+    - RM-ACT-02
+    - RM-OPS-01
+    - RM-TRS-07
+    - RM-TRS-04
+    - RM-AIC-01
+    - RM-AIC-05
+    - RM-MOD-12
+    - RM-MOD-13
+    - RM-MOD-06
+    - RM-AIC-02
+  architectureSteps: [o_ops, g7, s_runtime, s_detect, t_gw, t_input, t_infer, t_result]
+  workflowNode: pilot

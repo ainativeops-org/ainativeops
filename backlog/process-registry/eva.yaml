@@ -1,0 +1,134 @@
+# Реестр процессов · Оценка и допуск / Process registry · Evaluation and admission
+EVA-01:
+  name:
+    ru: Подготовка критериев и контрольного набора
+    en: Evaluation criteria and dataset preparation
+  start:
+    - Утверждены назначение, ограничения и существенные риски.
+    - The purpose, constraints and material risks are approved.
+  result:
+    - Версия критериев, контрольных примеров и ожидаемых результатов.
+    - A version of the criteria, test cases and expected results.
+  check:
+    - Владелец оценки и права изменения выделены. Автор кандидата не может подменить контрольный набор.
+    - The evaluation owner and change rights are assigned separately. The candidate's author cannot replace the test set.
+  gates: G4
+  classes: [RM-DAT-05, RM-DEV-07, RM-GOV-03, RM-GOV-04]
+EVA-02:
+  name:
+    ru: Независимое оценивание качества
+    en: Independent quality evaluation
+  start:
+    - Есть кандидат, контрольный набор и критерии.
+    - A candidate, a test set and criteria are available.
+  result:
+    - Отчёт о качестве и регрессии для точной версии кандидата.
+    - A quality and regression report for the exact candidate version.
+  check:
+    - Проверить применимость тестов к сценарию. Отчёт отдельно фиксирует неизвестное, отклонения и пределы сравнения.
+    - Check that the tests apply to the scenario. The report records unknowns, deviations and comparison limits separately.
+  gates: G4 И*
+  classes: [RM-DAT-05, RM-DEV-07, RM-DEV-05, RM-TRS-05]
+EVA-03:
+  name:
+    ru: Состязательное испытание ИИ-системы
+    en: Adversarial AI testing
+  start:
+    - Сформулированы модели угроз и варианты атак на доступные входы.
+    - Threat models and attack variants against accessible inputs are defined.
+  result:
+    - Отчёт о воспроизведённых атаках и фактических отказах защиты.
+    - A report on reproduced attacks and actual protection failures.
+  check:
+    - Испытать внедрённые инструкции, раскрытие, отравление контекста и обход через доступные интерфейсы по профилю.
+    - Test injected instructions, disclosure, context poisoning and bypass through accessible interfaces according to the profile.
+  gates: G4 И*
+  classes: [RM-DEV-07, RM-DAT-05, RM-ACT-03, RM-AIC-01, RM-AIC-02]
+EVA-04:
+  name:
+    ru: Проверка допуска действий и внешних эффектов
+    en: Action enforcement and side-effect testing
+  start:
+    - В кандидате есть операции с внешним ресурсом.
+    - The candidate performs operations on an external resource.
+  result:
+    - Свидетельства точного допуска, отказа и восстановления операции.
+    - Evidence of exact admission, denial and recovery of the operation.
+  check:
+    - Проверить подмену аргумента, отзыв после согласования и сбой после записи. Отказ не создаёт внешнего эффекта.
+    - Check argument substitution, revocation after approval and failure after a write. A denial creates no external effect.
+  gates: G4 G7
+  classes: [RM-DEV-07, RM-ACT-02, RM-AGT-05, RM-AIC-04, RM-TRS-04]
+EVA-05:
+  name:
+    ru: Оценка последствий для людей
+    en: Human impact evaluation
+  start:
+    - Результат влияет на людей или значимые для них решения.
+    - The result affects people or decisions significant to them.
+  result:
+    - Оценка ограничений, ошибок, порядка надзора и способов пересмотра.
+    - An assessment of limitations, errors, oversight procedure and means of review.
+  check:
+    - Проверить значимые группы, доступность обращения к ответственному и исправление неправильного результата по сценарию.
+    - Check relevant groups, access to the responsible person and correction of a wrong result per scenario.
+  gates: G0 G4
+  classes: [RM-GOV-04, RM-DAT-05, RM-DEV-07, RM-APP-03]
+EVA-06:
+  name:
+    ru: Квалификация режима инференса
+    en: Inference serving qualification
+  start:
+    - Кандидат подготовлен к работе с целевой нагрузкой.
+    - The candidate is prepared to handle the target load.
+  result:
+    - Отчёт о задержке, ёмкости, устойчивости и сохранении контролей.
+    - A report on latency, capacity, resilience and preservation of controls.
+  check:
+    - Испытать целевые нагрузки, деградацию, очередь и безопасный отказ. Сравнить заявленные и наблюдаемые версии.
+    - Test target loads, degradation, queueing and safe denial. Compare declared and observed versions.
+  gates: G4 И*
+  classes: [RM-MOD-07, RM-MOD-08, RM-DEV-07, RM-OPS-01, RM-OPS-02]
+EVA-07:
+  name:
+    ru: Квалификация ИИ-оценщика
+    en: AI evaluator qualification
+  start:
+    - Планируется использовать модель в независимой оценке или при контроле содержания.
+    - A model is planned for use in independent evaluation or content control.
+  result:
+    - Измеренные границы применимости и правила эскалации оценки.
+    - Measured limits of applicability and evaluation escalation rules.
+  check:
+    - Сравнить с независимой разметкой, измерить пропуски и ложные блокировки. Испытать внедрённую инструкцию в оцениваемом материале.
+    - Compare with independent labeling, and measure misses and false blocks. Test an injected instruction in the evaluated material.
+  gates: G4 И*
+  classes: [RM-AIC-03, RM-DAT-05, RM-DEV-07, RM-GOV-03]
+EVA-08:
+  name:
+    ru: Комплексная приёмка конфигурации
+    en: Integrated acceptance evaluation
+  start:
+    - Собраны свидетельства отдельных испытаний и точная конфигурация кандидата.
+    - Evidence from individual tests and the exact candidate configuration are collected.
+  result: [Комплект результатов для решения о выпуске., A set of results for the release decision.]
+  check:
+    - Проверить связность версии модели, кода, среды, политики и данных с отчётами. Неизмеренное свойство остаётся открытым.
+    - Check that the model, code, environment, policy and data versions link to the reports. An unmeasured property stays open.
+  gates: G4 G5
+  classes: [RM-DEV-07, RM-DEV-08, RM-TRS-05, RM-TRS-06]
+EVA-09:
+  name:
+    ru: Проверка обязательных маршрутов инференса
+    en: Inference guardrail coverage testing
+  start:
+    - Изменился канал, модельный маршрут или политика контроля.
+    - A channel, model route or control policy has changed.
+  result:
+    - Свидетельство отсутствия обходов в заявленной конфигурации и границе.
+    - Evidence that no bypasses exist within the declared configuration and boundary.
+  check:
+    - Испытать вход, выход, прямой вызов, кеш, резерв, поток и отказ проверки. Переход к другому потребителю также проверяется.
+    - Test input, output, direct calls, cache, fallback, streaming and check failure. Handover to another consumer is also checked.
+  gates: G4 G8 И
+  classes: [RM-AIC-01, RM-AIC-02, RM-MOD-06, RM-DEV-07, RM-SEC-02, RM-TRS-04]

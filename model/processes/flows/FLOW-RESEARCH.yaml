@@ -1,0 +1,227 @@
+# Процесс на карте / Process on the map: FLOW-RESEARCH
+# workflow: узлы и переходы схемы; SVG схемы строит tools/build.py через Graphviz.
+# workflow: diagram nodes and edges; tools/build.py renders the SVG with Graphviz.
+name:
+  ru: Многоисточниковое исследование с помощью агентов
+  en: Multi-source Agentic Research
+group: AGT
+owner: [Владелец исследовательской задачи, Research task owner]
+start:
+  - Поставлен вопрос, требующий поиска и проверки нескольких источников.
+  - A question requires finding and validating multiple sources.
+result:
+  - Выдана справка с проверяемыми источниками, датами и ограничениями либо передан неполный результат с явными пробелами.
+  - A brief with verifiable sources, dates, and limitations is delivered, or an incomplete result is handed over with explicit gaps.
+check:
+  - Запрещённый адрес не вызывается, скрытая инструкция из источника не ведёт к новому действию, а ключевой вывод ведёт к доступному первоисточнику либо помечен как непроверенный.
+  - A prohibited destination is never called, hidden source instructions cannot trigger new actions, and each key claim points to an accessible primary source or is marked unverified.
+maturity: [Референсный маршрут, Reference workflow]
+calls:
+  - id: KNW-03
+    when:
+      - Если нужны сведения из корпоративного корпуса, запросить ответ и разрешённые первоисточники под полномочиями инициатора.
+      - When enterprise corpus evidence is needed, request a grounded answer and permitted primary sources under the requester's authority.
+order: 12
+protection:
+  - Каждый вызов модели проходит проверку идентичности и прав, защиту входа и выхода и аудит в разрешённом объёме. Вызовы инструментов допускаются отдельно; код исполняется в изолированной среде. Согласование и ограничения раскрытия задаются политикой.
+  - Every model call uses identity and authorization checks, input and output protections, and permitted audit retention. Tool calls are authorized separately; code runs in a sandbox. Approval and disclosure restrictions follow policy.
+parts:
+  - CORE-01
+  - FLOW-RESEARCH--SCOPE
+  - FLOW-RESEARCH--PLAN
+  - FLOW-RESEARCH--ADMIT
+  - FLOW-RESEARCH--COLLECT
+  - FLOW-RESEARCH--EVIDENCE
+  - FLOW-RESEARCH--SYNTHESIS
+  - FLOW-RESEARCH--VERIFY
+tags: [Multi-source Agentic Research]
+option: placement
+paths:
+  local: process-flow-research-local
+  external: process-flow-research-external
+workflow:
+  summary:
+    - Поставлен вопрос, требующий поиска и проверки нескольких источников. Выдана справка с проверяемыми источниками, датами и ограничениями либо передан неполный результат с явными пробелами.
+    - A question requires finding and validating multiple sources. A brief with verifiable sources, dates, and limitations is delivered, or an incomplete result is handed over with explicit gaps.
+  synthesis:
+    - Последовательность, условия переходов и сопоставление компонентов — проектный синтез AiNativeOps. Источники подтверждают отдельные практики в указанной области, а не всю схему.
+    - The sequence, conditions and component mapping are AiNativeOps design synthesis. Sources support individual practices within their stated scope, not the entire diagram.
+  basis:
+    - source: P20-RESEARCH
+      claim:
+        - Декомпозиция исследования, параллельный поиск, синтез и устойчивое ведение состояния.
+        - Covers research decomposition, parallel search, synthesis, and durable state management.
+    - source: LLM-C
+      claim:
+        - Отделение инструкций от данных, проверки ввода и выхода, многослойный контроль.
+        - Covers separating instructions from data, input and output guardrails, and layered controls.
+    - source: MCP
+      claim:
+        - Схемы инструментов, discovery, вызов и результат; протокол не заменяет допуск.
+        - Covers tool schemas, discovery, invocation, and results; the protocol does not replace admission.
+    - source: OWASP
+      claim:
+        - Проверка полномочий на стороне вызываемой системы и согласование значимых действий.
+        - Covers authorization checks on the side of the called system and approval of significant actions.
+    - source: OPEN-G
+      claim:
+        - Различает начальные, конечные и инструментальные проверки. Границы SDK не подтверждают проверку каждого промежуточного вызова.
+        - Distinguishes input, output, and tool guardrails. The SDK boundaries do not confirm that every intermediate call is checked.
+    - source: RMF
+      claim:
+        - Профиль рисков генеративного ИИ и действия по управлению риском.
+        - Covers the generative AI risk profile and risk management actions.
+  nodes:
+    - id: scope
+      label: [Ограничить исследование, Set research scope]
+      detail:
+        - Зафиксировать вопрос, владельца, допустимые источники и действия, срок и бюджет. Внешний поиск допускается только при отдельном разрешении на направление и раскрытие.
+        - Record the question, owner, permitted sources and actions, deadline, and budget. External search requires explicit permission for its destination and disclosure.
+      kind: step
+      components:
+        architecture: [b_goal, b_polext, b_polbudget]
+        infrastructure: [agent-runtime, iam-sso, rate-limits-budgets]
+        stack: [RM-AGT-02, RM-SEC-01, RM-AGT-08, RM-GOV-03]
+    - id: plan
+      label: [Подготовить план поиска, Prepare search plan]
+      detail:
+        - Определить проверяемые вопросы и приоритет первичных источников. Каждый модельный шаг проходит контроль входа и результата через допущенный шлюз; план не даёт прав на инструменты.
+        - Define verifiable questions and prioritize primary sources. Each model step passes input and output checks through an approved gateway; the plan grants no tool permissions.
+      kind: step
+      components:
+        architecture: [t_harness, t_input, t_infer, t_result]
+        infrastructure: [agent-runtime, input-guardrails, llm-gateway, output-guardrails]
+        stack: [RM-AGT-02, RM-AIC-01, RM-MOD-06, RM-AIC-02]
+    - id: admit
+      label: ['Обращение к источнику разрешено?', 'May the source be contacted?']
+      detail:
+        - Для каждого чтения проверить точный адрес, параметры, инициатора, назначение, лимит и допустимые исходящие данные. Отклонённый адрес нельзя заменить перенаправлением или загрузкой файлов.
+        - For each read, check exact destination, arguments, requester, purpose, budget, and permitted outbound data. Do not bypass a denied destination via redirection or file uploads.
+      kind: decision
+      components:
+        architecture: [t_gw, b_polext, b_poldisc]
+        infrastructure: [tool-router, pep, pdp, egress-proxy]
+        stack: [RM-AGT-04, RM-ACT-02, RM-ACT-01, RM-SEC-02]
+    - id: collect
+      label: [Собрать свидетельства, Collect evidence]
+      detail:
+        - Запросить разрешённые источники. Для корпоративных знаний при необходимости вызвать KNW-03. Проверить результаты инструментов и сохранить ссылки, дату и происхождение; команды в источниках не выполнять.
+        - Query authorized sources. Call KNW-03 for enterprise knowledge when needed. Check tool results and retain references, dates, and provenance; do not execute instructions found in sources.
+      kind: step
+      components:
+        architecture: [t_gw, t_vec, t_result]
+        infrastructure: [mcp-servers, rag-access-filter, output-guardrails]
+        stack: [RM-INT-02, RM-DPR-06, RM-AIC-02]
+    - id: evidence
+      label: ['Свидетельства достаточны?', 'Is the evidence sufficient?']
+      detail:
+        - Сопоставить независимые сведения, дату, применимость и конфликтующие версии. Уточнение поиска ограничено исходной областью, числом шагов, временем и стоимостью.
+        - Compare independent evidence, date, applicability, and conflicting versions. Refinement stays within the original scope and step, time, and cost budgets.
+      kind: decision
+      components:
+        architecture: [mt_ev, b_polbudget]
+        infrastructure: [rule-based-checks, rate-limits-budgets]
+        stack: [RM-AGT-08, RM-OPS-02]
+    - id: synthesis
+      label: [Собрать справку, Draft the research brief]
+      detail:
+        - Синтезировать только проверенные материалы. При вызове модели проверить собранный контекст и результат через шлюз; отметить противоречия и отличить факт от гипотезы.
+        - Synthesize only checked material. When calling a model, check the assembled context and result through the gateway; identify contradictions and distinguish facts from hypotheses.
+      kind: step
+      components:
+        architecture: [t_input, t_infer, t_result]
+        infrastructure: [input-guardrails, llm-gateway, output-guardrails, context-manager]
+        stack: [RM-AIC-01, RM-MOD-06, RM-AIC-02, RM-AGT-03]
+    - id: verify
+      label: ['Справку можно выдать?', 'Can the brief be delivered?']
+      detail:
+        - Проверить выводы по первоисточникам, ссылки и права получателя. Генерация файлов кодом требует допуска и изоляции, а готовые файлы проверяются до выдачи.
+        - Check conclusions against primary sources, verify references, and recheck recipient access. Generating files with code requires admission and isolation, and the files must be checked before delivery.
+      kind: decision
+      components:
+        architecture: [t_result, b_poldisc, mt_ev]
+        infrastructure: [output-guardrails, audit-log, pep, job-sandbox]
+        stack: [RM-AIC-02, RM-TRS-04, RM-ACT-02, RM-ACT-03]
+    - id: brief
+      label: [Выдать проверенную справку, Deliver the checked brief]
+      detail:
+        - Вернуть выводы со ссылками, датами и ограничениями. Зафиксировать применённые маршруты, версии и решения без избыточного содержимого источников.
+        - Return conclusions with references, dates, and limitations. Record routes, versions, and decisions without unnecessary source contents.
+      kind: outcome
+      components:
+        architecture: [t_result, t_audit]
+        infrastructure: [business-apps, audit-log]
+        stack: [RM-APP-01, RM-TRS-04]
+    - id: limited
+      label: [Передать пробелы владельцу, Hand gaps to the owner]
+      detail:
+        - Остановиться по лимиту или при нехватке подтверждений. Вернуть только проверенную и разрешённую часть; явно указать, какие вопросы остались открыты.
+        - Stop at a limit or when evidence is insufficient. Return only checked and permitted material; identify unresolved questions explicitly.
+      kind: outcome
+      components:
+        architecture: [b_ownproc, mt_ev, t_audit]
+        infrastructure: [business-apps, audit-log]
+        stack: [RM-APP-03, RM-TRS-04]
+    - id: denied
+      label: [Остановить запрещённый маршрут, Stop the prohibited route]
+      detail:
+        - Зафиксировать запрещённую передачу или выдачу без отправки данных. Не расширять набор инструментов и не повторять запрос через другой домен.
+        - Record the prohibited transfer or delivery without sending data. Do not expand tools or repeat the request via another domain.
+      kind: outcome
+      components:
+        architecture: [t_gw, t_audit]
+        infrastructure: [pep, egress-proxy, audit-log]
+        stack: [RM-ACT-02, RM-SEC-02, RM-TRS-04]
+  edges:
+    - from: scope
+      to: plan
+      label: [Границы заданы, Scope defined]
+    - from: plan
+      to: admit
+      label: [Источник выбран, Source selected]
+    - from: admit
+      to: collect
+      label: [Обращение разрешено, Request permitted]
+    - from: admit
+      to: denied
+      label: [Маршрут или раскрытие запрещено, Route or disclosure prohibited]
+    - from: admit
+      to: limited
+      label: [Источник недоступен по технической причине, Source technically unavailable]
+    - from: collect
+      to: evidence
+      label: [Материалы проверены, Material checked]
+    - from: evidence
+      to: plan
+      label: [Нужен поиск в оставшемся бюджете, More retrieval within budget]
+    - from: evidence
+      to: synthesis
+      label: [Доказательств достаточно, Evidence sufficient]
+    - from: evidence
+      to: limited
+      label: ['Пробел, конфликт или лимит', 'Gap, conflict, or limit reached']
+    - from: synthesis
+      to: verify
+      label: [Справка составлена, Brief drafted]
+    - from: synthesis
+      to: limited
+      label: [Нет проверенного результата, No checked result]
+    - from: verify
+      to: brief
+      label: [Выводы и выдача допустимы, Claims and delivery allowed]
+    - from: verify
+      to: limited
+      label: [Выводы не подтверждены, Claims unsupported]
+    - from: verify
+      to: denied
+      label: [Выдача запрещена, Delivery prohibited]
+    - from: plan
+      to: denied
+      label: [Модельный шаг запрещён, Model step prohibited]
+    - from: collect
+      to: limited
+      label: [Источник не ответил или данные непригодны, No source response or unsuitable data]
+    - from: synthesis
+      to: denied
+      label: [Модельный результат заблокирован, Model output blocked]
+  main: [scope, plan, admit, collect, evidence, synthesis, verify, brief]

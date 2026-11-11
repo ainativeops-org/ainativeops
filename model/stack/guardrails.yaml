@@ -1,30 +1,37 @@
-# Guardrails / Guardrails
+# Безопасность инференса · Guardrails / Inference protection · Guardrails
 # Ключ RM-… после версии 1.0 не меняется и не переиспользуется. / An RM-… key is frozen after 1.0 and never reused.
 RM-AIC-01:
   name:
-    ru: Input guardrails
+    ru: Входные защитные проверки
     en: Input guardrails
   desc:
     ru: Проверяет состав и представление контекста перед передачей модели. Классификация содержимого дополняет ограничения источников и полномочий.
     en: Check the composition and representation of context before it reaches the model. Content classification complements source and authority limits.
 RM-AIC-02:
   name:
-    ru: Output guardrails
+    ru: Выходные защитные проверки
     en: Output guardrails
   desc:
     ru: Проверяет ответы модели и результаты инструментов до включения в контекст, память или пользовательский ответ. Предложенные действия передаются механизму допуска.
     en: Check model answers and tool results before they enter context, memory or a user response. Proposed actions go to the admission mechanism.
 RM-AIC-03:
   name:
-    ru: LLM-as-a-Judge
-    en: LLM-as-a-Judge
+    ru: Модельная оценка
+    en: Model-based evaluation
   desc:
     ru: Внутренняя модель даёт вспомогательные оценки с защищённой конфигурацией. Независимость данных, инструкций и владельца проверки обосновывается отдельно; решение о допуске остаётся у механизма правил.
     en: An internal model gives supplementary assessments with a protected configuration. Independence of data, instructions and check owner is justified separately; the admission decision stays with the rule mechanism.
 RM-AIC-04:
   name:
-    ru: Approval · HITL
-    en: Approval · HITL
+    ru: Согласование операции человеком
+    en: Human approval for operations
   desc:
     ru: Приостанавливает задачу для действий, требующих решения ответственного лица. Согласование связано с точными аргументами; после возобновления права и политика проверяются повторно.
     en: Suspends the task for actions that need a decision by a responsible person. The approval is bound to the exact arguments; after resumption rights and policy are checked again.
+RM-AIC-05:
+  name:
+    ru: Квоты и защита от злоупотреблений
+    en: Quotas and abuse protection
+  desc:
+    ru: Проверяет квоту потребителя до каждого вызова модели и ограничивает частоту запросов по ключу и проекту. Обнаруживает систематический перебор запросов, похожий на извлечение модели, и останавливает такой поток. Потребление берёт из учёта; бюджет задачи агента ведут лимиты задач.
+    en: Checks the consumer quota before every model call and limits the request rate per key and project. Detects systematic querying that resembles model extraction and stops such a stream. Takes consumption from usage metering; the budget of an agent task stays with task limits.

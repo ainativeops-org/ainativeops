@@ -1,0 +1,34 @@
+# Маршрут / Route: Создание и ввод в эксплуатацию корпоративного агента / Enterprise Agent Development and Deployment
+# Шаг = [элемент, [участники]] / Step = [element, [participants]]
+order: 3
+name:
+  ru: Создание и ввод в эксплуатацию корпоративного агента
+  en: Enterprise Agent Development and Deployment
+routes:
+  stack:
+    - [RM-APP-01, [RM-GOV-03, RM-GOV-04]]
+    - [RM-GOV-02, [RM-ACT-01, RM-ACT-02, RM-ACT-03, RM-AIC-04]]
+    - [RM-AGT-01, [RM-MOD-12, RM-AGT-03, RM-AGT-07, RM-AGT-04, RM-AGT-05, RM-ACT-02, RM-AIC-01, RM-MOD-06, RM-AIC-02, RM-TRS-04, RM-MOD-07, RM-AIC-05, RM-OPS-06]]
+    - [RM-AGT-02, [RM-INT-02, RM-ACT-03, RM-ACT-02, RM-DEV-06, RM-DEV-08, RM-AIC-01, RM-MOD-06, RM-AIC-02, RM-GOV-02, RM-OPS-01, RM-TRS-04]]
+    - [RM-ACT-03, [RM-DEV-07, RM-ACT-02, RM-AGT-08, RM-AGT-05, RM-AIC-01, RM-MOD-06, RM-AIC-02]]
+    - [RM-DEV-07, [RM-DAT-05, RM-AIC-03, RM-TRS-04, RM-AIC-01, RM-MOD-06, RM-AIC-02]]
+    - [RM-DEV-09, [RM-TRS-05, RM-DEV-08, RM-TRS-06, RM-AIC-04]]
+    - [RM-DEV-10, [RM-ACT-02, RM-OPS-01, RM-TRS-07, RM-TRS-04, RM-AIC-01, RM-MOD-06, RM-AIC-02]]
+  infrastructure:
+    - [business-apps, [audit-log]]
+    - [agent-iam, [pdp, pep, job-sandbox]]
+    - [agent-orchestrator, [request-classifier, context-manager, prompt-skill-registry, tool-router, checkpoint-store, pep, input-guardrails, llm-gateway, output-guardrails, audit-log, inference-servers, inference-quotas, usage-billing]]
+    - [agent-runtime, [mcp-servers, job-sandbox, pep, ci-runner, artifact-registry, input-guardrails, llm-gateway, output-guardrails, agent-iam, metrics-alerts, audit-log]]
+    - [job-sandbox, [eval-red-teaming, pep, rule-based-checks, rate-limits-budgets, checkpoint-store, input-guardrails, llm-gateway, output-guardrails]]
+    - [eval-red-teaming, [eval-datasets, llm-as-a-judge, rule-based-checks, audit-log, input-guardrails, llm-gateway, output-guardrails]]
+    - [release-gate, [provenance-registry, artifact-registry, integrity-monitoring]]
+    - [cd-deployment, [pep, metrics-alerts, kill-switch, audit-log, input-guardrails, llm-gateway, output-guardrails]]
+  architecture:
+    - [g0, [b_goal, b_np, b_polagent]]
+    - [b_polagent, [mt_tb, s_prep, g2]]
+    - [t_harness, [t_route, t_gw, mt_tb, s_runtime, t_input, t_infer, t_result, t_audit, t_base]]
+    - [v2, [v3, t_harness, t_gw, t_input, t_infer, t_result]]
+    - [g7, [o_eval, t_harness, s_runtime, t_input, t_infer, t_result]]
+    - [o_eval, [g4, mt_indep, mt_ev, t_ctl, t_input, t_infer, t_result]]
+    - [o_pack, [o_release, g6, b_ownrisk]]
+    - [o_ops, [g7, s_runtime, s_detect, t_gw, t_input, t_infer, t_result, b_ownproc, t_audit]]

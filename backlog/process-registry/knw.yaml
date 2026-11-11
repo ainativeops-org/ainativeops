@@ -1,0 +1,91 @@
+# Реестр процессов · Знания и поиск / Process registry · Knowledge and retrieval
+KNW-01:
+  name:
+    ru: Подготовка индекса знаний
+    en: Knowledge index construction
+  start:
+    - Владелец передаёт допущенный набор источников для поиска.
+    - The owner provides an admitted set of sources for search.
+  result:
+    - Версия индекса со ссылками на источники и их права.
+    - An index version with references to the sources and their access rights.
+  check:
+    - Версия преобразования, индекс и права воспроизводимы. Эмбеддинги нужны только по выбранному поиску.
+    - The transformation version, the index and the access rights are reproducible. Embeddings are needed only if the chosen search method uses them.
+  gates: G1 G2 И*
+  classes: [RM-DAT-01, RM-DAT-04, RM-DAT-07, RM-DPR-06, RM-MOD-09]
+KNW-02:
+  name:
+    ru: Поиск и ранжирование источников
+    en: Knowledge retrieval and ranking
+  start:
+    - Пользователь или сервис запрашивает знания в доступной ему области.
+    - A user or service queries knowledge within the scope it can access.
+  result:
+    - Упорядоченные фрагменты с происхождением и условиями использования.
+    - Ranked fragments with provenance and terms of use.
+  check:
+    - Запрещённый фрагмент отсекается до выдачи и передачи модели. Модельное ранжирование проходит собственный контроль.
+    - A prohibited fragment is removed before it is returned or passed to the model. Model-based ranking passes its own check.
+  gates: И*
+  classes: [RM-DAT-07, RM-DPR-06, RM-MOD-09, RM-DAT-02]
+KNW-03:
+  name:
+    ru: Ответ с опорой на корпоративные источники
+    en: Grounded answer generation
+  start:
+    - Запрос требует извлечь доступные пользователю сведения из корпуса.
+    - A request requires extracting information the user can access from the corpus.
+  result:
+    - Ответ со ссылками, степенью опоры на источники и отказом при нехватке данных.
+    - An answer with citations, a measure of grounding in sources, and a denial when data is insufficient.
+  check:
+    - Отозванный источник не попадает в контекст и ответ, в том числе из кеша. Ссылка подтверждает заявленный фрагмент.
+    - A revoked source does not enter the context or the answer, including from a cache. Each citation supports the claimed fragment.
+  gates: И
+  classes: [RM-DAT-07, RM-DPR-06, RM-AGT-03, RM-MOD-06, RM-AIC-02]
+KNW-04:
+  name:
+    ru: Обновление и отзыв записей индекса
+    en: Knowledge index refresh and revocation
+  start:
+    - Изменились источник, его версия, права, срок хранения или поисковый алгоритм.
+    - A source, its version, access rights, retention period or search algorithm has changed.
+  result:
+    - Обновлённый индекс и подтверждение исключения старых данных.
+    - An updated index and confirmation that old data is excluded.
+  check:
+    - После отзыва проверяются поиск, кеш, ранее сохранённый контекст и заданный срок обновления.
+    - After revocation, search, the cache, previously saved context and the required refresh deadline are checked.
+  gates: G8
+  classes: [RM-DAT-02, RM-DAT-07, RM-DPR-06, RM-MOD-10, RM-OPS-07]
+KNW-05:
+  name:
+    ru: Построение и сопровождение графа знаний
+    en: Knowledge graph curation
+  start:
+    - Предметный эксперт задаёт сущности, связи и источники.
+    - A domain expert defines entities, relations and sources.
+  result:
+    - Версия графа с происхождением и статусом проверенных утверждений.
+    - A graph version with provenance and the review status of assertions.
+  check:
+    - Изменение или удаление источника прослеживается до связанных утверждений.
+    - A change to or removal of a source is traced to the related assertions.
+  gates: G2 G8
+  classes: [RM-DAT-02, RM-DAT-03, RM-DAT-08, RM-TRS-05]
+KNW-06:
+  name:
+    ru: Ведение памяти между задачами
+    en: Cross-task memory management
+  start:
+    - Пользователь или агент предлагает сохранять сведения для новых задач.
+    - A user or agent proposes saving information for new tasks.
+  result:
+    - Допущенная запись памяти с областью доступа, источником и сроком.
+    - An admitted memory entry with an access scope, a source and a retention period.
+  check:
+    - При записи и чтении проверяются доверие и права. Отозванные записи и чужие сведения не влияют на новый контекст.
+    - Trust and permissions are checked on write and on read. Revoked entries and other subjects' information do not affect a new context.
+  gates: И*
+  classes: [RM-AGT-06, RM-DPR-07, RM-AGT-03, RM-TRS-04]

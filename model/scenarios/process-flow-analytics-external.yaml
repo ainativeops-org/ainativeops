@@ -1,0 +1,30 @@
+# Маршрут / Route: Аналитическое исследование корпоративных данных · внешняя модель / AI-assisted Enterprise Data Analysis · external
+# Шаг = [элемент, [участники]] / Step = [element, [participants]]
+order: 14
+name:
+  ru: Аналитическое исследование корпоративных данных · внешняя модель
+  en: AI-assisted Enterprise Data Analysis · external
+routes:
+  stack:
+    - [RM-APP-01, [RM-SEC-01]]
+    - [RM-DAT-02, [RM-DAT-03, RM-DAT-04, RM-DPR-04, RM-ACT-01]]
+    - [RM-AIC-01, [RM-MOD-12, RM-MOD-13, RM-MOD-06, RM-AIC-02, RM-AGT-03, RM-DAT-03, RM-TRS-04, RM-MOD-03, RM-SEC-02, RM-AIC-05, RM-OPS-06]]
+    - [RM-AGT-04, [RM-ACT-02, RM-ACT-01, RM-DPR-04, RM-AGT-08]]
+    - [RM-DPR-04, [RM-ACT-02, RM-DAT-06, RM-ACT-03]]
+    - [RM-DAT-03, [RM-DAT-05, RM-AIC-02]]
+    - [RM-APP-01, [RM-TRS-04, RM-OPS-02]]
+  infrastructure:
+    - [business-apps, [iam-sso, analytical-store, semantic-layer]]
+    - [data-catalog, [data-access-proxy, dataset-versioning, pdp]]
+    - [input-guardrails, [request-classifier, model-call-planner, llm-gateway, output-guardrails, context-manager, audit-log, external-llm-api, egress-proxy, inference-quotas, usage-billing]]
+    - [tool-router, [pep, pdp, data-access-proxy, rate-limits-budgets]]
+    - [data-access-proxy, [pep, job-sandbox]]
+    - [rule-based-checks, [output-guardrails, data-catalog]]
+    - [business-apps, [audit-log]]
+  architecture:
+    - [b_goal, [t_iam]]
+    - [d2, [b_owndata, b_poldisc]]
+    - [t_input, [t_route, t_plan, t_infer, t_result, t_audit, t_ext, b_polext, b_poldisc]]
+    - [t_gw, [d2, b_polbudget, s_runtime]]
+    - [d4, [t_result, mt_ev]]
+    - [t_result, [t_audit]]

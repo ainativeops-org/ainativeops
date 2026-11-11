@@ -1,0 +1,132 @@
+# Границы детализации зависимостей / Limits of dependency detail
+stack:
+  RM-HW-01:
+    - Базовый вычислительный ресурс в этой детализации. Питание, площадка и гипервизор здесь не моделируются.
+    - A foundational compute resource at this level. Power, facilities and hypervisor dependencies are outside this detail.
+  RM-HW-02:
+    - GPU требуется по профилю нагрузки. Драйверы, межсоединения и площадка требуют отдельной инфраструктурной детализации.
+    - GPUs are workload-dependent. Drivers, interconnects and facilities need separate infrastructure detail.
+  RM-HW-03:
+    - Условное аппаратное основание TEE. Поддержка конкретного процесса и аттестация проверяются отдельно.
+    - Conditional TEE hardware. Workload support and attestation are assessed separately.
+  RM-HW-04:
+    - Базовая опора хранения. Репликация и отказоустойчивость определяются выбранной реализацией.
+    - Foundational storage. Replication and resilience depend on the selected implementation.
+  RM-HW-05:
+    - Базовая сетевая опора. Маршрутизация и сегментация детализируются в проекте размещения.
+    - Foundational networking. Routing and segmentation are detailed in the deployment design.
+  RM-MOD-03:
+    - 'Граница поставщика: внутренний runtime, веса и оборудование внешнего API неизвестны этой модели.'
+    - 'Provider boundary: the external API runtime, weights and hardware are not known to this model.'
+  RM-MOD-01:
+    - Пассивный артефакт. Исполняется runtime; сам не использует оборудование и не вызывает сервисы.
+    - A passive artifact. A runtime executes it; it does not use hardware or invoke services itself.
+  RM-MOD-02:
+    - Полный checkpoint или отдельный адаптер — разные варианты. Зависимость от base обязательна только для отдельного LoRA.
+    - A full checkpoint and a separate adapter are different options. A base is mandatory only for a separate LoRA adapter.
+  RM-MOD-04:
+    - Условный класс предиктивных моделей. Зависимости конкретного runtime и признаков ещё не специфицированы.
+    - A conditional predictive-model class. Runtime and feature dependencies are not yet specified.
+  RM-CMP-03:
+    - Аппаратная криптографическая граница. Внутреннее устройство и платформа HSM здесь не раскрываются.
+    - Hardware cryptographic boundary. HSM internals and hosting are not detailed here.
+  RM-DAT-03:
+    - 'Пока не специфицировано: семантический слой требует выбранных бизнес-метрик, источников и владельцев определений. Без предметной области конкретные зависимости не утверждаются.'
+    - 'Not yet specified: a semantic layer needs selected business metrics, sources and definition owners. Concrete dependencies are not asserted without a domain.'
+  RM-ACT-04:
+    - 'Пока не специфицировано: проектная гипотеза защищённого представления исходников. Протокол раскрытия, реализация и подтверждение применимости не заданы; это не универсальный стандартный компонент.'
+    - 'Not yet specified: a project hypothesis for protected source representation. Disclosure protocol, implementation and applicability evidence are undefined; this is not a universal standard component.'
+  RM-INT-04:
+    - 'Опциональная альтернатива: A2A нужен при обмене между независимыми агентными системами. Внутреннее делегирование Harness не требует отдельного A2A-шлюза.'
+    - 'Optional alternative: A2A is for exchanges between independent agent systems. Internal Harness delegation does not require a separate A2A gateway.'
+  RM-MOD-08:
+    - 'Условная оптимизация: отдельная очередь или батчинг выбираются по требованиям нагрузки. Они могут быть внутренними механизмами runtime.'
+    - 'Conditional optimization: a separate queue or batching is chosen for workload requirements. They may be internal runtime mechanisms.'
+  RM-MOD-10:
+    - 'Условная оптимизация: повторное использование ответов требует проверки применимости, области доступа, версий и срока жизни. Кеш не заменяет контроль выдачи.'
+    - 'Conditional optimization: response reuse needs applicability, access-scope, version and lifetime checks. Caching does not replace output controls.'
+  RM-DAT-08:
+    - Опциональный вариант GraphRAG. Граф не требуется обычному чату и не является обязательным дополнением каждого векторного индекса.
+    - An optional GraphRAG choice. A graph is not required for ordinary chat or for every vector index.
+  RM-DAT-09:
+    - Условный сервис признаков для выбранных предиктивных задач. LLM-чат и RAG не требуют Feature Store по умолчанию.
+    - A conditional feature service for selected predictive tasks. LLM chat and RAG do not require a feature store by default.
+  RM-CMP-01:
+    - Опциональный профиль Confidential Computing. Необходимость TEE определяется моделью угроз и поддержкой выбранной нагрузки.
+    - An optional confidential-computing profile. TEE need depends on the threat model and workload support.
+  RM-CMP-02:
+    - Условный механизм удалённой аттестации. Формат свидетельств и правила доверия зависят от TEE и профиля выдачи секретов.
+    - A conditional remote-attestation mechanism. Evidence formats and trust rules depend on the TEE and secret-release profile.
+  RM-APP-04:
+    - Опциональная BPM-оркестрация для заданного бизнес-процесса. Не подменяет внутренний цикл и делегирование агента.
+    - Optional BPM orchestration for a defined business process. It does not replace the agent loop and delegation.
+  RM-AIC-03:
+    - 'ИИ-контролёр подключается по условию и дополняет проверяемые критерии. Он не считается независимым автоматически и не принимает решение о выпуске сам.'
+    - 'The AI controller is conditional and supplements verifiable criteria. It is not automatically independent and does not decide release by itself.'
+  RM-PLT-02:
+    - 'Вариант платформы: Kubernetes и GPU-планирование выбираются по размещению. Управляемый внешний сервис может скрывать этот слой за границей поставщика.'
+    - 'A platform choice: Kubernetes and GPU scheduling depend on deployment. A managed external service can hide this layer behind its provider boundary.'
+infra:
+  external-llm-api:
+    - 'Граница поставщика: внутренний runtime, веса и оборудование внешнего API неизвестны этой модели.'
+    - 'Provider boundary: the external API runtime, weights and hardware are not known to this model.'
+  foundation-model-artifact:
+    - Пассивный артефакт. Исполняется runtime; сам не использует оборудование и не вызывает сервисы.
+    - A passive artifact. A runtime executes it; it does not use hardware or invoke services itself.
+  adapted-model-artifact:
+    - Полный checkpoint или отдельный адаптер — разные варианты. Зависимость от base обязательна только для отдельного LoRA.
+    - A full checkpoint and a separate adapter are different options. A base is mandatory only for a separate LoRA adapter.
+  model-hubs:
+    - 'Внешняя граница: внутренние зависимости поставщика не установлены.'
+    - 'External boundary: provider-internal dependencies are not established.'
+  external-datasets:
+    - 'Внешняя граница: внутренние зависимости поставщика не установлены.'
+    - 'External boundary: provider-internal dependencies are not established.'
+  public-package-registries:
+    - 'Внешняя граница: внутренние зависимости поставщика не установлены.'
+    - 'External boundary: provider-internal dependencies are not established.'
+  external-apis-mcp:
+    - 'Внешняя граница: внутренние зависимости поставщика не установлены.'
+    - 'External boundary: provider-internal dependencies are not established.'
+  users:
+    - Субъект использования, не исполняющий компонент платформы.
+    - A user actor, not a platform execution component.
+  erp-crm:
+    - Внешняя для ИИ-платформы бизнес-система. Её внутреннее устройство не детализируется.
+    - A business system outside the AI platform. Its internal design is not detailed.
+  zero-trust-git:
+    - 'Пока не специфицировано: проектная гипотеза защищённого представления исходников. Протокол раскрытия, реализация и подтверждение применимости не заданы; это не универсальный стандартный компонент.'
+    - 'Not yet specified: a project hypothesis for protected source representation. Disclosure protocol, implementation and applicability evidence are undefined; this is not a universal standard component.'
+  llm-as-a-judge:
+    - 'ИИ-контролёр подключается по условию и дополняет проверяемые критерии. Он не считается независимым автоматически и не принимает решение о выпуске сам.'
+    - 'The AI controller is conditional and supplements verifiable criteria. It is not automatically independent and does not decide release by itself.'
+  log-collectors:
+    - Пайплайн телеметрии детализирован потоками между сбором и нормализацией. Это два экземпляра одного класса; связь между ними не размножается как зависимость класса от самого себя.
+    - Telemetry flow distinguishes collection and normalization. These are instances of one class; their connection is not expanded into a class self-dependency.
+  archive-backup:
+    - 'Пока не специфицировано: конкретное физическое хранилище архива и домен отказа не выбраны в этой карте. Целевые RPO/RTO требуют проверки восстановления.'
+    - 'Not yet specified: the physical archive store and failure domain are not selected in this map. Target RPO/RTO require recovery testing.'
+  rule-based-checks:
+    - Детерминированная часть стенда испытаний, отдельный экземпляр класса RM-DEV-07. Её обслуживание стенда показано связью модели; на уровне классов это не превращается в самозависимость.
+    - A deterministic part of the evaluation bench, another RM-DEV-07 instance. Its serving relation to the bench is shown in the model; this does not become a class self-dependency.
+  evidence-store:
+    - Режим неизменяемости и сроки хранения подтверждаются конфигурацией и испытаниями; наличие архива само по себе их не доказывает.
+    - Retention and immutability require configuration and testing; an archive alone does not establish them.
+  analytical-store:
+    - Хранилище данных может быть внешней корпоративной службой; физические носители и резервирование задаются профилем размещения.
+    - The data store may be an existing enterprise service; physical storage and redundancy follow the placement profile.
+  inference-runtime:
+    - В этой проекции показаны сервисы, среды исполнения и артефакты. CPU/GPU и другие аппаратные опоры раскрыты на вкладке «Стек».
+    - This view shows services, runtimes and artifacts. CPU/GPU and other hardware dependencies are detailed in the Stack view.
+  eval-inference-runtime:
+    - В этой проекции показаны сервисы, среды исполнения и артефакты. CPU/GPU и другие аппаратные опоры раскрыты на вкладке «Стек».
+    - This view shows services, runtimes and artifacts. CPU/GPU and other hardware dependencies are detailed in the Stack view.
+  training-runtime:
+    - В этой проекции показаны сервисы, среды исполнения и артефакты. CPU/GPU и другие аппаратные опоры раскрыты на вкладке «Стек».
+    - This view shows services, runtimes and artifacts. CPU/GPU and other hardware dependencies are detailed in the Stack view.
+  model-training-service:
+    - В этой проекции показаны сервисы, среды исполнения и артефакты. CPU/GPU и другие аппаратные опоры раскрыты на вкладке «Стек».
+    - This view shows services, runtimes and artifacts. CPU/GPU and other hardware dependencies are detailed in the Stack view.
+  hsm-kms:
+    - Граница сервиса управления ключами. Аппаратная защита и HSM показаны на вкладке «Стек».
+    - Key management service boundary. Hardware protection and HSM are shown in the Stack view.

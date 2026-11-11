@@ -101,8 +101,8 @@ g7:
     ru: Исполнение
     en: Execution
   desc:
-    ru: 'Условие допуска: действие соответствует идентичности, политике раскрытия и бюджету.'
-    en: 'Admission condition: the action matches the identity, the disclosure policy and the budget.'
+    ru: Решение относится к точной операции, каноническим параметрам, ресурсу, актуальным полномочиям и идентичности фактического исполнителя. Отказ не допускает внешнего эффекта.
+    en: Admission is bound to the exact operation, canonical arguments, resource, current authority, and authenticated executor. Denial prevents an external effect.
 g8:
   type: gate
   name:
@@ -125,8 +125,8 @@ mt_trust:
     ru: Основания доверия
     en: Trust anchors
   desc:
-    ru: Основание доверия есть проверяемый механизм, защищённый от изменения тем, кого он ограничивает. Оно завершает рекурсию «кто проверит проверяющего».
-    en: A trust anchor is a verifiable mechanism protected from modification by whatever it constrains. It ends the recursion of "who checks the checker".
+    ru: Граница доверия фиксирует существенные зависимости, владельцев и проверяемые предположения об идентичностях, политиках, ключах и свидетельствах.
+    en: The trust boundary records material dependencies, owners, and verifiable assumptions about identities, policies, keys, and evidence.
 mt_indep:
   type: principle
   name:

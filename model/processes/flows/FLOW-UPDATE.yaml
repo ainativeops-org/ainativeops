@@ -1,0 +1,220 @@
+# Процесс на карте / Process on the map: FLOW-UPDATE
+# workflow: узлы и переходы схемы; SVG схемы строит tools/build.py через Graphviz.
+# workflow: diagram nodes and edges; tools/build.py renders the SVG with Graphviz.
+name:
+  ru: Управляемое улучшение действующей ИИ-системы
+  en: Controlled AI System Improvement
+group: RUN
+owner:
+  - Владелец ИИ-системы; выпуском управляет ответственный за изменения.
+  - AI system owner; the change owner manages release.
+start:
+  - Зарегистрирован сигнал качества, стоимости, новый риск, изменение требований или прекращение поддержки зависимости.
+  - A quality or cost signal, new risk, changed requirement or dependency end of life has been recorded.
+result:
+  - Проверенное изменение подтверждено в эксплуатации либо отклонено с сохранением допущенного состояния или остановкой затронутого маршрута.
+  - A verified change is confirmed in production or rejected with the admitted state preserved or the affected route stopped.
+check:
+  - Сигнал прослеживается до точной конфигурации и повторённых испытаний. Без допуска трафик не переключается, нарушение порога приводит к проверенному возврату или остановке.
+  - Trace the signal to the exact configuration and repeated tests. Traffic cannot shift without admission; a threshold breach causes verified rollback or suspension.
+maturity:
+  - 'Управляемый цикл изменения: контрольная линия, допуск, ограниченное включение и наблюдение.'
+  - 'Managed change loop: baseline, admission, limited rollout and observation.'
+calls:
+  - id: FLOW-ADMISSION
+    when:
+      - После сборки кандидата провести независимый допуск точной изменённой версии. Без результата допуска не переходить к развёртыванию.
+      - After assembling the candidate, obtain independent admission of the exact changed version. Deployment requires admission.
+order: 16
+protection:
+  - Каждый вызов модели проходит проверку идентичности и прав, защиту входа и выхода и аудит в разрешённом объёме. Вызовы инструментов допускаются отдельно; код исполняется в изолированной среде. Согласование и ограничения раскрытия задаются политикой.
+  - Every model call uses identity and authorization checks, input and output protections, and permitted audit retention. Tool calls are authorized separately; code runs in a sandbox. Approval and disclosure restrictions follow policy.
+parts:
+  - CORE-01
+  - FLOW-UPDATE--SIGNAL
+  - FLOW-UPDATE--IMPACT
+  - FLOW-UPDATE--PLAN-GATE
+  - FLOW-UPDATE--CANDIDATE
+  - FLOW-UPDATE--ADMIT
+  - FLOW-UPDATE--CANARY
+  - FLOW-UPDATE--OBSERVE
+tags: [Controlled AI System Improvement]
+path: process-flow-update
+workflow:
+  summary:
+    - Зарегистрирован сигнал качества, стоимости, новый риск, изменение требований или прекращение поддержки зависимости. Проверенное изменение подтверждено в эксплуатации либо отклонено с сохранением допущенного состояния или остановкой затронутого маршрута.
+    - A quality or cost signal, new risk, changed requirement or dependency end of life has been recorded. A verified change is confirmed in production or rejected with the admitted state preserved or the affected route stopped.
+  synthesis:
+    - Последовательность, условия переходов и сопоставление компонентов — проектный синтез AiNativeOps. Источники подтверждают отдельные практики в указанной области, а не всю схему.
+    - The sequence, conditions and component mapping are AiNativeOps design synthesis. Sources support individual practices within their stated scope, not the entire diagram.
+  basis:
+    - source: P20-GENOPS
+      claim:
+        - Оценка и версионирование конфигурации ИИ-приложения, выпуск, наблюдение и улучшение.
+        - Covers evaluation and versioning of the AI application configuration, release, monitoring, and improvement.
+    - source: NIST-C
+      claim:
+        - Измерение, независимое участие в оценке, управление и регулярный пересмотр рисков.
+        - Covers measurement, independent participation in assessment, governance, and regular risk review.
+    - source: GCP-M
+      claim:
+        - Автоматизация конвейера, проверки данных и модели, метаданные, онлайн, пакетный и встроенный инференс.
+        - Covers pipeline automation, data and model validation, metadata, and online, batch, and embedded inference.
+    - source: INTUIT-GENOS
+      claim:
+        - Каталог моделей, версии промптов, автоматическая и ручная оценка качества, задержки и стоимости.
+        - Covers a model catalog, prompt versions, and automated and manual evaluation of quality, latency, and cost.
+    - source: AZURE-SAFE-ROLLOUT
+      claim:
+        - Изолированная проверка новой версии, shadow-трафик и постепенное переключение production-трафика. Критерии отката задаёт организация.
+        - Covers isolated testing of a new version, shadow traffic, and gradual shifting of production traffic. The organization defines the rollback criteria.
+    - source: LIFE
+      claim:
+        - Статусы модели и окончание поддержки создают отдельный сценарий миграции.
+        - Model statuses and end of support create a separate migration scenario.
+  nodes:
+    - id: signal
+      label: [Зарегистрировать сигнал, Record a change signal]
+      detail:
+        - Связать жалобу, метрику, изменение требований или уведомление поставщика с владельцем, рабочим маршрутом и версией. Пользовательский материал не поступает в обучение без отдельного допуска.
+        - Link a complaint, metric, changed requirement or provider notice to the owner, production path and version. User material cannot enter training without separate approval.
+      kind: step
+      components:
+        architecture: [s_detect, s_change, mt_review]
+        infrastructure: [metrics-alerts, landing-zone, audit-log]
+        stack: [RM-OPS-01, RM-OPS-05, RM-OPS-07, RM-TRS-04]
+    - id: impact
+      label: [Определить область изменения, Scope the change]
+      detail:
+        - 'Воспроизвести проблему, зафиксировать контрольную линию и затронутые зависимости: код, инструкции, данные, индекс, модель, политика, инструменты или среда. Назначить повторные проверки G8, критерии остановки и план возврата.'
+        - 'Reproduce the issue and record the baseline and affected dependencies: code, instructions, data, index, model, policy, tools or runtime. Define G8 retests, stop criteria and rollback plan.'
+      kind: step
+      components:
+        architecture: [g8, s_change, mt_assess]
+        infrastructure: [provenance-registry, prompt-skill-registry, model-registry, eval-datasets]
+        stack: [RM-GOV-01, RM-OPS-07, RM-TRS-05, RM-DAT-05]
+    - id: plan-gate
+      label: ['Изменение обосновано?', 'Is the change justified?']
+      detail:
+        - Владелец подтверждает гипотезу, ценность, область, бюджет и выполнимые критерии. Если недостаточно оснований или невозможно безопасно проверить изменение, рабочая версия остаётся без изменений.
+        - The owner confirms the hypothesis, expected benefit, scope, budget and actionable criteria. If evidence is insufficient or safe testing is infeasible, production remains unchanged.
+      kind: decision
+      components:
+        architecture: [b_ownproc, b_goal, g8, mt_review]
+        infrastructure: [metrics-alerts, audit-log, eval-datasets]
+        stack: [RM-GOV-04, RM-OPS-05, RM-OPS-07, RM-TRS-04]
+    - id: candidate
+      label: [Собрать минимальное изменение, Build the smallest change]
+      detail:
+        - 'Изменить только нужную часть: например, инструкцию, правило доступа, индекс, интеграцию или модель. Подготовить версионированный кандидат и повторить затронутые проверки; автор не меняет критерии допуска.'
+        - Change only the necessary part, such as instructions, access policy, index, integration or model. Build a versioned candidate and repeat affected checks; the author cannot change admission criteria.
+      kind: step
+      components:
+        architecture: [v3, s_change, g8]
+        infrastructure: [git-repository, ci-runner, artifact-registry, eval-red-teaming]
+        stack: [RM-DEV-01, RM-DEV-06, RM-DEV-07, RM-DEV-08, RM-OPS-07]
+    - id: admit
+      label: ['Кандидат допущен?', 'Is the candidate admitted?']
+      detail:
+        - Передать манифест в FLOW-ADMISSION и получить решение на эту версию. До положительного решения новая конфигурация не принимает рабочий трафик.
+        - Submit the manifest to FLOW-ADMISSION and obtain a decision for that version. The new configuration cannot receive production traffic before admission.
+      kind: decision
+      components:
+        architecture: [g8, g6, o_release]
+        infrastructure: [release-gate, provenance-registry]
+        stack: [RM-DEV-09, RM-GOV-04, RM-TRS-05]
+    - id: canary
+      label: [Включить ограниченный трафик, Enable limited traffic]
+      detail:
+        - Переключить согласованную долю на допущенную версию, сохранив проверки исполнения. Для маршрута с записью теневые пробы используют тестовые цели или не производят внешних эффектов.
+        - Route an approved traffic cohort to the admitted version with runtime checks intact. For a path that can write, shadow tests use test targets or produce no external effects.
+      kind: step
+      components:
+        architecture: [o_ops, g7, t_prod]
+        infrastructure: [cd-deployment, llm-gateway, metrics-alerts, pep]
+        stack: [RM-DEV-10, RM-MOD-06, RM-OPS-01, RM-ACT-02]
+    - id: observe
+      label: ['Пороги соблюдены?', 'Are thresholds met?']
+      detail:
+        - Сравнить наблюдаемое качество, безопасность, задержку и стоимость с контрольной линией по выбранным срезам. Недостаточно данных — удерживать ограничение до срока наблюдения; при нарушении или неопределённости к этому сроку остановить продвижение.
+        - Compare observed quality, safety, latency and cost against the baseline across selected slices. Insufficient data holds limited exposure until the observation deadline; a breach or remaining uncertainty then stops promotion.
+      kind: decision
+      components:
+        architecture: [o_ops, s_detect, mt_review]
+        infrastructure: [metrics-alerts, log-metric-store, audit-log]
+        stack: [RM-OPS-01, RM-OPS-04, RM-OPS-05, RM-OPS-06]
+    - id: confirm
+      label: [Изменение введено в работу, Change in production]
+      detail:
+        - Расширить включение по плану, обновить реестр конфигураций и записать контрольные результаты. Владелец задаёт срок последующего наблюдения.
+        - Expand exposure as planned, update the configuration inventory and record verification results. The owner sets a follow-up observation period.
+      kind: outcome
+      components:
+        architecture: [o_ops, s_change, g8]
+        infrastructure: [cd-deployment, provenance-registry, audit-log]
+        stack: [RM-DEV-10, RM-GOV-01, RM-OPS-07, RM-TRS-04]
+    - id: stop
+      label: [Остановить продвижение, Stop promotion]
+      detail:
+        - Остановить расширение, вернуть допущенный совместимый маршрут после проверки схем и политик. Если безопасный возврат невозможен, оставить затронутый маршрут закрытым и сверить выполненные внешние операции.
+        - Stop expansion and restore a compatible admitted route after checking schemas and policies. If safe rollback is impossible, keep the affected route closed and reconcile completed external operations.
+      kind: step
+      components:
+        architecture: [s_change, s_resp, g8]
+        infrastructure: [cd-deployment, llm-gateway, kill-switch, audit-log]
+        stack: [RM-DEV-10, RM-MOD-06, RM-TRS-07, RM-OPS-07]
+    - id: reverted
+      label: [Возврат или остановка записаны, Rollback or suspension recorded]
+      detail:
+        - Зафиксировать фактическую конфигурацию, причину остановки, статус внешних эффектов и владельца следующего решения. Повторное изменение начинает новый вход в процесс.
+        - Record the actual configuration, stop reason, external-effect status and next decision owner. A further change is a new entry into the process.
+      kind: outcome
+      components:
+        architecture: [s_change, t_audit, mt_review]
+        infrastructure: [audit-log, cd-deployment, provenance-registry]
+        stack: [RM-OPS-07, RM-TRS-04, RM-TRS-05]
+    - id: rejected
+      label: [Кандидат не выведен, Candidate not promoted]
+      detail:
+        - Зафиксировать отказ от изменения. Сохранить прежнюю конфигурацию только при действующем допуске и допустимом риске; при отзыве допуска, окончании поддержки или недопустимом риске ограничить либо остановить затронутые маршруты.
+        - Record the rejected change. Retain the old configuration only while admission and risk remain acceptable; revoked admission, end of support or unacceptable risk requires restricting or stopping affected routes.
+      kind: outcome
+      components:
+        architecture: [g8, mt_review, t_audit]
+        infrastructure: [audit-log, release-gate]
+        stack: [RM-GOV-04, RM-OPS-07, RM-TRS-04]
+  edges:
+    - from: signal
+      to: impact
+      label: [Сигнал с владельцем, Signal with owner]
+    - from: impact
+      to: plan-gate
+      label: [Гипотеза и критерии, Hypothesis and criteria]
+    - from: plan-gate
+      to: candidate
+      label: [Есть основания, Justified]
+    - from: plan-gate
+      to: rejected
+      label: [Отложить или отклонить, Defer or reject]
+    - from: candidate
+      to: admit
+      label: [Точная версия, Exact version]
+    - from: admit
+      to: canary
+      label: [Есть допуск, Admitted]
+    - from: admit
+      to: rejected
+      label: [Допуска нет, No admission]
+    - from: canary
+      to: observe
+      label: [Результаты включения, Rollout results]
+    - from: observe
+      to: confirm
+      label: [Все пороги соблюдены, All thresholds met]
+    - from: observe
+      to: stop
+      label: [Провал или нет уверенности, Breach or uncertainty]
+    - from: stop
+      to: reverted
+      label: [Фактическое состояние, Actual state]
+  main: [signal, impact, plan-gate, candidate, admit, canary, observe, confirm]

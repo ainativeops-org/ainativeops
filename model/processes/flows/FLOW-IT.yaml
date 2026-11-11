@@ -1,0 +1,298 @@
+# Процесс на карте / Process on the map: FLOW-IT
+# workflow: узлы и переходы схемы; SVG схемы строит tools/build.py через Graphviz.
+# workflow: diagram nodes and edges; tools/build.py renders the SVG with Graphviz.
+name:
+  ru: Разработка ИТ-продукта с помощью ИИ
+  en: AI-assisted IT Product Development
+group: DEV
+owner:
+  - Владелец ИТ-продукта; допуск выпуска — владелец рубежа.
+  - IT product owner; release admission belongs to the gate owner.
+start:
+  - Появилась согласованная бизнес-потребность, назначен владелец и выделен бюджет разработки.
+  - An agreed business need has a product owner and a development budget.
+result:
+  - Подтверждена работа точной версии продукта в эксплуатации; назначены ответственные за сопровождение.
+  - The exact product version is verified in operation and has assigned support owners.
+check:
+  - Требования прослеживаются до тестов; сборка с известным хешем и пакет свидетельств прошли независимый допуск. Выполнены проверка после выкладки и репетиция отката.
+  - Requirements trace to tests. A digest-pinned build and its evidence passed independent admission. Post-deployment checks and a rollback rehearsal are complete.
+maturity:
+  - Базовый жизненный цикл ИТ-продукта. ИИ ускоряет работу в согласованных границах.
+  - Baseline IT product lifecycle. AI assists within agreed boundaries.
+calls:
+  - id: FLOW-AGENT-BUILD
+    when:
+      - Если проектируемый продукт включает агента, которому нужен собственный допуск как развёртываемому компоненту.
+      - When the product design includes an agent requiring separate admission as a deployable component.
+  - id: FLOW-ADMISSION
+    when:
+      - Перед выпуском конфигурации ИИ-системы по пакету свидетельств.
+      - Before releasing an AI system configuration on the basis of its evidence package.
+order: 1
+protection:
+  - Каждый вызов модели проходит проверку идентичности и прав, защиту входа и выхода и аудит в разрешённом объёме. Вызовы инструментов допускаются отдельно; код исполняется в изолированной среде. Согласование и ограничения раскрытия задаются политикой.
+  - Every model call uses identity and authorization checks, input and output protections, and permitted audit retention. Tool calls are authorized separately; code runs in a sandbox. Approval and disclosure restrictions follow policy.
+parts:
+  - IT-REPAIR
+  - CORE-01
+  - FLOW-IT--BRIEF
+  - FLOW-IT--SPEC
+  - FLOW-IT--DESIGN
+  - FLOW-IT--AUTHORITY
+  - FLOW-IT--IMPLEMENT
+  - FLOW-IT--INTEGRATE
+  - FLOW-IT--VERIFY
+  - FLOW-IT--ADMIT
+  - FLOW-IT--ROLLOUT
+tags: [AI-assisted IT Product Development]
+path: process-flow-it
+workflow:
+  summary:
+    - Появилась согласованная бизнес-потребность, назначен владелец и выделен бюджет разработки. Подтверждена работа точной версии продукта в эксплуатации; назначены ответственные за сопровождение.
+    - An agreed business need has a product owner and a development budget. The exact product version is verified in operation and has assigned support owners.
+  synthesis:
+    - Последовательность, условия переходов и сопоставление компонентов — проектный синтез AiNativeOps. Источники подтверждают отдельные практики в указанной области, а не всю схему.
+    - The sequence, conditions and component mapping are AiNativeOps design synthesis. Sources support individual practices within their stated scope, not the entire diagram.
+  basis:
+    - source: P20-HARNESS
+      claim:
+        - Разделение планирования, генерации и оценки, длительное исполнение с передачей состояния; не подтверждает весь предлагаемый корпоративный цикл.
+        - Separates planning, generation, and evaluation, and covers long-running execution with state handoff; does not confirm the whole proposed enterprise cycle.
+    - source: UBER-SOFTWARE-FACTORY
+      claim:
+        - Агентные задачи разработки и CI, человеческое review и эскалации, декомпозиция основной моделью и выполнение подагентами.
+        - Covers agentic development and CI tasks, human review and escalations, and task decomposition by a primary model with execution by subagents.
+    - source: SSDF
+      claim:
+        - Безопасная разработка моделей и ИИ-систем, происхождение, проверки и роли.
+        - Covers secure development of models and AI systems, provenance, checks, and roles.
+    - source: SLSA
+      claim:
+        - Происхождение связывает артефакт с материалами и способом его построения.
+        - Provenance links an artifact to its materials and to the way it was built.
+    - source: AZURE-SAFE-ROLLOUT
+      claim:
+        - Изолированная проверка новой версии, shadow-трафик и постепенное переключение production-трафика. Критерии отката задаёт организация.
+        - Covers isolated testing of a new version, shadow traffic, and gradual shifting of production traffic. The organization defines the rollback criteria.
+  nodes:
+    - id: brief
+      label: [Цель и границы продукта, Product goal and scope]
+      detail:
+        - Записать потребность пользователя, владельца, ожидаемый эффект, пределы бюджета и события, которых продукт не должен допускать. Согласовать измеримый критерий успеха.
+        - Record the user need, owner, expected outcome, budget limits and prohibited events. Agree on a measurable success criterion.
+      kind: step
+      components:
+        architecture: [g0, b_goal, b_np, b_ownproc]
+        infrastructure: [business-apps]
+        stack: [RM-APP-01, RM-GOV-04]
+    - id: spec
+      label: [Требования и приёмка, Requirements and acceptance]
+      detail:
+        - Версионировать сценарии пользователей, интерфейсы, требования к доступности и безопасности. До реализации закрепить примеры, требования к данным и критерии приёмки за ответственными ролями.
+        - Version user journeys, interfaces, availability and security requirements. Before implementation, assign ownership of acceptance cases, data requirements and criteria.
+      kind: step
+      components:
+        architecture: [v1, b_reqprod, b_reqsec, b_poldisc]
+        infrastructure: [git-repository, rule-based-checks]
+        stack: [RM-DEV-01, RM-DEV-07, RM-GOV-03]
+    - id: design
+      label: [Проектирование и прототип, Design and prototype]
+      detail:
+        - Спроектировать модули, контракты, схему данных, границы доверия, зависимости и путь отката. Если ИИ помогает оценить варианты, каждый запрос и результат проходят входные и выходные guardrails; решения и риски фиксирует инженер.
+        - Design modules, contracts, schemas, trust boundaries, dependencies and the rollback path. If AI assists with alternatives, every invocation passes input and output guardrails; an engineer records decisions and risks.
+      kind: step
+      components:
+        architecture: [mt_tb, mt_assess, v1, v4, t_input, t_infer, t_result]
+        infrastructure: [git-repository, artifact-intake, input-guardrails, llm-gateway, output-guardrails]
+        stack: [RM-DEV-01, RM-GOV-04, RM-SEC-03, RM-AIC-01, RM-MOD-06, RM-AIC-02]
+    - id: authority
+      label: ['План и полномочия допущены?', 'Are plan and authority admitted?']
+      detail:
+        - Утвердить архитектурный вариант и риск, выдать ограниченное рабочее окружение и полномочия по репозиторию, данным и инструментам. Не выдавать агенту права на выпуск или обход ревью.
+        - Approve the design and risk; provision a bounded workspace and repository, data and tool permissions. Do not grant the agent release or review-bypass authority.
+      kind: decision
+      components:
+        architecture: [s_prep, b_polagent, mt_residual, t_harness]
+        infrastructure: [agent-iam, job-sandbox, zero-trust-git, pdp, pep]
+        stack: [RM-GOV-02, RM-ACT-03, RM-ACT-04, RM-ACT-01, RM-ACT-02]
+    - id: implement
+      label: [Реализация и тесты, Implementation and tests]
+      detail:
+        - Подготовить код, тесты и документацию в допущенной области. Каждый вызов модели, включая подагентов, проходит входные и выходные guardrails, а чтение или запись через инструмент проверяется PEP перед выполнением. Сохранить изменения на ревью.
+        - Prepare code, tests and documentation in the approved scope. Every model invocation, including subagents, passes input and output guardrails; PEP checks tool reads and writes before execution. Submit changes for review.
+      kind: step
+      components:
+        architecture: [v2, t_eng, t_harness, t_gw, g7, t_input, t_infer, t_result]
+        infrastructure:
+          - agent-orchestrator
+          - agent-runtime
+          - job-sandbox
+          - tool-router
+          - pep
+          - git-repository
+          - input-guardrails
+          - llm-gateway
+          - output-guardrails
+        stack:
+          - RM-DEV-01
+          - RM-AGT-01
+          - RM-AGT-02
+          - RM-ACT-03
+          - RM-AGT-04
+          - RM-ACT-02
+          - RM-AIC-01
+          - RM-MOD-06
+          - RM-AIC-02
+    - id: integrate
+      label: [Интеграция и сборка, Integration and build]
+      detail:
+        - Собрать кандидата из точной ревизии в CI, проверить миграции и контракты интеграций, зависимости и секреты. Зарегистрировать хеш пакета и свидетельство происхождения.
+        - Build the candidate from the exact revision in CI. Test migration and integration contracts, dependencies and secrets. Register the package digest and provenance evidence.
+      kind: step
+      components:
+        architecture: [v3, v4, v5, g5, s_scan, o_pack]
+        infrastructure: [ci-runner, sast-sca-secrets, artifact-registry, provenance-registry]
+        stack: [RM-DEV-06, RM-SEC-04, RM-DEV-08, RM-TRS-05]
+    - id: verify
+      label: ['Независимая приёмка пройдена?', 'Does independent acceptance pass?']
+      detail:
+        - Проверить функциональность, интеграции, нагрузку и негативные сценарии на независимом стенде. Если оценивают ИИ-функцию или используют ИИ-контролёра, каждый модельный вызов проходит входные и выходные guardrails; решение опирается на проверяемые критерии и ревью. До допуска отрепетировать откат, проверить совместимость миграций; для первой версии подтвердить безопасное отключение.
+        - Check functionality, integrations, load and negative cases in an independent environment. When testing an AI feature or using an AI controller, every model call passes input and output guardrails; verifiable criteria and review drive the decision. Rehearse rollback and migration compatibility before admission; for a first release verify safe shutdown.
+      kind: decision
+      components:
+        architecture: [o_eval, g4, mt_indep, mt_ev, t_input, t_infer, t_result]
+        infrastructure:
+          - eval-red-teaming
+          - eval-datasets
+          - rule-based-checks
+          - llm-as-a-judge
+          - input-guardrails
+          - llm-gateway
+          - output-guardrails
+        stack: [RM-DEV-07, RM-DAT-05, RM-AIC-03, RM-AIC-04, RM-AIC-01, RM-MOD-06, RM-AIC-02]
+    - id: rework
+      label: ['Доработка остаётся в границах?', 'Is rework still within scope?']
+      detail:
+        - По замечанию определить, меняется ли контракт, архитектура или реализация. Установить конечный лимит исправлений; изменение рисков требует нового допуска и новой версии свидетельств.
+        - Determine whether findings change a contract, design or implementation. Bound the correction loop; changed risk requires fresh admission and a new evidence version.
+      kind: decision
+      components:
+        architecture: [s_change, mt_review, b_polbudget]
+        infrastructure: [rate-limits-budgets, git-repository, audit-log]
+        stack: [RM-AGT-08, RM-OPS-07, RM-TRS-04]
+    - id: admit
+      label: ['Выпуск точной версии разрешён?', 'Is the exact version admitted for release?']
+      detail:
+        - Сверить манифест кода, зависимостей, данных и конфигураций, включая модели, инструкции и политики при их наличии. Ответственный утверждает точный пакет; подпись и сохранение свидетельств относятся к этому хешу.
+        - Verify the manifest of code, dependencies, data and configurations, including models, instructions and policies where used. The responsible owner approves the exact package; its signature and evidence bind to that digest.
+      kind: decision
+      components:
+        architecture: [o_release, g6, b_ownrisk, mt_ev]
+        infrastructure: [release-gate, integrity-monitoring, provenance-registry, hsm-kms]
+        stack: [RM-DEV-09, RM-TRS-01, RM-TRS-05, RM-TRS-06]
+    - id: rollout
+      label: ['Выкладка выдержала контроль?', 'Does rollout pass its checks?']
+      detail:
+        - Развернуть допущенный пакет с проверкой подписи и наблюдением. Если контрольная операция вызывает модель, запрос и результат идут через штатные guardrails. При нарушении порогов остановить продвижение и применить проверенный откат или эскалировать необратимые эффекты.
+        - Deploy the approved package with signature verification and monitoring. If a smoke check calls a model, its request and response pass production guardrails. On threshold breaches, stop promotion and apply the rehearsed rollback or escalate irreversible effects.
+      kind: decision
+      components:
+        architecture: [o_ops, t_prod, g7, s_runtime, s_detect, t_input, t_infer, t_result]
+        infrastructure:
+          - cd-deployment
+          - metrics-alerts
+          - integrity-monitoring
+          - input-guardrails
+          - llm-gateway
+          - output-guardrails
+        stack: [RM-DEV-10, RM-OPS-01, RM-TRS-06, RM-AIC-01, RM-MOD-06, RM-AIC-02]
+    - id: live
+      label: [Продукт введён в эксплуатацию, Product in operation]
+      detail:
+        - Сохранены номер версии, результат проверки и ссылка на свидетельства. Службе сопровождения переданы SLO, владельцы, алерты и план реагирования.
+        - Record the release version, verification result and evidence reference. Hand over SLOs, owners, alerts and the response plan to operations.
+      kind: outcome
+      components:
+        architecture: [o_ops, t_prod, b_ownproc, t_audit]
+        infrastructure: [business-apps, metrics-alerts, audit-log]
+        stack: [RM-APP-01, RM-OPS-01, RM-TRS-04]
+    - id: halt
+      label: [Выпуск остановлен, Release stopped]
+      detail:
+        - Не продвигать кандидата. Зафиксировать отказ или выполненный откат, затронутую версию, остаточные эффекты и следующий шаг для владельца.
+        - Do not promote the candidate. Record the denial or completed rollback, affected version, residual effects and the owner's next action.
+      kind: outcome
+      components:
+        architecture: [mt_residual, s_resp, t_audit]
+        infrastructure: [audit-log, release-gate, cd-deployment]
+        stack: [RM-TRS-04, RM-DEV-09, RM-DEV-10]
+  edges:
+    - from: brief
+      to: spec
+      label: [Цель принята, Goal agreed]
+    - from: spec
+      to: design
+      label: [Критерии закреплены, Criteria pinned]
+    - from: design
+      to: authority
+      label: [Проект подготовлен, Design prepared]
+    - from: authority
+      to: implement
+      label: [Права и риск утверждены, Authority and risk approved]
+    - from: authority
+      to: design
+      label: [Нужен более узкий проект, Narrower design needed]
+    - from: authority
+      to: halt
+      label: [Права или риск недопустимы, Authority or risk denied]
+    - from: implement
+      to: integrate
+      label: [Изменение собрано на ревью, Change ready for review]
+    - from: implement
+      to: halt
+      label: [Недопустимый вызов или действие, Prohibited call or operation]
+    - from: integrate
+      to: verify
+      label: [Хеш кандидата закреплён, Candidate digest pinned]
+    - from: integrate
+      to: rework
+      label: [Интеграция или проверка не пройдена, Integration or scan failed]
+    - from: verify
+      to: admit
+      label: [Свидетельства подтверждены, Evidence confirmed]
+    - from: verify
+      to: rework
+      label: [Обнаружена регрессия, Regression found]
+    - from: rework
+      to: implement
+      label: [Правка в текущем контракте, Fix within current contract]
+    - from: rework
+      to: design
+      label: [Нужна повторная оценка проекта, Design needs reassessment]
+    - from: rework
+      to: halt
+      label: [Лимит исчерпан, Rework limit reached]
+    - from: admit
+      to: rollout
+      label: [Допущен точный манифест, Exact manifest admitted]
+    - from: admit
+      to: halt
+      label: [Нет допуска выпуска, Release admission denied]
+    - from: rollout
+      to: live
+      label: [Контрольные показатели в пределах, Metrics within thresholds]
+    - from: rollout
+      to: halt
+      label: ['Стоп, откат или эскалация', 'Stop, rollback or escalate']
+  main:
+    - brief
+    - spec
+    - design
+    - authority
+    - implement
+    - integrate
+    - verify
+    - admit
+    - rollout
+    - live

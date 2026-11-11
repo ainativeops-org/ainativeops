@@ -1,0 +1,224 @@
+# Процесс на карте / Process on the map: FLOW-RECOVERY
+# workflow: узлы и переходы схемы; SVG схемы строит tools/build.py через Graphviz.
+# workflow: diagram nodes and edges; tools/build.py renders the SVG with Graphviz.
+name:
+  ru: Восстановление ИИ-сервиса после эксплуатационного инцидента
+  en: AI Service Incident Recovery
+group: RUN
+owner:
+  - Руководитель восстановления сервиса; возврат подтверждает владелец сервиса.
+  - Service recovery lead; the service owner confirms resumption.
+start:
+  - Контроль доступности, очереди, вычислительной ёмкости или целостности данных выявил деградацию или отказ сервиса.
+  - Availability, queue, capacity or data integrity checks detect degradation or service failure.
+result:
+  - Сервис восстановлен по проверенному маршруту, оставлен в безопасном ограничении либо передан в расследование ИБ при соответствующих признаках.
+  - The service resumes on a verified path, remains safely restricted or is transferred for security investigation if indicators warrant it.
+check:
+  - Учебный сбой подтверждает целевое время и допустимую потерю данных. Резервный маршрут сохраняет ограничения, восстановленная копия не возвращает отозванные права и не повторяет записи.
+  - An outage drill confirms recovery time and allowed data loss. The fallback preserves controls; a restored copy neither reinstates revoked access nor repeats writes.
+maturity:
+  - 'Управляемое восстановление: запасные пути, проверка актуальных полномочий, контроль возврата нагрузки.'
+  - 'Managed recovery: fallback paths, current access checks and controlled traffic resumption.'
+calls:
+  - id: FLOW-INCIDENT
+    when:
+      - Если при первичном разборе или восстановлении обнаружены признаки раскрытия, обхода контроля или компрометации, зафиксировать сигнал и передать реагирование в процесс ИБ.
+      - If triage or recovery reveals possible disclosure, control bypass or compromise, record the signal and activate the security incident process.
+order: 18
+protection:
+  - Каждый вызов модели проходит проверку идентичности и прав, защиту входа и выхода и аудит в разрешённом объёме. Вызовы инструментов допускаются отдельно; код исполняется в изолированной среде. Согласование и ограничения раскрытия задаются политикой.
+  - Every model call uses identity and authorization checks, input and output protections, and permitted audit retention. Tool calls are authorized separately; code runs in a sandbox. Approval and disclosure restrictions follow policy.
+parts:
+  - CORE-01
+  - FLOW-RECOVERY--ALERT
+  - FLOW-RECOVERY--TRIAGE
+  - FLOW-RECOVERY--LIMIT
+  - FLOW-RECOVERY--CHOOSE
+  - FLOW-RECOVERY--SWITCH
+  - FLOW-RECOVERY--VALIDATE
+  - FLOW-RECOVERY--RESUME
+tags: [AI Service Incident Recovery]
+path: process-flow-recovery
+workflow:
+  summary:
+    - Контроль доступности, очереди, вычислительной ёмкости или целостности данных выявил деградацию или отказ сервиса. Сервис восстановлен по проверенному маршруту, оставлен в безопасном ограничении либо передан в расследование ИБ при соответствующих признаках.
+    - Availability, queue, capacity or data integrity checks detect degradation or service failure. The service resumes on a verified path, remains safely restricted or is transferred for security investigation if indicators warrant it.
+  synthesis:
+    - Последовательность, условия переходов и сопоставление компонентов — проектный синтез AiNativeOps. Источники подтверждают отдельные практики в указанной области, а не всю схему.
+    - The sequence, conditions and component mapping are AiNativeOps design synthesis. Sources support individual practices within their stated scope, not the entire diagram.
+  basis:
+    - source: STORAGE
+      claim:
+        - Защита хранилищ, резервирование и восстановление.
+        - Covers storage protection, backup, and recovery.
+    - source: AWS-MULTI-GATEWAY
+      claim:
+        - Шлюз нескольких провайдеров, guardrails, ограничения доступа, маршрутизация и обработка временных отказов.
+        - Covers a multi-provider gateway, guardrails, access restrictions, routing, and handling of transient failures.
+    - source: AZURE-SAFE-ROLLOUT
+      claim:
+        - Изолированная проверка новой версии, shadow-трафик и постепенное переключение production-трафика. Критерии отката задаёт организация.
+        - Covers isolated testing of a new version, shadow traffic, and gradual shifting of production traffic. The organization defines the rollback criteria.
+    - source: OTEL
+      claim:
+        - Метрики, трассы и журналы как разные сигналы.
+        - Treats metrics, traces, and logs as distinct signals.
+  nodes:
+    - id: alert
+      label: [Зарегистрировать сбой сервиса, Record the service disruption]
+      detail:
+        - Сохранить время, симптом, затронутый маршрут и версию, контрольные показатели и ожидаемое время восстановления. Назначить руководителя и определить приоритет по влиянию на потребителей.
+        - Record time, symptom, affected path and version, service targets and expected recovery time. Assign a recovery lead and prioritize by consumer impact.
+      kind: step
+      components:
+        architecture: [s_detect, o_ops, b_ownproc]
+        infrastructure: [metrics-alerts, log-metric-store, audit-log]
+        stack: [RM-OPS-01, RM-OPS-02, RM-OPS-04, RM-TRS-04]
+    - id: triage
+      label: ['Есть признаки нарушения ИБ?', 'Are there security indicators?']
+      detail:
+        - Сопоставить ошибки и трассы с последними изменениями. Деградация без признаков нарушения допускает эксплуатационное восстановление; при подозрении на раскрытие, компрометацию или недопустимый эффект не расширять доступ.
+        - Correlate errors and traces with recent changes. Degradation without signs of a breach permits operational recovery; suspected disclosure, compromise or a prohibited effect rules out access expansion.
+      kind: decision
+      components:
+        architecture: [s_detect, b_regincident, mt_tb]
+        infrastructure: [metrics-alerts, log-metric-store, siem-soc]
+        stack: [RM-OPS-01, RM-OPS-02, RM-SEC-05]
+    - id: limit
+      label: [Стабилизировать нагрузку, Stabilize the workload]
+      detail:
+        - Ограничить новые запросы, поставить очередь в безопасное состояние и отметить незавершённые операции. Не повторять вызовы с неизвестным результатом до сверки с целевой системой.
+        - Restrict new requests, put queues in a safe state and identify unfinished work. Do not repeat a call with an unknown outcome before reconciling with the target system.
+      kind: step
+      components:
+        architecture: [o_ops, s_runtime, t_prod]
+        infrastructure: [llm-gateway, rate-limits-budgets, checkpoint-store]
+        stack: [RM-MOD-06, RM-MOD-08, RM-PLT-04, RM-AGT-05]
+    - id: choose
+      label: ['Какой путь восстановления допустим?', 'Which recovery path is eligible?']
+      detail:
+        - Выбрать заранее допущенный запасной маршрут или возврат совместимой версии, если состояние согласовано. При потере состояния использовать проверяемую резервную копию. Если условий нет, оставить сервис ограниченным.
+        - Choose a pre-admitted fallback path or return to a compatible version if state is consistent. If state was lost, use a verifiable backup. If no option meets the conditions, keep the service restricted.
+      kind: decision
+      components:
+        architecture: [o_ops, g6, mt_tb]
+        infrastructure: [llm-gateway, cd-deployment, archive-backup]
+        stack: [RM-MOD-06, RM-DEV-10, RM-OPS-08, RM-GOV-04]
+    - id: switch
+      label: [Переключить на допущенный резерв, Switch to an admitted fallback]
+      detail:
+        - Проверить действующий допуск, совместимость, местонахождение обработки и прежние ограничения раскрытия. Переключить маршрут без расширения доступа; внешний маршрут не разрешается самим фактом отказа.
+        - Verify current admission, compatibility, processing location and existing disclosure restrictions. Switch without expanding access; a failure does not authorize an external path.
+      kind: step
+      components:
+        architecture: [o_ops, t_infer, b_poldisc, b_polext]
+        infrastructure: [llm-gateway, inference-servers, cd-deployment]
+        stack: [RM-MOD-06, RM-MOD-07, RM-DEV-10, RM-GOV-03]
+    - id: restore
+      label: [Восстановить согласованное состояние, Restore consistent state]
+      detail:
+        - Восстановить данные и версии в изолированной среде, проверить целостность и фактическую потерю данных. До включения применить текущие политики и сведения об отзыве, сверить ожидающие операции.
+        - Restore data and versions in isolation; verify integrity and actual data loss. Before activation apply current policy and revocation records and reconcile pending operations.
+      kind: step
+      components:
+        architecture: [o_ops, mt_ev, t_prod]
+        infrastructure: [archive-backup, integrity-monitoring, checkpoint-store, pep]
+        stack: [RM-OPS-08, RM-TRS-06, RM-AGT-05, RM-ACT-02]
+    - id: validate
+      label: ['Восстановление подтверждено?', 'Is recovery verified?']
+      detail:
+        - Проверить целостность и версию, отказ по старым полномочиям, защиту запросов и ответов, отсутствие повторных эффектов, доступность и задержку. Сравнить фактическое время и потерю данных с целями восстановления.
+        - Check integrity and version, old-authority denials, input and output controls, no duplicate effects, availability and latency. Compare actual time and data loss with recovery objectives.
+      kind: decision
+      components:
+        architecture: [o_ops, s_runtime, t_result, mt_ev]
+        infrastructure: [input-guardrails, output-guardrails, pep, metrics-alerts, audit-log]
+        stack: [RM-AIC-01, RM-AIC-02, RM-ACT-02, RM-OPS-01, RM-OPS-08]
+    - id: resume
+      label: ['Возврат нагрузки устойчив?', 'Is traffic resumption stable?']
+      detail:
+        - По решению владельца открыть ограниченную долю трафика и наблюдать в установленный срок. При повторном отказе остановить расширение и вернуть ограничение; при признаках нарушения ИБ немедленно передать сигнал.
+        - With owner approval, resume a limited traffic cohort and monitor for the defined interval. On recurrent failure, stop expansion and restore restrictions; transfer security indicators immediately.
+      kind: decision
+      components:
+        architecture: [o_ops, s_detect, b_ownproc]
+        infrastructure: [cd-deployment, llm-gateway, metrics-alerts]
+        stack: [RM-DEV-10, RM-MOD-06, RM-OPS-01, RM-OPS-07]
+    - id: restored
+      label: [Сервис восстановлен, Service restored]
+      detail:
+        - Подтвердить рабочий маршрут, достигнутые параметры восстановления и восстановленную конфигурацию. Оформить разбор причины и ответственного за последующие улучшения.
+        - Confirm the live path, achieved recovery parameters and restored configuration. Record root-cause follow-up and assign an improvement owner.
+      kind: outcome
+      components:
+        architecture: [o_ops, s_change, t_audit]
+        infrastructure: [metrics-alerts, provenance-registry, audit-log]
+        stack: [RM-OPS-07, RM-OPS-08, RM-TRS-04]
+    - id: restricted
+      label: [Работа безопасно ограничена, Service safely restricted]
+      detail:
+        - Не открывать неподтверждённый маршрут, удержать или завершить задания по регламенту. Сообщить владельцу фактическое состояние, потери и условие повторного входа.
+        - Keep the unverified route closed and hold or terminate work under procedure. Give the owner the actual state, losses and the condition for a new recovery attempt.
+      kind: outcome
+      components:
+        architecture: [o_ops, s_runtime, t_audit]
+        infrastructure: [llm-gateway, metrics-alerts, audit-log]
+        stack: [RM-MOD-06, RM-OPS-01, RM-OPS-07, RM-TRS-04]
+    - id: security-handoff
+      label: [Сигнал передан в ИБ, Security signal handed off]
+      detail:
+        - Зафиксировать признак нарушения и защищённую ссылку на исходные события, сохранить действующее ограничение маршрута. Дальнейшее сдерживание и возврат решает FLOW-INCIDENT.
+        - Record the security indicator and a protected reference to original events, retaining path restrictions. FLOW-INCIDENT owns further containment and resumption.
+      kind: outcome
+      components:
+        architecture: [s_detect, s_resp, t_siem]
+        infrastructure: [siem-soc, audit-log, llm-gateway, evidence-store]
+        stack: [RM-SEC-05, RM-SEC-07, RM-TRS-04, RM-MOD-06]
+  edges:
+    - from: alert
+      to: triage
+      label: [Сигнал и контекст, Alert and context]
+    - from: triage
+      to: limit
+      label: [Эксплуатационный сбой, Operational disruption]
+    - from: triage
+      to: security-handoff
+      label: [Признак нарушения, Security indicator]
+    - from: limit
+      to: choose
+      label: [Нагрузка ограничена, Workload stabilized]
+    - from: choose
+      to: switch
+      label: [Резерв или откат допустим, Fallback or rollback allowed]
+    - from: choose
+      to: restore
+      label: [Есть проверяемая копия, Verifiable backup available]
+    - from: choose
+      to: restricted
+      label: [Безопасного пути нет, No safe path]
+    - from: switch
+      to: validate
+      label: [Резерв включён ограниченно, Fallback enabled in isolation]
+    - from: restore
+      to: validate
+      label: [Состояние восстановлено, State restored]
+    - from: validate
+      to: resume
+      label: [Проверки пройдены, Checks passed]
+    - from: validate
+      to: restricted
+      label: [Проверка не пройдена, Verification failed]
+    - from: validate
+      to: security-handoff
+      label: [Признак нарушения, Security indicator]
+    - from: resume
+      to: restored
+      label: [Сервис устойчив, Service stable]
+    - from: resume
+      to: restricted
+      label: [Сбой повторился, Disruption recurs]
+    - from: resume
+      to: security-handoff
+      label: [Признак нарушения, Security indicator]
+  main: [alert, triage, limit, choose, switch, validate, resume, restored]

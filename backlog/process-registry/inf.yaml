@@ -1,0 +1,132 @@
+# Реестр процессов · Инференс и применение / Process registry · Inference and use
+INF-01:
+  name:
+    ru: Текстовый чат с LLM
+    en: Text-only LLM chat
+  start:
+    - Сотрудник открывает разговор и отправляет текст.
+    - An employee opens a conversation and sends text.
+  result:
+    - Проверенный ответ и сохранённая история этого разговора.
+    - A checked answer and the saved history of this conversation.
+  check:
+    - История доступна только по действующим правам. Запрещённый вход не достигает модели, запрещённый ответ не показывается.
+    - History is available only under current permissions. Prohibited input does not reach the model, and a prohibited answer is not shown.
+  gates: И
+  classes: [RM-APP-02, RM-SEC-01, RM-PLT-03, RM-MOD-06, RM-AIC-01, RM-AIC-02, RM-TRS-04]
+INF-02:
+  name:
+    ru: Разовый запрос к модели
+    en: Single-turn interactive inference
+  start:
+    - Человек отправляет отдельный запрос без использования предыдущих сообщений.
+    - A person sends a standalone request that does not use previous messages.
+  result: [Один проверенный ответ или отказ., One checked answer or a denial.]
+  check:
+    - Проверяются запрос, маршрут и результат. Из другого разговора ничего не подставляется.
+    - The request, route and result are checked. Nothing is inserted from another conversation.
+  gates: И
+  classes: [RM-APP-02, RM-MOD-06]
+INF-03:
+  name:
+    ru: Синхронный инференс по API
+    en: Synchronous model API inference
+  start:
+    - Сервис с собственной идентичностью вызывает разрешённый API модели.
+    - A service with its own identity calls a permitted model API.
+  result:
+    - Ответ по контракту вызывающего сервиса.
+    - A response that follows the calling service's contract.
+  check:
+    - Запрос вне области прав, тайм-аут и ответ вне схемы обрабатываются как задано политикой.
+    - A request outside the granted permissions, a timeout and a response that violates the schema are handled as the policy specifies.
+  gates: И
+  classes: [RM-APP-01, RM-INT-01, RM-SEC-01, RM-MOD-06, RM-MOD-07]
+INF-04:
+  name:
+    ru: Пакетный инференс
+    en: Batch inference job
+  start:
+    - Владелец задания подаёт версию входной партии, модель и условия выполнения.
+    - The job owner submits an input batch version, a model and execution conditions.
+  result:
+    - Версионированная партия прогнозов или ответов и статусы записей.
+    - A versioned batch of predictions or responses and per-record statuses.
+  check:
+    - Отдельно допущены задание, вход и публикация результатов. Повтор задания не создаёт лишнюю выдачу.
+    - The job, the input and the publication of results are admitted separately. A job rerun does not produce duplicate output.
+  gates: И
+  classes: [RM-DAT-04, RM-PLT-04, RM-MOD-07, RM-MOD-08, RM-AIC-01, RM-AIC-02]
+INF-05:
+  name:
+    ru: Инференс по событию
+    en: Event-triggered inference
+  start:
+    - Доверенный источник публикует событие, которое запускает вычисление.
+    - A trusted source publishes an event that triggers a computation.
+  result: ['Результат, связанный с исходным событием.', A result linked to the originating event.]
+  check:
+    - Одинаковое событие распознаётся при повторной доставке. Итог имеет корреляцию и разрешённое назначение.
+    - A duplicate event is recognized on redelivery. The result carries correlation and goes to a permitted destination.
+  gates: И
+  classes: [RM-INT-03, RM-PLT-04, RM-MOD-06, RM-TRS-04]
+INF-06:
+  name:
+    ru: Инференс непрерывного потока данных
+    en: Continuous stream inference
+  start:
+    - Сервис получает длительный поток наблюдений с требованиями к задержке.
+    - A service receives a long-running stream of observations with latency requirements.
+  result:
+    - Поток проверенных результатов, связанных с окнами входных данных.
+    - A stream of checked results linked to input data windows.
+  check:
+    - Заданы окно, опоздавшее событие, граница выдачи и безопасная обработка отставания. Поток токенов ответа чата относится к режиму выдачи.
+    - The window, late events, the output boundary and safe handling of lag are defined. Streaming the tokens of a chat response is an output mode.
+  gates: И
+  classes: [RM-INT-03, RM-MOD-07, RM-MOD-08, RM-OPS-01]
+INF-07:
+  name:
+    ru: Автономный инференс на устройстве
+    en: Offline on-device inference
+  start:
+    - Допущенное устройство выполняет модель при ограниченной связи.
+    - An admitted device runs the model with limited connectivity.
+  result:
+    - Локально проверенный результат и свидетельство для последующей сверки.
+    - A locally checked result and evidence for later reconciliation.
+  check:
+    - Проверить отзыв, истечение политики, обновление модели и поведение при отсутствии сети.
+    - Check revocation, policy expiry, model updates and behavior without a network connection.
+  gates: И
+  classes: [RM-MOD-07, RM-AIC-01, RM-AIC-02, RM-TRS-04, RM-OPS-07]
+INF-08:
+  name:
+    ru: Поддержка решения человека
+    en: Human decision support
+  start:
+    - Специалист получает модельную рекомендацию для решения с ответственным владельцем.
+    - A specialist receives a model recommendation for a decision that has an accountable owner.
+  result:
+    - Рекомендация, основания, ограничения и зафиксированное решение человека.
+    - The recommendation, its grounds, its limitations and the recorded human decision.
+  check:
+    - Проверить, что значимое решение учитывает реальные основания, а ответ модели не создаёт действие сам по себе.
+    - Check that a significant decision considers the actual grounds and that the model output does not trigger an action on its own.
+  gates: И
+  classes: [RM-APP-01, RM-APP-03, RM-AIC-04, RM-GOV-04, RM-TRS-04]
+INF-09:
+  name:
+    ru: Исполнение составного модельного конвейера
+    en: Multi-model inference pipeline
+  start:
+    - Сервис запускает определённую цепочку или ансамбль моделей.
+    - A service runs a defined chain or ensemble of models.
+  result:
+    - Составной результат с происхождением и версиями всех этапов.
+    - A composite result with the provenance and versions of all stages.
+  check:
+    - Проверить допустимость промежуточного результата на границе каждого получателя и отказ одной стадии.
+    - Check that each intermediate result is acceptable at every recipient's boundary, and check how a single-stage failure is handled.
+  gates: И
+  classes: [RM-DEV-03, RM-MOD-06, RM-MOD-07, RM-OPS-02]

@@ -1,0 +1,125 @@
+# Этапы и варианты процессов. Ключ этапа процесса: <процесс>--<этап>.
+# Stages and variants of processes. A process stage key is <process>--<stage>.
+FLOW-PRETRAIN--BRIEF:
+  kind: operation
+  name:
+    ru: Цель, базовый уровень и бюджет
+    en: Goal, baseline and budget
+  description:
+    - Согласовать модальности, целевые возможности, пороги безопасности, бюджет и условие остановки. Закрепить базовый уровень для сравнения и правила измерения до расчётов.
+    - Agree on modalities, target capabilities, safety thresholds, budget and stop conditions. Pin the reference baseline and measurement rules before execution.
+  classes: [RM-DEV-05, RM-DAT-05, RM-OPS-06, RM-GOV-04]
+  architectureSteps: [g0, m2, b_goal, b_np, b_polbudget]
+  workflowNode: brief
+FLOW-PRETRAIN--CORPUS:
+  kind: operation
+  name:
+    ru: Манифест корпуса и контрольных наборов
+    en: Corpus and evaluation set manifest
+  description:
+    - Связать источники, права, доли смеси, дедупликацию, классификацию и проверки на пересечение с контрольной выборкой. Если фильтр или генератор вызывают модель, каждый вызов проходит входные и выходные guardrails; модельные преобразования отмечаются в происхождении.
+    - Bind sources, use rights, mixture weights, deduplication, classification and checks for overlap with evaluation data. If a filter or generator calls a model, every invocation passes input and output guardrails; record model-derived transforms in provenance.
+  classes:
+    - RM-DAT-01
+    - RM-DAT-02
+    - RM-DAT-04
+    - RM-DAT-05
+    - RM-DPR-04
+    - RM-TRS-05
+    - RM-AIC-01
+    - RM-AIC-05
+    - RM-MOD-12
+    - RM-MOD-13
+    - RM-MOD-06
+    - RM-AIC-02
+  architectureSteps: [d1, d2, d3, d5, g1, s_src, t_input, t_infer, t_result]
+  workflowNode: corpus
+FLOW-PRETRAIN--RECIPE:
+  kind: operation
+  name:
+    ru: Рецепт предобучения и топология
+    en: Pretraining recipe and topology
+  description:
+    - 'Зафиксировать код архитектуры, версию токенизатора, инициализацию, функцию обучения и режим параллелизма. Определить контракт контрольной точки: веса, оптимизатор, шаг, порядок чтения и генераторы случайных чисел там, где это требуется.'
+    - Pin architecture code, tokenizer, initialization, objective and parallelism. Define the checkpoint contract for weights, optimizer, step, data cursor and random states where needed.
+  classes: [RM-DEV-01, RM-DEV-04, RM-DEV-05, RM-DEV-11, RM-DEV-12, RM-PLT-02]
+  architectureSteps: [m2, s_prep, g2, t_gpu]
+  workflowNode: recipe
+FLOW-PRETRAIN--READINESS:
+  kind: operation
+  name:
+    ru: Среда и восстановление проверены?
+    en: Are runtime and recovery verified?
+  description:
+    - На малом прогоне проверить обмен между участниками, пропускную способность хранения и доступа, метрики и пробное возобновление. Разрешить основной запуск только для закреплённой конфигурации.
+    - Use a small run to verify communication, storage and access throughput, metrics and a trial restart. Admit the main run only for the pinned configuration.
+  classes: [RM-DEV-11, RM-DEV-12, RM-HW-02, RM-HW-04, RM-HW-05, RM-OPS-01]
+  architectureSteps: [s_prep, g2, mt_ev, mt_tb]
+  workflowNode: readiness
+FLOW-PRETRAIN--TRAIN:
+  kind: operation
+  name:
+    ru: Основной запуск и сохранение состояния
+    en: Main run and state persistence
+  description:
+    - Обучить новые веса из заданной инициализации, записывать телеметрию и согласованные контрольные точки. Тензорные вычисления остаются внутри задания; отдельный вызов модельного сервиса, включая промежуточную оценку, проходит входные и выходные guardrails.
+    - Train new weights from the declared initialization while writing telemetry and consistent checkpoints. Tensor computation stays within the job; any separate model service call, including interim evaluation, passes input and output guardrails.
+  classes:
+    - RM-DEV-04
+    - RM-DEV-11
+    - RM-DEV-12
+    - RM-DEV-05
+    - RM-HW-02
+    - RM-OPS-01
+    - RM-OPS-06
+    - RM-AIC-01
+    - RM-AIC-05
+    - RM-MOD-12
+    - RM-MOD-13
+    - RM-MOD-06
+    - RM-AIC-02
+  architectureSteps: [m3, t_gpu, b_polbudget, s_detect, t_input, t_infer, t_result]
+  workflowNode: train
+FLOW-PRETRAIN--HEALTH:
+  kind: operation
+  name:
+    ru: Состояние запуска допустимо?
+    en: Is the run healthy and within limits?
+  description:
+    - Проверить ожидаемый шаг, численную устойчивость, ресурсы, качество контрольной выборки и ограничения данных. Различить достижение цели, временный сбой и недействительный запуск.
+    - Check expected progress, numerical stability, resources, control metrics and data restrictions. Distinguish completion, transient failure and an invalid run.
+  classes: [RM-DEV-05, RM-OPS-01, RM-DEV-12, RM-OPS-06, RM-TRS-04]
+  architectureSteps: [m4, s_detect, s_change, b_polbudget]
+  workflowNode: health
+FLOW-PRETRAIN--REGISTER:
+  kind: operation
+  name:
+    ru: Версия новых базовых весов
+    en: New base-weight version
+  description:
+    - Собрать веса, токенизатор, описание архитектуры, контрольные хеши и манифест обучения. Связать пакет со свидетелями происхождения и точным запуском; отметить ограничения предполагаемого использования.
+    - Package weights, tokenizer, architecture description, digests and training manifest. Bind the package to provenance and the exact run; record intended-use limits.
+  classes: [RM-MOD-01, RM-MOD-05, RM-DEV-08, RM-TRS-05, RM-DEV-05]
+  architectureSteps: [m5, g3, t_base, o_pack]
+  workflowNode: register
+FLOW-PRETRAIN--EVALUATE:
+  kind: operation
+  name:
+    ru: Базовый кандидат пригоден?
+    en: Does the base candidate qualify?
+  description:
+    - Сопоставить независимые метрики с эталоном и бюджетом, проверить нежелательные поведения и ограничения. Кандидат и ИИ-контролёр запускаются через входные и выходные guardrails в испытательной среде; блокировки учитываются отдельно от качества модели.
+    - Compare independent metrics with the reference and budget and test prohibited behavior and limitations. Candidate and AI controller calls use input and output guardrails in evaluation; count guardrail denials separately from model quality.
+  classes:
+    - RM-DAT-05
+    - RM-DEV-07
+    - RM-AIC-03
+    - RM-MOD-11
+    - RM-AIC-01
+    - RM-AIC-05
+    - RM-MOD-12
+    - RM-MOD-13
+    - RM-MOD-06
+    - RM-AIC-02
+  architectureSteps: [m4, o_eval, g4, mt_indep, t_ctl, t_input, t_infer, t_result, t_eval]
+  workflowNode: evaluate

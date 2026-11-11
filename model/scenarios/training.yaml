@@ -1,0 +1,27 @@
+# Маршрут / Route: Распределённое обучение / Distributed training
+# Шаг = [элемент, [участники]] / Step = [element, [participants]]
+order: 37
+name:
+  ru: Распределённое обучение
+  en: Distributed training
+routes:
+  architecture:
+    - [d5, [t_store]]
+    - [m2, [g2]]
+    - [m3, [t_gpu]]
+    - [m5, [g3]]
+    - [o_eval, [g4]]
+  infrastructure:
+    - [dataset-versioning, [dataset-store]]
+    - [training-runtime, [training-state]]
+    - [experiment-tracking, []]
+    - [artifact-registry, []]
+    - [eval-red-teaming, [eval-datasets]]
+  stack:
+    - [RM-DAT-04, []]
+    - [RM-PLT-02, [RM-HW-02]]
+    - [RM-DEV-04, []]
+    - [RM-DEV-11, [RM-DEV-12]]
+    - [RM-DEV-05, []]
+    - [RM-MOD-05, []]
+    - [RM-DEV-07, []]

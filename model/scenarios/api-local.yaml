@@ -1,0 +1,30 @@
+# Маршрут / Route: Инференс по API · локальная модель / API inference · local model
+# Шаг = [элемент, [участники]] / Step = [element, [participants]]
+order: 33
+name:
+  ru: Инференс по API · локальная модель
+  en: API inference · local model
+routes:
+  architecture:
+    - [t_iam, []]
+    - [t_input, []]
+    - [t_route, []]
+    - [t_infer, [t_plan]]
+    - [t_result, []]
+    - [t_audit, []]
+  infrastructure:
+    - [business-apps, [iam-sso]]
+    - [input-guardrails, []]
+    - [request-classifier, []]
+    - [llm-gateway, [model-call-planner, inference-quotas, usage-billing]]
+    - [inference-servers, []]
+    - [output-guardrails, []]
+    - [business-apps, [audit-log]]
+  stack:
+    - [RM-INT-01, [RM-SEC-01, RM-APP-01]]
+    - [RM-AIC-01, [RM-GOV-03]]
+    - [RM-MOD-12, []]
+    - [RM-MOD-06, [RM-MOD-13, RM-AIC-05, RM-OPS-06]]
+    - [RM-MOD-07, []]
+    - [RM-AIC-02, []]
+    - [RM-TRS-04, []]

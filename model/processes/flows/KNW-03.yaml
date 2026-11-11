@@ -1,0 +1,211 @@
+# Процесс на карте / Process on the map: KNW-03
+# workflow: узлы и переходы схемы; SVG схемы строит tools/build.py через Graphviz.
+# workflow: diagram nodes and edges; tools/build.py renders the SVG with Graphviz.
+name:
+  ru: Получение обоснованного ответа по корпоративным знаниям
+  en: Grounded Enterprise Question Answering
+group: KNW
+owner: [Владелец сервиса корпоративных знаний, Enterprise knowledge service owner]
+start:
+  - Сотруднику нужен ответ с опорой на доступные корпоративные источники.
+  - An employee needs an answer grounded in enterprise sources they may access.
+result:
+  - Выдан проверенный ответ со ссылками, либо зафиксирован отказ или передача эксперту.
+  - A checked answer with references is delivered, or a denial or expert handoff is recorded.
+check:
+  - Запрещённый фрагмент отсутствует в поисковой выдаче и фактическом контексте, а вывод без достаточной опоры не выдаётся как факт. Доступ к ссылкам проверяется при выдаче.
+  - An unauthorized fragment is absent from retrieval results and actual model context, and unsupported conclusions are not delivered as facts. Reference access is checked at delivery.
+maturity: [Базовый референсный маршрут, Baseline reference workflow]
+calls: []
+order: 10
+protection:
+  - Каждый вызов модели проходит проверку идентичности и прав, защиту входа и выхода и аудит в разрешённом объёме. Вызовы инструментов допускаются отдельно; код исполняется в изолированной среде. Согласование и ограничения раскрытия задаются политикой.
+  - Every model call uses identity and authorization checks, input and output protections, and permitted audit retention. Tool calls are authorized separately; code runs in a sandbox. Approval and disclosure restrictions follow policy.
+parts:
+  - FLOW-HYBRID
+  - CORE-01
+  - KNW-03--REQUEST
+  - KNW-03--SCOPE
+  - KNW-03--RETRIEVE
+  - KNW-03--EVIDENCE
+  - KNW-03--CONTEXT
+  - KNW-03--INVOKE
+  - KNW-03--VERIFY
+tags: [Grounded Enterprise Question Answering]
+option: placement
+paths:
+  local: process-knw-03-local
+  external: process-knw-03-external
+workflow:
+  summary:
+    - Сотруднику нужен ответ с опорой на доступные корпоративные источники. Выдан проверенный ответ со ссылками, либо зафиксирован отказ или передача эксперту.
+    - An employee needs an answer grounded in enterprise sources they may access. A checked answer with references is delivered, or a denial or expert handoff is recorded.
+  synthesis:
+    - Последовательность, условия переходов и сопоставление компонентов — проектный синтез AiNativeOps. Источники подтверждают отдельные практики в указанной области, а не всю схему.
+    - The sequence, conditions and component mapping are AiNativeOps design synthesis. Sources support individual practices within their stated scope, not the entire diagram.
+  basis:
+    - source: MS-EVALS
+      claim:
+        - Корпоративный поиск, экспертная оценка и регрессионные проверки; конкретные правила эскалации этой схемы являются проектными.
+        - Covers enterprise search, expert evaluation, and regression checks; the specific escalation rules of this scheme are design decisions.
+    - source: AZURE-RAG-ACCESS
+      claim:
+        - Передача идентичности и ограничение извлекаемого контекста данными, доступными пользователю.
+        - Covers identity propagation and restricting retrieved context to data the user can access.
+    - source: RAG
+      claim:
+        - Отдельные контуры загрузки, индексации, извлечения и выдачи. Vector Search — пример реализации.
+        - Separates the ingestion, indexing, retrieval, and serving subsystems. Vector Search is one example implementation.
+    - source: BOLA
+      claim:
+        - Проверка полномочий на конкретный объект, в том числе диалог по ID.
+        - Covers authorization checks on a specific object, including a conversation accessed by ID.
+    - source: LLM-C
+      claim:
+        - Отделение инструкций от данных, проверки ввода и выхода, многослойный контроль.
+        - Covers separating instructions from data, input and output guardrails, and layered controls.
+  nodes:
+    - id: request
+      label: [Принять вопрос, Receive question]
+      detail:
+        - Установить пользователя, организацию, назначение запроса и требуемую точность. Присвоить ID запроса.
+        - Establish the user, organization, request purpose, and required precision. Assign a request ID.
+      kind: step
+      components:
+        architecture: [t_iam, t_input]
+        infrastructure: [business-apps, iam-sso]
+        stack: [RM-APP-01, RM-SEC-01]
+    - id: scope
+      label: ['Поиск разрешён?', 'Is retrieval authorized?']
+      detail:
+        - Проверить запрос и определить доступный корпус и фильтры на уровне объекта. Не подменять запрет поиском под привилегированной сервисной учётной записью.
+        - Check the request and determine the authorized corpus and object-level filters. Do not bypass a denial by searching with a privileged service identity.
+      kind: decision
+      components:
+        architecture: [t_iam, b_poldisc, t_input]
+        infrastructure: [rag-access-filter, data-access-proxy, pdp, input-guardrails]
+        stack: [RM-DPR-06, RM-DPR-04, RM-ACT-01, RM-AIC-01]
+    - id: retrieve
+      label: [Найти доступные фрагменты, Retrieve accessible passages]
+      detail:
+        - Искать в разрешённой области и возвращать источник, версию, дату и координаты фрагмента. Модельные переформулирование, эмбеддинги и ранжирование, если нужны, проходят входной и выходной контроль.
+        - Search the permitted scope and retain each passage's source, version, date, and location. Model-based rewriting, embedding, and ranking, when used, each pass input and output checks.
+      kind: step
+      components:
+        architecture: [t_vec, t_infer, t_input, t_result]
+        infrastructure: [vector-db, rag-access-filter, data-catalog, llm-gateway]
+        stack: [RM-DAT-07, RM-DPR-06, RM-DAT-02, RM-MOD-09, RM-MOD-06, RM-AIC-01, RM-AIC-02]
+    - id: evidence
+      label: ['Доказательств достаточно?', 'Is the evidence sufficient?']
+      detail:
+        - Проверить охват вопроса, актуальность и существенные противоречия. Повторить поиск с уточнением в рамках исходных прав и лимита; после исчерпания передать эксперту.
+        - Check coverage, freshness, and material contradictions. Refine retrieval within the original scope and retry budget; escalate after exhaustion.
+      kind: decision
+      components:
+        architecture: [t_vec, mt_ev, b_polbudget]
+        infrastructure: [vector-db, rag-access-filter, rate-limits-budgets]
+        stack: [RM-DAT-07, RM-DPR-06, RM-AGT-08]
+    - id: context
+      label: [Собрать контекст со ссылками, Build context with references]
+      detail:
+        - Добавить только разрешённые фрагменты с проверяемыми идентификаторами. Текст источника — данные, даже если в нём есть команды для модели.
+        - Include only permitted passages with verifiable identifiers. Source content remains data even when it contains instructions to the model.
+      kind: step
+      components:
+        architecture: [t_vec, t_input]
+        infrastructure: [context-manager, rag-access-filter, input-guardrails]
+        stack: [RM-AGT-03, RM-DPR-06, RM-AIC-01]
+    - id: invoke
+      label: ['Модель вернула ответ?', 'Did the model return an answer?']
+      detail:
+        - Проверить собранный контекст, маршрут и раскрытие, затем вызвать допущенную модель через шлюз. На выходе проверить ответ до дальнейшего использования.
+        - Check the assembled context, route, and disclosure, then invoke an approved model through the gateway. Check its output before any further use.
+      kind: decision
+      components:
+        architecture: [t_input, t_infer, t_result, b_polext]
+        infrastructure: [input-guardrails, llm-gateway, output-guardrails]
+        stack: [RM-AIC-01, RM-MOD-06, RM-AIC-02, RM-ACT-01]
+    - id: verify
+      label: ['Выводы подтверждены?', 'Are conclusions supported?']
+      detail:
+        - Сопоставить существенные утверждения с доступными фрагментами, проверить ссылки и права получателя на момент выдачи. Запрещённое раскрытие блокировать; недоказанный вывод передать на разбор.
+        - Check material claims against authorized passages and revalidate references and recipient access at delivery. Block prohibited disclosure and escalate unsupported conclusions.
+      kind: decision
+      components:
+        architecture: [t_result, b_poldisc, mt_ev]
+        infrastructure: [output-guardrails, rag-access-filter, audit-log]
+        stack: [RM-AIC-02, RM-DPR-06, RM-TRS-04]
+    - id: answer
+      label: [Выдать ответ и ссылки, Deliver answer and references]
+      detail:
+        - Показать проверенный ответ, доступные ссылки и существенные ограничения. Записать версии источников и решений без копирования закрытого содержимого в журнал.
+        - Show the checked answer, accessible references, and material limitations. Record source versions and decisions without copying restricted content into logs.
+      kind: outcome
+      components:
+        architecture: [t_result, t_audit]
+        infrastructure: [business-apps, audit-log]
+        stack: [RM-APP-01, RM-TRS-04]
+    - id: denied
+      label: [Отказать без раскрытия, Deny without disclosure]
+      detail:
+        - Зафиксировать этап и основание. Не раскрывать закрытые фрагменты, название недоступного источника или исходный вывод.
+        - Record the stage and reason. Do not disclose restricted passages, names of inaccessible sources, or raw output.
+      kind: outcome
+      components:
+        architecture: [t_result, t_audit]
+        infrastructure: [business-apps, output-guardrails, audit-log]
+        stack: [RM-APP-01, RM-AIC-02, RM-TRS-04]
+    - id: expert
+      label: [Передать вопрос эксперту, Refer the question to an expert]
+      detail:
+        - Сообщить о пробеле, конфликте источников или недоступности проверенного маршрута. Передать только материалы, доступные назначенному эксперту, без автоматического расширения прав.
+        - Report missing evidence, conflicting sources, or an unavailable checked route. Forward only material the assigned expert may access, without expanding permissions automatically.
+      kind: outcome
+      components:
+        architecture: [b_ownproc, t_audit]
+        infrastructure: [business-apps, audit-log]
+        stack: [RM-APP-03, RM-TRS-04]
+  edges:
+    - from: request
+      to: scope
+      label: [Вопрос принят, Question received]
+    - from: scope
+      to: retrieve
+      label: [Область поиска разрешена, Search scope allowed]
+    - from: scope
+      to: denied
+      label: [Доступ или ввод запрещён, Access or input prohibited]
+    - from: retrieve
+      to: evidence
+      label: [Получены фрагменты, Passages retrieved]
+    - from: evidence
+      to: context
+      label: [Достаточно доказательств, Evidence sufficient]
+    - from: evidence
+      to: retrieve
+      label: [Уточнить в пределах лимита, Refine within retry budget]
+    - from: evidence
+      to: expert
+      label: ['Пробел, конфликт или лимит', 'Gap, conflict, or limit reached']
+    - from: context
+      to: invoke
+      label: [Контекст собран, Context assembled]
+    - from: invoke
+      to: verify
+      label: [Результат прошёл контроль, Result passed checks]
+    - from: invoke
+      to: denied
+      label: [Контроль запретил вызов или вывод, Control blocked invocation or output]
+    - from: invoke
+      to: expert
+      label: [Нет доступного проверенного маршрута, No available checked route]
+    - from: verify
+      to: answer
+      label: [Выводы и ссылки допустимы, Claims and references allowed]
+    - from: verify
+      to: denied
+      label: [Раскрытие запрещено, Disclosure prohibited]
+    - from: verify
+      to: expert
+      label: [Вывод не подтверждён, Conclusion unsupported]
+  main: [request, scope, retrieve, evidence, context, invoke, verify, answer]

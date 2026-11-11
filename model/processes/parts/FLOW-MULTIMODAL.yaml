@@ -1,0 +1,77 @@
+# Этапы и варианты процессов. Ключ этапа процесса: <процесс>--<этап>.
+# Stages and variants of processes. A process stage key is <process>--<stage>.
+FLOW-MULTIMODAL--INTAKE:
+  kind: operation
+  name:
+    ru: Принять материал и цель
+    en: Receive media and purpose
+  description:
+    - Проверить идентичность, полномочия и назначение. Зарегистрировать ID и версию файла или потока, не отправляя его в модель и не исполняя содержимое.
+    - Check identity, authority, and purpose. Register the ID and version of the file or stream without sending it to a model or executing its contents.
+  classes: [RM-APP-01, RM-SEC-01, RM-SEC-03]
+  architectureSteps: [t_iam, d1]
+  workflowNode: intake
+FLOW-MULTIMODAL--FILE:
+  kind: operation
+  name:
+    ru: Файл и область обработки допустимы?
+    en: Are file and processing scope allowed?
+  description:
+    - В карантине определить фактический формат, размер, длительность и класс данных; проверить требования к декодированию и хранению. Запрещённый или подозрительный материал не переносить в рабочую среду.
+    - In quarantine, determine actual format, size, duration, and data class; check decoding and retention requirements. Do not move prohibited or suspicious media to the working environment.
+  classes: [RM-SEC-03, RM-DPR-01, RM-ACT-01]
+  architectureSteps: [d1, d2, s_scan]
+  workflowNode: file
+FLOW-MULTIMODAL--ROUTE:
+  kind: operation
+  name:
+    ru: Есть допущенный обработчик?
+    en: Is an approved processor available?
+  description:
+    - Выбрать разрешённый парсер, OCR, распознавание речи или нативный мультимодальный маршрут. Проверить формат, версию, качество и ограничения размещения. Без допущенной возможности передать на ручную проверку.
+    - Select an approved parser, OCR, speech recognition, or native multimodal route. Check format, version, quality, and placement constraints. Without an admitted capability, refer for manual review.
+  classes: [RM-DAT-10, RM-MOD-05, RM-ACT-01]
+  architectureSteps: [d_extract, t_infer, b_polext]
+  workflowNode: route
+FLOW-MULTIMODAL--EXTRACT:
+  kind: operation
+  name:
+    ru: Извлечь данные в изоляции
+    en: Extract data in isolation
+  description:
+    - Запустить обработчик только после допуска с ограничениями файлов, сети и ресурсов. Сохранить привязку к странице, области или времени. Для модельного OCR, ASR или vision применить входной контроль модальности, шлюз и выходной контроль.
+    - Run the admitted processor with file, network, and resource limits. Preserve page, region, or time references. For model-based OCR, ASR, or vision, apply modality-aware input checks, gateway routing, and output checks.
+  classes:
+    - RM-DAT-10
+    - RM-ACT-02
+    - RM-ACT-03
+    - RM-AIC-01
+    - RM-AIC-05
+    - RM-MOD-12
+    - RM-MOD-13
+    - RM-MOD-06
+    - RM-AIC-02
+  architectureSteps: [d_extract, t_gw, t_input, t_infer, t_result]
+  workflowNode: extract
+FLOW-MULTIMODAL--QUALITY:
+  kind: operation
+  name:
+    ru: Извлечение пригодно?
+    en: Is the extraction usable?
+  description:
+    - Проверить полноту, привязки, чувствительные поля и качество по установленным порогам и контрольным образцам. Считать команды из вложения недоверенными данными; сомнительные значения не дополнять догадкой.
+    - Check completeness, locations, sensitive fields, and quality against defined thresholds and reference samples. Treat embedded instructions as untrusted data; do not guess uncertain values.
+  classes: [RM-DAT-10, RM-DAT-05, RM-AIC-02, RM-DPR-01]
+  architectureSteps: [d4, t_result, b_poldisc]
+  workflowNode: quality
+FLOW-MULTIMODAL--DELIVER-CHECK:
+  kind: operation
+  name:
+    ru: Результат разрешён к выдаче?
+    en: May the result be delivered?
+  description:
+    - Если требуется модельное резюме, проверить его вход и выход отдельно и сверить с извлечением. Перед выдачей проверить права получателя, представление и метаданные файла.
+    - If a model-generated summary is needed, check its input and output separately and reconcile it against the extraction. Check recipient rights, representation, and file metadata before delivery.
+  classes: [RM-AIC-01, RM-AIC-05, RM-MOD-12, RM-MOD-13, RM-MOD-06, RM-AIC-02, RM-TRS-04]
+  architectureSteps: [t_input, t_infer, t_result, b_poldisc]
+  workflowNode: deliver-check

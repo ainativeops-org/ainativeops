@@ -1,0 +1,68 @@
+# Этапы и варианты процессов. Ключ этапа процесса: <процесс>--<этап>.
+# Stages and variants of processes. A process stage key is <process>--<stage>.
+FLOW-ACCESS--REQUEST:
+  kind: operation
+  name:
+    ru: Зафиксировать запрос или отзыв
+    en: Record a grant or revocation request
+  description:
+    - Указать инициатора, эффективного субъекта, владельца ресурса, назначение, среду, объекты, операции и срок. Плановый пересмотр указывает действующее полномочие, его использование и дату окончания.
+    - Record the initiator, effective subject, resource owner, purpose, environment, objects, operations and expiry. A scheduled review identifies the grant in force, its use and end date.
+  classes: [RM-SEC-01, RM-GOV-02, RM-TRS-04]
+  architectureSteps: [b_polagent, t_iam, g0]
+  workflowNode: request
+FLOW-ACCESS--ASSESS:
+  kind: operation
+  name:
+    ru: Выдача, отказ или отзыв?
+    en: Grant, deny or revoke?
+  description:
+    - Сверить заявленную цель и субъект с областью ресурса. Утрата необходимости, смена роли, истечение срока или сигнал отзыва запускают отмену; отсутствие основания для нового права ведёт к отказу.
+    - Reconcile the declared purpose and subject with resource scope. Loss of need, role change, expiry or a revocation signal triggers withdrawal; a new grant without justification is denied.
+  classes: [RM-SEC-01, RM-GOV-02, RM-GOV-03, RM-ACT-01]
+  architectureSteps: [b_ownproc, b_polagent, t_iam]
+  workflowNode: assess
+FLOW-ACCESS--SCOPE:
+  kind: operation
+  name:
+    ru: Ограничить права и срок
+    en: Scope authority and expiry
+  description:
+    - Развести права пользователя, агента и сервиса. Явное делегирование содержит получателя, ресурс, операции и срок; полномочие сервиса задаётся отдельно. Согласование отдельного действия не заменяется общей ролью.
+    - Separate user, agent and service authority. Explicit delegation includes grantee, resource, actions and expiry; service authority is defined separately. A broad role does not replace approval of a specific action.
+  classes: [RM-SEC-01, RM-GOV-02, RM-GOV-03, RM-AIC-04]
+  architectureSteps: [b_polagent, mt_tb, s_runtime]
+  workflowNode: scope
+FLOW-ACCESS--APPROVE:
+  kind: operation
+  name:
+    ru: Владелец согласовал?
+    en: Did the owner approve?
+  description:
+    - Владелец ресурса проверяет минимальность, разделение обязанностей, условия раскрытия и срок; субъект не одобряет себе расширение. Запрет политики и отсутствие согласования закрывают выдачу.
+    - The resource owner checks least privilege, separation of duties, disclosure terms and expiry; the subject cannot approve their own elevation. Policy denial or missing approval prevents issuance.
+  classes: [RM-GOV-03, RM-GOV-04, RM-ACT-01, RM-TRS-04]
+  architectureSteps: [b_ownproc, b_owndata, b_polagent, mt_indep]
+  workflowNode: approve
+FLOW-ACCESS--APPLY:
+  kind: operation
+  name:
+    ru: Подготовить доступ без активации
+    en: Stage access without activation
+  description:
+    - Применить согласованную роль в приостановленном состоянии. Не выдавать рабочие удостоверения и не открывать очередь агента до успешных положительных и отрицательных проб.
+    - Stage the approved role in a suspended state. Do not issue production credentials or enable the agent queue before positive and negative probes pass.
+  classes: [RM-SEC-01, RM-GOV-02, RM-ACT-01, RM-ACT-02, RM-TRS-03]
+  architectureSteps: [t_iam, t_gw, s_runtime]
+  workflowNode: apply
+FLOW-ACCESS--TEST:
+  kind: operation
+  name:
+    ru: Область доступа верна?
+    en: Is access correctly scoped?
+  description:
+    - В изолированном проверочном контексте подтвердить разрешённые операции и отказ во всех проверяемых запрещённых операциях. Ошибка оставляет выдачу заблокированной.
+    - Use an isolated test context to verify permitted operations and denial of tested forbidden operations. Any failure keeps issuance blocked.
+  classes: [RM-ACT-01, RM-ACT-02, RM-SEC-01, RM-TRS-04]
+  architectureSteps: [t_iam, s_runtime, g7]
+  workflowNode: test

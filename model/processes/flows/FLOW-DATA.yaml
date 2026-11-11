@@ -1,0 +1,221 @@
+# Процесс на карте / Process on the map: FLOW-DATA
+# workflow: узлы и переходы схемы; SVG схемы строит tools/build.py через Graphviz.
+# workflow: diagram nodes and edges; tools/build.py renders the SVG with Graphviz.
+name:
+  ru: Создание и публикация продукта данных с помощью ИИ
+  en: AI-assisted Data Product Development
+group: DAT
+owner:
+  - Владелец данных; качество и публикацию ведёт владелец дата-продукта.
+  - Data owner; the data product owner manages quality and publication.
+start:
+  - Есть потребитель, задача, разрешённые источники и согласованный договор о данных.
+  - A consumer, purpose, authorized sources and agreed data contract are identified.
+result:
+  - Потребитель получает допущенную версию набора с контрактом, происхождением и правилами использования.
+  - The consumer receives an approved dataset version with its contract, provenance and use policy.
+check:
+  - От исходных версий до манифеста восстанавливается цепочка преобразований. Запрещённая строка и неподтверждённый источник не проходят публикацию.
+  - The source-to-manifest transformation chain is recoverable. A forbidden record and an unverified source fail publication.
+maturity:
+  - Применим при подготовке данных любой сложности; массовые и чувствительные наборы требуют отдельных мер.
+  - Applicable to any preparation workload; large and sensitive datasets need additional controls.
+calls: []
+order: 4
+protection:
+  - Каждый вызов модели проходит проверку идентичности и прав, защиту входа и выхода и аудит в разрешённом объёме. Вызовы инструментов допускаются отдельно; код исполняется в изолированной среде. Согласование и ограничения раскрытия задаются политикой.
+  - Every model call uses identity and authorization checks, input and output protections, and permitted audit retention. Tool calls are authorized separately; code runs in a sandbox. Approval and disclosure restrictions follow policy.
+parts:
+  - CORE-01
+  - FLOW-DATA--CONTRACT
+  - FLOW-DATA--INGEST
+  - FLOW-DATA--PERMIT
+  - FLOW-DATA--TRANSFORM
+  - FLOW-DATA--QUALITY
+  - FLOW-DATA--PACKAGE
+  - FLOW-DATA--ADMIT
+tags: [AI-assisted Data Product Development]
+path: process-flow-data
+workflow:
+  summary:
+    - Есть потребитель, задача, разрешённые источники и согласованный договор о данных. Потребитель получает допущенную версию набора с контрактом, происхождением и правилами использования.
+    - A consumer, purpose, authorized sources and agreed data contract are identified. The consumer receives an approved dataset version with its contract, provenance and use policy.
+  synthesis:
+    - Последовательность, условия переходов и сопоставление компонентов — проектный синтез AiNativeOps. Источники подтверждают отдельные практики в указанной области, а не всю схему.
+    - The sequence, conditions and component mapping are AiNativeOps design synthesis. Sources support individual practices within their stated scope, not the entire diagram.
+  basis:
+    - source: GCP-M
+      claim:
+        - Автоматизация конвейера, проверки данных и модели, метаданные, онлайн, пакетный и встроенный инференс.
+        - Covers pipeline automation, data and model validation, metadata, and online, batch, and embedded inference.
+    - source: CUR
+      claim:
+        - Нормализация, фильтрация и дедупликация корпуса как инженерные операции подготовки.
+        - Treats corpus normalization, filtering, and deduplication as engineering preparation operations.
+    - source: SLSA
+      claim:
+        - Происхождение связывает артефакт с материалами и способом его построения.
+        - Provenance links an artifact to its materials and to the way it was built.
+  nodes:
+    - id: contract
+      label: [Контракт и условия потребления, Consumer contract and terms]
+      detail:
+        - Задать владельца, разрешённые цели и получателей, схему, минимальные показатели качества, период хранения и порядок изменения контракта.
+        - Set the owner, allowed purposes and recipients, schema, minimum quality metrics, retention and change procedure.
+      kind: step
+      components:
+        architecture: [b_owndata, b_poldisc, b_law, b_goal]
+        infrastructure: [data-catalog]
+        stack: [RM-DAT-02, RM-GOV-03]
+    - id: ingest
+      label: [Приём в карантин, Quarantine intake]
+      detail:
+        - Снять точную версию источника, хеш и атрибуты происхождения. Загружать с ограниченными правами в карантин, отдельно проверять неожиданные схемы и вредоносное содержимое.
+        - Capture the exact source revision, digest and provenance attributes. Ingest with limited rights into quarantine; check schema surprises and malicious content.
+      kind: step
+      components:
+        architecture: [d1, s_src, g1, t_store]
+        infrastructure: [landing-zone, artifact-intake, dataset-store, analytical-store]
+        stack: [RM-DAT-01, RM-SEC-03, RM-DAT-06, RM-TRS-05]
+    - id: permit
+      label: ['Обработка и доступ разрешены?', 'Are processing and access authorized?']
+      detail:
+        - Проверить назначение, категорию, права и сроки. Выбрать минимальное представление, отделить запрещённые данные. Обратимая подмена допустима только с отдельным контролем словаря и раскрытия.
+        - Verify purpose, classification, access and retention. Choose the minimum representation and separate prohibited data. Reversible substitution requires separate mapping and disclosure controls.
+      kind: decision
+      components:
+        architecture: [d2, b_poldisc, s_prep, g2]
+        infrastructure: [data-discovery, data-access-proxy, data-catalog, pep]
+        stack: [RM-DPR-01, RM-DPR-04, RM-DAT-02, RM-ACT-02]
+    - id: transform
+      label: ['Очистка, разметка и преобразования', 'Clean, label and transform']
+      detail:
+        - 'Закрепить код, параметры и правила дедупликации. Если ИИ разметил или синтезировал данные, отметить их происхождение: каждый вызов проходит входные и выходные guardrails, а результат проверяется до попадания в набор.'
+        - 'Pin code, settings and deduplication rules. If AI labels or generates data, mark its provenance: every invocation passes input and output guardrails, and results are checked before entering the dataset.'
+      kind: step
+      components:
+        architecture: [d3, v2, t_store, t_input, t_infer, t_result]
+        infrastructure:
+          - dataset-store
+          - git-repository
+          - dataset-versioning
+          - input-guardrails
+          - llm-gateway
+          - output-guardrails
+        stack: [RM-DAT-01, RM-DEV-01, RM-DEV-03, RM-DAT-04, RM-AIC-01, RM-MOD-06, RM-AIC-02]
+    - id: quality
+      label: ['Контракт качества соблюдён?', 'Does quality meet the contract?']
+      detail:
+        - Проверить полноту, схему, дубликаты, пригодность преобразований и отсутствие запрещённых записей. Для обучающих данных проверить разделение тренировочной и контрольной выборок.
+        - Check completeness, schema, duplicates, transformation fitness and absence of prohibited records. For training data, verify separation of training and evaluation splits.
+      kind: decision
+      components:
+        architecture: [d4, g4, mt_indep]
+        infrastructure: [eval-datasets, rule-based-checks, eval-red-teaming]
+        stack: [RM-DAT-05, RM-DEV-07, RM-DPR-01]
+    - id: reconcile
+      label: ['Разрешена повторная обработка?', 'Is reprocessing permitted?']
+      detail:
+        - Изолировать проблемную партию, закрепить причину и владельца. Исправлять только проверяемый дефект источника, классификации или преобразования; новый допуск нужен при изменении назначения.
+        - Isolate the affected batch and record the reason and owner. Fix only a verifiable source, classification or transform defect; changed purpose needs new authorization.
+      kind: decision
+      components:
+        architecture: [d1, s_change, mt_review, t_audit]
+        infrastructure: [landing-zone, data-catalog, audit-log]
+        stack: [RM-DAT-01, RM-DAT-02, RM-OPS-07, RM-TRS-04]
+    - id: package
+      label: [Версия и манифест набора, Dataset version and manifest]
+      detail:
+        - Связать снимок набора с исходниками, преобразованиями, схемой, результатами проверок, правами и сроком хранения. Регистрация манифеста не открывает доступ.
+        - Bind the snapshot to sources, transforms, schema, test results, access and retention. Registering the manifest does not grant access.
+      kind: step
+      components:
+        architecture: [d5, o_pack, g5, mt_ev]
+        infrastructure:
+          - dataset-versioning
+          - dataset-store
+          - data-catalog
+          - provenance-registry
+          - artifact-registry
+          - analytical-store
+        stack: [RM-DAT-04, RM-DAT-06, RM-DAT-02, RM-TRS-05, RM-DEV-08]
+    - id: admit
+      label: ['Версию можно предоставить?', 'Can the version be made available?']
+      detail:
+        - Сверить согласие владельца, правила доступа и целостность манифеста. Испытать разрешённый и запрещённый запрос потребителя. При несоответствии не публиковать и сохранить текущую версию.
+        - Check owner approval, access rules and manifest integrity. Test allowed and denied consumer queries. On failure, withhold publication and retain the current version.
+      kind: decision
+      components:
+        architecture: [o_release, g6, b_owndata, b_ownrisk]
+        infrastructure: [release-gate, data-access-proxy, integrity-monitoring]
+        stack: [RM-DEV-09, RM-DPR-04, RM-TRS-06, RM-AIC-04]
+    - id: published
+      label: [Версия доступна потребителям, Version available to consumers]
+      detail:
+        - Обновить каталог и выдать права только согласованным потребителям. Описать замену версии, отзыв и оповещение потребителей при нарушении качества.
+        - Update the catalog and grant access only to approved consumers. Define replacement, revocation and consumer notification on a quality breach.
+      kind: outcome
+      components:
+        architecture: [o_ops, b_owndata, t_audit]
+        infrastructure: [data-catalog, data-access-proxy, audit-log]
+        stack: [RM-DAT-02, RM-DPR-04, RM-TRS-04, RM-OPS-07]
+    - id: hold
+      label: [Публикация остановлена, Publication withheld]
+      detail:
+        - Сохранить запрещённый или непроверенный материал в карантине согласно сроку хранения; потребителям доступна только ранее допущенная версия либо явный отказ.
+        - Retain prohibited or unverified material in quarantine under its retention rule; consumers receive only a previously admitted version or an explicit denial.
+      kind: outcome
+      components:
+        architecture: [d1, mt_ev, t_audit]
+        infrastructure: [landing-zone, audit-log]
+        stack: [RM-DAT-01, RM-TRS-04, RM-OPS-07]
+  edges:
+    - from: contract
+      to: ingest
+      label: [Контракт согласован, Contract agreed]
+    - from: ingest
+      to: permit
+      label: [Источник зафиксирован, Source pinned]
+    - from: ingest
+      to: hold
+      label: [Происхождение не подтверждено, Source provenance unverified]
+    - from: permit
+      to: transform
+      label: [Назначение и доступ разрешены, Purpose and access approved]
+    - from: permit
+      to: reconcile
+      label: [Исправимая ошибка классификации, Fixable classification issue]
+    - from: permit
+      to: hold
+      label: [Использование запрещено, Use prohibited]
+    - from: transform
+      to: quality
+      label: [Версия подготовлена, Version prepared]
+    - from: transform
+      to: reconcile
+      label: [Небезопасный или неполный результат, Unsafe or incomplete result]
+    - from: quality
+      to: package
+      label: [Пороги выполнены, Thresholds met]
+    - from: quality
+      to: reconcile
+      label: [Выявлено расхождение, Discrepancy found]
+    - from: reconcile
+      to: permit
+      label: [Допустима повторная классификация, Reclassification permitted]
+    - from: reconcile
+      to: transform
+      label: [Нужна повторная обработка, Reprocessing needed]
+    - from: reconcile
+      to: hold
+      label: [Назначение запрещено или лимит исчерпан, Purpose prohibited or limit reached]
+    - from: package
+      to: admit
+      label: [Пакет проверяем, Package verifiable]
+    - from: admit
+      to: published
+      label: [Права и версия подтверждены, Access and version confirmed]
+    - from: admit
+      to: hold
+      label: [Свидетельство или доступ не прошли проверку, Evidence or access check failed]
+  main: [contract, ingest, permit, transform, quality, package, admit, published]

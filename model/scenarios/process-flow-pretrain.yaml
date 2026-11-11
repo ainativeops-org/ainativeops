@@ -1,0 +1,32 @@
+# Маршрут / Route: Обучение собственной базовой модели / Foundation Model Pretraining
+# Шаг = [элемент, [участники]] / Step = [element, [participants]]
+order: 7
+name:
+  ru: Обучение собственной базовой модели
+  en: Foundation Model Pretraining
+routes:
+  stack:
+    - [RM-DEV-05, [RM-DAT-05, RM-OPS-06, RM-GOV-04, RM-OPS-01, RM-DEV-12, RM-TRS-04]]
+    - [RM-DAT-01, [RM-MOD-12, RM-MOD-13, RM-DAT-02, RM-DAT-04, RM-DAT-05, RM-DPR-04, RM-TRS-05, RM-AIC-01, RM-MOD-06, RM-AIC-02, RM-TRS-04, RM-MOD-07, RM-AIC-05, RM-OPS-06]]
+    - [RM-DEV-01, [RM-DEV-04, RM-DEV-05, RM-DEV-11, RM-DEV-12, RM-PLT-02]]
+    - [RM-DEV-11, [RM-DEV-12, RM-HW-02, RM-HW-04, RM-HW-05, RM-OPS-01]]
+    - [RM-DEV-04, [RM-DEV-11, RM-DEV-12, RM-DEV-05, RM-HW-02, RM-OPS-01, RM-OPS-06, RM-AIC-01, RM-MOD-06, RM-AIC-02]]
+    - [RM-MOD-01, [RM-MOD-05, RM-DEV-08, RM-TRS-05, RM-DEV-05]]
+    - [RM-DAT-05, [RM-DEV-07, RM-AIC-03, RM-MOD-11, RM-AIC-01, RM-MOD-06, RM-AIC-02]]
+    - [RM-MOD-05, [RM-MOD-01, RM-TRS-05, RM-TRS-04]]
+  infrastructure:
+    - [experiment-tracking, [eval-datasets, rate-limits-budgets, model-training-service, metrics-alerts, training-state, audit-log]]
+    - [landing-zone, [request-classifier, model-call-planner, dataset-store, dataset-versioning, data-catalog, data-access-proxy, eval-datasets, input-guardrails, llm-gateway, output-guardrails, audit-log, eval-inference-service, inference-quotas, usage-billing]]
+    - [git-repository, [experiment-tracking, training-runtime, training-state]]
+    - [training-runtime, [training-state, dataset-store, metrics-alerts, experiment-tracking, input-guardrails, llm-gateway, output-guardrails]]
+    - [eval-base-artifact, [model-registry, artifact-registry, provenance-registry]]
+    - [eval-datasets, [eval-red-teaming, llm-as-a-judge, rule-based-checks, eval-inference-runtime, input-guardrails, llm-gateway, output-guardrails]]
+    - [model-registry, [eval-base-artifact, provenance-registry, audit-log]]
+  architecture:
+    - [g0, [m2, b_goal, b_np, b_polbudget, t_eval]]
+    - [d1, [t_route, t_plan, d2, d3, d5, g1, s_src, t_input, t_infer, t_result, t_audit, t_base]]
+    - [m2, [s_prep, g2, t_gpu]]
+    - [s_prep, [g2, mt_ev, mt_tb]]
+    - [m3, [t_gpu, b_polbudget, s_detect, t_input, t_infer, t_result]]
+    - [m4, [s_detect, s_change, b_polbudget, o_eval, g4, mt_indep, t_ctl, t_input, t_infer, t_result]]
+    - [m5, [g3, t_base, o_pack, mt_ev, b_ownmodel, t_audit]]

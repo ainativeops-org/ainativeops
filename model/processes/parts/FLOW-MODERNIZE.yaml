@@ -1,0 +1,121 @@
+# Этапы и варианты процессов. Ключ этапа процесса: <процесс>--<этап>.
+# Stages and variants of processes. A process stage key is <process>--<stage>.
+FLOW-MODERNIZE--SCOPE:
+  kind: operation
+  name:
+    ru: Цель и окно изменения
+    en: Change goal and window
+  description:
+    - Задать исходную проблему, критичные функции, допустимый перерыв, ограничения данных и владельца решения о переключении.
+    - Define the problem, critical functions, tolerable interruption, data restrictions and cutover authority.
+  classes: [RM-OPS-07, RM-OPS-01, RM-GOV-04]
+  architectureSteps: [b_regchange, b_goal, b_np, g8]
+  workflowNode: scope
+FLOW-MODERNIZE--INVENTORY:
+  kind: operation
+  name:
+    ru: Карта наследия и зависимостей
+    en: Legacy and dependency inventory
+  description:
+    - Снять версии, схемы, интеграции, права и невидимые зависимости по трассам. Если ИИ читает код или логи, оставить только разрешённые фрагменты и провести каждый вызов через входные и выходные guardrails.
+    - Inventory versions, schemas, integrations, permissions and hidden dependencies using traces. If AI reads code or logs, retain only authorized fragments and apply input and output guardrails to every invocation.
+  classes:
+    - RM-DEV-01
+    - RM-AGT-03
+    - RM-OPS-02
+    - RM-DPR-01
+    - RM-OPS-07
+    - RM-AIC-01
+    - RM-AIC-05
+    - RM-MOD-12
+    - RM-MOD-13
+    - RM-MOD-06
+    - RM-AIC-02
+  architectureSteps: [mt_tb, t_repo, t_audit, v4, t_input, t_infer, t_result]
+  workflowNode: inventory
+FLOW-MODERNIZE--BASELINE:
+  kind: operation
+  name:
+    ru: Эталон текущего поведения
+    en: Current behavior baseline
+  description:
+    - Зафиксировать выборки, контракты, SLO и известные расхождения. Отделить дефекты, которые исправляем, от поведения, которое обязано сохраниться, и запретить запись в продуктивные системы из теста.
+    - Pin datasets, contracts, SLOs and known discrepancies. Separate intentional fixes from behavior that must remain and prohibit test writes to production systems.
+  classes: [RM-DAT-05, RM-DEV-07, RM-OPS-01, RM-OPS-07]
+  architectureSteps: [v1, g4, mt_indep, t_prod]
+  workflowNode: baseline
+FLOW-MODERNIZE--PLAN:
+  kind: operation
+  name:
+    ru: План совместимости и миграции
+    en: Compatibility and migration plan
+  description:
+    - Выбрать последовательность совместимых изменений интерфейсов и данных. Определить сверку, контрольную точку, момент необратимости, процедуру отката или компенсации и ограничение параллельной работы.
+    - Choose a sequence of compatible API and data changes. Define reconciliation, checkpoints, the point of irreversibility, rollback or compensation and the parallel-run limit.
+  classes: [RM-DEV-01, RM-PLT-05, RM-OPS-07, RM-OPS-08, RM-DEV-10]
+  architectureSteps: [v4, b_regchange, mt_assess, mt_residual]
+  workflowNode: plan
+FLOW-MODERNIZE--READINESS:
+  kind: operation
+  name:
+    ru: Миграция и возврат безопасны?
+    en: Are migration and recovery safe?
+  description:
+    - Проверить на копии восстановление, повтор операции, разрешения и измеримое окно простоя. Зафиксировать критерии сверки и согласие владельцев на действия после необратимой точки.
+    - Rehearse restore, replay, permissions and the measurable downtime window on a copy. Record reconciliation criteria and owner approval for steps beyond the point of no return.
+  classes: [RM-OPS-08, RM-DEV-07, RM-AIC-04, RM-GOV-04]
+  architectureSteps: [g2, mt_residual, mt_ev, b_ownrisk]
+  workflowNode: readiness
+FLOW-MODERNIZE--IMPLEMENT:
+  kind: operation
+  name:
+    ru: Подготовка совместимой версии
+    en: Prepare the compatible version
+  description:
+    - 'Собрать изменение и миграционные операции в CI. Агент меняет код и тесты только в изолированной среде: каждый модельный вызов проходит входные и выходные guardrails, а операции по коду, данным и CI проверяет PEP.'
+    - 'Build the change and migration operations in CI. Agents edit code and tests only in the sandbox: every model call passes input and output guardrails, and PEP checks code, data and CI operations.'
+  classes:
+    - RM-ACT-03
+    - RM-AGT-02
+    - RM-ACT-02
+    - RM-DEV-06
+    - RM-DEV-08
+    - RM-AIC-01
+    - RM-AIC-05
+    - RM-MOD-12
+    - RM-MOD-06
+    - RM-AIC-02
+  architectureSteps: [v2, v3, t_harness, t_gw, s_scan, t_input, t_infer, t_result]
+  workflowNode: implement
+FLOW-MODERNIZE--SHADOW:
+  kind: operation
+  name:
+    ru: Параллельная проверка сошлась?
+    en: Does parallel validation reconcile?
+  description:
+    - Проверить копию нагрузки без повторных внешних эффектов, сопоставить строки и бизнес-результаты, задержку и ошибки с эталоном. Для ИИ-функций проверять кандидата только по разрешённому маршруту с входными и выходными guardrails.
+    - Run mirrored workload without duplicating external effects. Reconcile records, business results, latency and errors against baseline. Exercise AI features only through authorized routes with input and output guardrails.
+  classes:
+    - RM-DEV-07
+    - RM-DAT-05
+    - RM-OPS-01
+    - RM-ACT-02
+    - RM-AIC-01
+    - RM-AIC-05
+    - RM-MOD-12
+    - RM-MOD-13
+    - RM-MOD-06
+    - RM-AIC-02
+  architectureSteps: [o_eval, mt_indep, v4, s_runtime, t_input, t_infer, t_result]
+  workflowNode: shadow
+FLOW-MODERNIZE--CUTOVER:
+  kind: operation
+  name:
+    ru: Переключение в допустимых пределах?
+    en: Is cutover within bounds?
+  description:
+    - Проверить разрешение на точный манифест, провести малую волну переключения и сверить данные. Если в ней вызывается модель, входные и выходные guardrails сохраняются и для старой, и для новой версии. Остановить дальнейшее движение при нарушении целостности, доступа или SLO; сохранить сведения о уже совершённых действиях.
+    - Verify authorization for the exact manifest, cut over a small cohort and reconcile data. When it invokes a model, input and output guardrails apply on both versions. Stop further rollout on integrity, access or SLO violations and record effects already committed.
+  classes: [RM-DEV-09, RM-DEV-10, RM-OPS-01, RM-OPS-07, RM-TRS-04]
+  architectureSteps: [g6, o_release, g7, s_change, t_audit]
+  workflowNode: cutover

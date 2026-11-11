@@ -1,0 +1,136 @@
+# Реестр процессов · Защита и реагирование / Process registry · Security and response
+SEC-01:
+  name:
+    ru: Выдача и отзыв полномочий
+    en: Identity and access lifecycle
+  start:
+    - Пользователь, сервис, агент или исполнитель подключается, меняет роль или уходит.
+    - A user, service, agent or executor joins, changes role or leaves.
+  result:
+    - Действующая идентичность и полномочия с ограниченной областью и сроком.
+    - An active identity and permissions with a limited scope and validity period.
+  check:
+    - Субъект не получает права через общую учётную запись. Отзыв действует и после паузы, смены версии и восстановления.
+    - A subject does not obtain permissions through a shared account. Revocation remains in effect after a pause, a version change and recovery.
+  gates: G7* G8
+  classes: [RM-SEC-01, RM-GOV-02, RM-ACT-01, RM-ACT-02, RM-TRS-04]
+SEC-02:
+  name:
+    ru: Выдача и ротация секретов
+    en: Secret lifecycle management
+  start:
+    - Исполнителю нужен секрет для разрешённой операции либо наступил срок ротации.
+    - An executor needs a secret for a permitted operation, or a rotation date arrives.
+  result:
+    - Разрешённая выдача или отзыв секрета с записью операции.
+    - A permitted issuance or revocation of the secret with a record of the operation.
+  check:
+    - Секрет не включается в контекст и журналы. Отдельно проверить ротацию, срок и область использования.
+    - The secret is not included in context or logs. Separately check rotation, validity period and scope of use.
+  gates: G7* G8
+  classes: [RM-TRS-03, RM-SEC-01, RM-ACT-02, RM-TRS-04]
+SEC-03:
+  name:
+    ru: Управление жизненным циклом ключей
+    en: Cryptographic key lifecycle management
+  start:
+    - Требуется новый ключ, ротация, отзыв или вывод ключа.
+    - A new key, rotation, revocation or key retirement is required.
+  result:
+    - Версия ключа и состояние, привязанные к назначению и правам.
+    - A key version and state bound to its purpose and permissions.
+  check:
+    - Проверить, кто может применять, ротировать и уничтожать ключ. Конкретный криптомодуль выбирается по требованиям.
+    - Check who can use, rotate and destroy the key. The specific cryptographic module is selected by requirements.
+  gates: G8
+  classes: [RM-TRS-01, RM-CMP-03, RM-DPR-05, RM-TRS-04]
+SEC-04:
+  name:
+    ru: Разбор уязвимостей и цепочки поставки
+    en: Vulnerability and supply-chain review
+  start:
+    - Поступило уведомление об уязвимости или изменении зависимости.
+    - A notification of a vulnerability or a dependency change arrives.
+  result:
+    - Список затронутых выпусков и решение о замене, ограничении или принятии риска.
+    - A list of affected releases and a decision to replace, restrict or accept the risk.
+  check:
+    - По версии компонента находятся реально развёрнутые конфигурации. Проверено, что компенсирующая мера действует.
+    - The component version leads to the configurations actually deployed. The compensating control is verified to be in effect.
+  gates: G1 G8
+  classes: [RM-GOV-01, RM-SEC-04, RM-SEC-06, RM-TRS-05, RM-OPS-07]
+SEC-05:
+  name:
+    ru: Обнаружение и первичный разбор инцидента
+    en: Incident detection and triage
+  start:
+    - Средство контроля или человек сообщает о подозрительном событии.
+    - A control tool or a person reports a suspicious event.
+  result:
+    - Зафиксированное событие, область, серьёзность и владелец разбора.
+    - A recorded event, scope, severity and investigation owner.
+  check:
+    - Событие связывается с версией, запросом и фактическими действиями без избыточного раскрытия в журналах.
+    - The event is linked to the version, the request and the actual actions without excessive disclosure in logs.
+  gates: G8*
+  classes: [RM-SEC-05, RM-OPS-03, RM-OPS-04, RM-TRS-04]
+SEC-06:
+  name:
+    ru: Сдерживание инцидента и возврат к работе
+    en: Incident containment and service recovery
+  start:
+    - Инцидент подтверждён и требует остановки, изоляции или ограничения.
+    - An incident is confirmed and requires stopping, isolation or restriction.
+  result:
+    - Затронутые действия остановлены, условия восстановления и решение документированы.
+    - Affected actions are stopped, and the recovery conditions and decision are documented.
+  check:
+    - Отзыв блокирует новые операции. Возобновление разрешено после сверки эффекта и повторной проверки условий.
+    - Revocation blocks new operations. Resumption is permitted after the effect is reconciled and the conditions are checked again.
+  gates: G7 G8
+  classes: [RM-SEC-05, RM-SEC-02, RM-TRS-07, RM-GOV-04, RM-OPS-07]
+SEC-07:
+  name:
+    ru: Сверка и компенсация внешней операции
+    en: External effect reconciliation and compensation
+  start:
+    - Фактический исход вызова неизвестен, действие повторилось или ошибочно.
+    - The actual outcome of a call is unknown, or an action was repeated or erroneous.
+  result:
+    - Подтверждённый эффект и допущенное исправление либо эскалация.
+    - A confirmed effect and an admitted correction, or an escalation.
+  check:
+    - Сверять по ресурсу и ключу операции. Компенсация проходит собственный допуск, если меняет состояние.
+    - Reconcile by resource and operation key. A compensating action passes its own admission if it changes state.
+  gates: G7
+  classes: [RM-AGT-05, RM-AGT-04, RM-ACT-02, RM-INT-02, RM-TRS-04]
+SEC-08:
+  name:
+    ru: Хранение и проверка свидетельств
+    en: Assurance evidence retention
+  start:
+    - Получены решения допуска, результаты тестов, записи операций или материалы инцидента.
+    - Admission decisions, test results, operation records or incident materials are received.
+  result:
+    - Доступный уполномоченному лицу след доказательств с правилами хранения.
+    - An evidence trail available to an authorized person, with retention rules.
+  check:
+    - Проверить целостность и возможность связать свидетельство с точной версией. Полный текст чата в аудит по умолчанию не переносится.
+    - Check integrity and that each piece of evidence can be linked to an exact version. The full chat text is not transferred to the audit by default.
+  gates: G4 G6 G7 G9*
+  classes: [RM-TRS-04, RM-TRS-05, RM-TRS-06, RM-SEC-07]
+SEC-09:
+  name:
+    ru: Расследование ИИ-инцидента
+    en: AI incident investigation
+  start:
+    - Инцидент зарегистрирован и зафиксирована исходная область.
+    - An incident is registered and its initial scope is recorded.
+  result:
+    - Хронология, установленные причины и последствия, корректирующие действия и итоговая проверка.
+    - A timeline, established causes and consequences, corrective actions and a final check.
+  check:
+    - Связать событие с точными версиями, решениями и фактическими эффектами; неполные данные и неподтверждённые исходы помечаются.
+    - Link the event to exact versions, decisions and actual effects; incomplete data and unconfirmed outcomes are flagged.
+  gates: G8
+  classes: [RM-SEC-05, RM-SEC-07, RM-TRS-04, RM-TRS-05, RM-OPS-07]

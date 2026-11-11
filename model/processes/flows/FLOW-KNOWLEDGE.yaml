@@ -1,0 +1,237 @@
+# Процесс на карте / Process on the map: FLOW-KNOWLEDGE
+# workflow: узлы и переходы схемы; SVG схемы строит tools/build.py через Graphviz.
+# workflow: diagram nodes and edges; tools/build.py renders the SVG with Graphviz.
+name:
+  ru: Создание и сопровождение корпоративной базы знаний для ИИ
+  en: Enterprise AI Knowledge Base Lifecycle
+group: KNW
+owner:
+  - Владелец базы знаний; допуск источника и права подтверждает владелец данных.
+  - Knowledge base owner; the data owner approves sources and access.
+start:
+  - Нужен управляемый поиск по определённым корпоративным источникам или обновление действующего индекса.
+  - A governed search over defined enterprise sources or an update to a live index is needed.
+result:
+  - В эксплуатации согласованная версия поиска с происхождением фрагментов, правами доступа и регламентом обновления.
+  - An approved search version is live with fragment provenance, access rules and an update procedure.
+check:
+  - Два пользователя с разными правами получают разные разрешённые фрагменты. Отзыв доступа или удаление источника прекращают выдачу в заданный срок; при рассинхронизации выдача блокируется.
+  - Users with different access get different authorized fragments. Revocation or deletion stops retrieval within the agreed time; synchronization loss blocks retrieval.
+maturity:
+  - Распространённая схема корпоративного поиска; векторный и графовый поиск подключаются по задаче.
+  - Established enterprise search pattern; vector and graph retrieval are selected as needed.
+calls:
+  - id: FLOW-DATA
+    when:
+      - Если источник ещё не приведён к договорному формату или не получил допустимую версию данных.
+      - When a source lacks a contracted format or an approved data version.
+order: 5
+protection:
+  - Каждый вызов модели проходит проверку идентичности и прав, защиту входа и выхода и аудит в разрешённом объёме. Вызовы инструментов допускаются отдельно; код исполняется в изолированной среде. Согласование и ограничения раскрытия задаются политикой.
+  - Every model call uses identity and authorization checks, input and output protections, and permitted audit retention. Tool calls are authorized separately; code runs in a sandbox. Approval and disclosure restrictions follow policy.
+parts:
+  - CORE-01
+  - FLOW-KNOWLEDGE--SCOPE
+  - FLOW-KNOWLEDGE--SOURCE
+  - FLOW-KNOWLEDGE--NORMALIZE
+  - FLOW-KNOWLEDGE--INDEX
+  - FLOW-KNOWLEDGE--SYNCHRONIZE
+  - FLOW-KNOWLEDGE--VERIFY
+  - FLOW-KNOWLEDGE--SWITCH
+tags: [Enterprise AI Knowledge Base Lifecycle]
+path: process-flow-knowledge
+workflow:
+  summary:
+    - Нужен управляемый поиск по определённым корпоративным источникам или обновление действующего индекса. В эксплуатации согласованная версия поиска с происхождением фрагментов, правами доступа и регламентом обновления.
+    - A governed search over defined enterprise sources or an update to a live index is needed. An approved search version is live with fragment provenance, access rules and an update procedure.
+  synthesis:
+    - Последовательность, условия переходов и сопоставление компонентов — проектный синтез AiNativeOps. Источники подтверждают отдельные практики в указанной области, а не всю схему.
+    - The sequence, conditions and component mapping are AiNativeOps design synthesis. Sources support individual practices within their stated scope, not the entire diagram.
+  basis:
+    - source: RAG
+      claim:
+        - Отдельные контуры загрузки, индексации, извлечения и выдачи. Vector Search — пример реализации.
+        - Separates the ingestion, indexing, retrieval, and serving subsystems. Vector Search is one example implementation.
+    - source: AZURE-RAG-ACCESS
+      claim:
+        - Передача идентичности и ограничение извлекаемого контекста данными, доступными пользователю.
+        - Covers identity propagation and restricting retrieved context to data the user can access.
+    - source: MS-EVALS
+      claim:
+        - Корпоративный поиск, экспертная оценка и регрессионные проверки; конкретные правила эскалации этой схемы являются проектными.
+        - Covers enterprise search, expert evaluation, and regression checks; the specific escalation rules of this scheme are design decisions.
+  nodes:
+    - id: scope
+      label: [Назначение и границы знаний, Knowledge purpose and boundaries]
+      detail:
+        - Согласовать источники, владельцев, группы пользователей, сроки актуальности, отзыв и ожидаемые сценарии поиска с проверяемыми ссылками.
+        - Agree on sources, owners, audiences, freshness, revocation and search scenarios with verifiable citations.
+      kind: step
+      components:
+        architecture: [g0, b_goal, b_owndata, b_poldisc]
+        infrastructure: [data-catalog, business-apps]
+        stack: [RM-DAT-02, RM-APP-01, RM-GOV-03]
+    - id: source
+      label: ['Источник и права подтверждены?', 'Are source and access verified?']
+      detail:
+        - Установить каноническую версию источника и авторитетную систему прав. Связать документ с владельцем и правилами раскрытия; не индексировать материалы с неподтверждённым происхождением или правами.
+        - Identify the canonical source version and authority for access. Bind documents to owners and disclosure rules; exclude sources with unverified provenance or permissions.
+      kind: decision
+      components:
+        architecture: [d1, d2, s_src, g1]
+        infrastructure: [landing-zone, data-catalog, data-access-proxy]
+        stack: [RM-DAT-01, RM-DAT-02, RM-DPR-04, RM-TRS-05]
+    - id: normalize
+      label: ['Документы, фрагменты и происхождение', 'Documents, fragments and provenance']
+      detail:
+        - Разобрать документы, удалить ненужные данные, стабилизировать идентификаторы фрагментов и привязать их к версии источника и области доступа. При модельном разборе или OCR каждый вызов сервиса проверяется guardrails на входе и выходе.
+        - Parse documents, remove unnecessary data, assign stable fragment IDs and bind them to source versions and access scope. For model-based parsing or OCR, check each service call with input and output guardrails.
+      kind: step
+      components:
+        architecture: [d3, d5, b_poldisc, t_store, t_input, t_infer, t_result]
+        infrastructure:
+          - dataset-store
+          - dataset-versioning
+          - data-discovery
+          - input-guardrails
+          - llm-gateway
+          - output-guardrails
+        stack: [RM-DAT-01, RM-DAT-04, RM-DPR-01, RM-AIC-01, RM-MOD-06, RM-AIC-02]
+    - id: index
+      label: [Построение версии индекса, Build the index version]
+      detail:
+        - Выбрать полнотекстовый, векторный, графовый или гибридный способ. При эмбеддингах или модельном ранжировании закрепить версии модели, фрагментов и индекса; каждый сервисный вызов проходит входные и выходные guardrails.
+        - Select full-text, vector, graph or hybrid retrieval. For embeddings or model reranking, pin model, fragment and index versions; every model service call passes input and output guardrails.
+      kind: step
+      components:
+        architecture: [d5, t_vec, b_poldisc, t_input, t_infer, t_result]
+        infrastructure:
+          - vector-db
+          - provenance-registry
+          - dataset-versioning
+          - input-guardrails
+          - llm-gateway
+          - output-guardrails
+        stack:
+          - RM-DAT-07
+          - RM-MOD-09
+          - RM-DAT-08
+          - RM-TRS-05
+          - RM-DAT-04
+          - RM-AIC-01
+          - RM-MOD-06
+          - RM-AIC-02
+    - id: synchronize
+      label: [Синхронизация прав и удаления, Synchronize access and deletion]
+      detail:
+        - Связать проверку доступа при запросе с актуальным субъектом и ACL источника. При изменении прав аннулировать выдачу и связанные кеши; при пропаже актуальных правил закрыть затронутую область.
+        - Bind query-time authorization to the current caller and source ACL. On access change, invalidate retrieval and related caches; close the affected scope when current policy is unavailable.
+      kind: step
+      components:
+        architecture: [t_iam, mt_tb, b_poldisc, s_runtime]
+        infrastructure: [iam-sso, rag-access-filter, data-access-proxy, vector-db]
+        stack: [RM-SEC-01, RM-DPR-06, RM-DPR-04, RM-DAT-07, RM-MOD-10]
+    - id: verify
+      label: ['Доступ и качество выдачи подтверждены?', 'Are access and retrieval quality verified?']
+      detail:
+        - Проверить покрытие, точность ссылок и результаты для разных прав. Отдельно испытать удаление, отзыв и внедрённую инструкцию в документе. Если проверка вызывает модель, контекст проходит входные guardrails, результат — выходные.
+        - Test coverage, citation accuracy and results across access scopes. Exercise deletion, revocation and injected instructions in a document. If a test invokes a model, apply input guardrails to context and output guardrails to the result.
+      kind: decision
+      components:
+        architecture: [o_eval, g4, mt_indep, g7, t_input, t_infer, t_result]
+        infrastructure:
+          - eval-datasets
+          - eval-red-teaming
+          - rule-based-checks
+          - rag-access-filter
+          - input-guardrails
+          - llm-gateway
+          - output-guardrails
+        stack: [RM-DAT-05, RM-DEV-07, RM-DPR-06, RM-AIC-01, RM-MOD-06, RM-AIC-02]
+    - id: fix
+      label: ['Причина локализована?', 'Is the cause isolated?']
+      detail:
+        - При ошибке разметки или фрагментации пересобрать затронутые данные; при расхождении прав заблокировать выдачу и восстановить связь с ACL. Продолжать только с проверяемым исправлением в лимите.
+        - Rebuild affected data for labeling or chunking faults. On authorization mismatch, block retrieval and restore the ACL binding. Continue only with a verifiable fix within limits.
+      kind: decision
+      components:
+        architecture: [s_change, mt_review, s_resp]
+        infrastructure: [vector-db, rag-access-filter, audit-log, metrics-alerts]
+        stack: [RM-DAT-07, RM-DPR-06, RM-OPS-07, RM-TRS-04]
+    - id: switch
+      label: ['Безопасно переключить индекс?', 'Is the index safe to switch?']
+      detail:
+        - Сопоставить манифесты источников, правил и индекса. Выпустить версию с записью переключения. Предыдущий индекс можно вернуть лишь при действующих правах и актуальных удалениях.
+        - Reconcile source, policy and index manifests. Release the version with a cutover record. Restore a prior index only if permissions and deletions are current.
+      kind: decision
+      components:
+        architecture: [o_pack, o_release, g6, mt_ev]
+        infrastructure: [release-gate, cd-deployment, vector-db, provenance-registry]
+        stack: [RM-DEV-09, RM-DEV-10, RM-DAT-07, RM-TRS-05]
+    - id: available
+      label: [Проверенная версия поиска доступна, Verified search version available]
+      detail:
+        - Объявить версию и окно актуальности. Передать владельцу метрики качества и синхронизации прав, правила обновления и порядок экстренного закрытия выдачи.
+        - Publish the version and freshness window. Hand over quality and access synchronization metrics, updates and emergency closure procedures.
+      kind: outcome
+      components:
+        architecture: [o_ops, s_detect, t_audit]
+        infrastructure: [vector-db, metrics-alerts, audit-log]
+        stack: [RM-DAT-07, RM-OPS-01, RM-OPS-05, RM-TRS-04]
+    - id: hold
+      label: [Область выдачи закрыта, Retrieval scope closed]
+      detail:
+        - Не выдавать результат из недопущенного источника, индекса или кеша. Зарегистрировать затронутые права и условие повторного запуска.
+        - Do not serve results from an unauthorized source, index or cache. Record the affected access and reopening conditions.
+      kind: outcome
+      components:
+        architecture: [s_resp, mt_residual, t_audit]
+        infrastructure: [rag-access-filter, audit-log, kill-switch]
+        stack: [RM-DPR-06, RM-TRS-04, RM-TRS-07]
+  edges:
+    - from: scope
+      to: source
+      label: [Область поиска согласована, Search scope agreed]
+    - from: source
+      to: normalize
+      label: [Источник и ACL подтверждены, Source and ACL verified]
+    - from: source
+      to: hold
+      label: [Источник или право не подтверждены, Source or access unverified]
+    - from: normalize
+      to: index
+      label: [Фрагменты и ссылки готовы, Fragments and links ready]
+    - from: normalize
+      to: hold
+      label: [Недопустимое представление, Prohibited representation]
+    - from: index
+      to: synchronize
+      label: [Индекс построен, Index built]
+    - from: index
+      to: hold
+      label: [Модельный маршрут или версия запрещены, Model route or version prohibited]
+    - from: synchronize
+      to: verify
+      label: [Актуальные правила связаны, Current policies bound]
+    - from: verify
+      to: switch
+      label: [Проверки пройдены, Checks passed]
+    - from: verify
+      to: fix
+      label: [Качество или доступ не подтверждены, Quality or access check failed]
+    - from: fix
+      to: normalize
+      label: [Ошибка фрагментации или данных, Fragment or data defect]
+    - from: fix
+      to: synchronize
+      label: [Ошибка связки прав исправлена, Access binding corrected]
+    - from: fix
+      to: hold
+      label: [Безопасное исправление не найдено, No safe fix found]
+    - from: switch
+      to: available
+      label: [Версия допущена, Version admitted]
+    - from: switch
+      to: hold
+      label: [Сверка не пройдена, Reconciliation failed]
+  main: [scope, source, normalize, index, synchronize, verify, switch, available]

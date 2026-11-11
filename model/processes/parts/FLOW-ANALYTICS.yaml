@@ -1,0 +1,87 @@
+# Этапы и варианты процессов. Ключ этапа процесса: <процесс>--<этап>.
+# Stages and variants of processes. A process stage key is <process>--<stage>.
+FLOW-ANALYTICS--QUESTION:
+  kind: operation
+  name:
+    ru: Уточнить аналитическую задачу
+    en: Define the analytical question
+  description:
+    - Зафиксировать инициатора, период, метрику, назначение и критерий проверки. Различать установленный показатель и исследовательскую оценку.
+    - Record the requester, period, metric, purpose, and verification criterion. Distinguish an established metric from an exploratory estimate.
+  classes: [RM-APP-01, RM-SEC-01]
+  architectureSteps: [b_goal, t_iam]
+  workflowNode: question
+FLOW-ANALYTICS--DATA:
+  kind: operation
+  name:
+    ru: Данные и метрика допустимы?
+    en: Are data and metric suitable?
+  description:
+    - Выбрать допущенную версию источника, определение метрики и права на поля и строки. Недоступность данных не лечится запросом под общей привилегированной учётной записью.
+    - Select an admitted source version, metric definition, and row and column permissions. Do not compensate for missing access with a shared privileged identity.
+  classes: [RM-DAT-02, RM-DAT-03, RM-DAT-04, RM-DPR-04, RM-ACT-01]
+  architectureSteps: [d2, b_owndata, b_poldisc]
+  workflowNode: data
+FLOW-ANALYTICS--PLAN:
+  kind: operation
+  name:
+    ru: Подготовить план расчёта
+    en: Prepare the calculation plan
+  description:
+    - Сформировать параметры и запрос на чтение. Если план или код предлагает модель, провести каждый вызов через входной контроль, шлюз и выходную проверку; результат остаётся предложением.
+    - Prepare parameters and a read-only query. If a model proposes the plan or code, route each call through input checks, the gateway, and output checks; the result remains a proposal.
+  classes:
+    - RM-AIC-01
+    - RM-AIC-05
+    - RM-MOD-12
+    - RM-MOD-13
+    - RM-MOD-06
+    - RM-AIC-02
+    - RM-AGT-03
+    - RM-DAT-03
+  architectureSteps: [t_input, t_infer, t_result]
+  workflowNode: plan
+FLOW-ANALYTICS--ADMIT:
+  kind: operation
+  name:
+    ru: Расчёт допущен?
+    en: Is the calculation admitted?
+  description:
+    - Проверить точный запрос и параметры, разрешённые таблицы и действия, строковые и колоночные права, квоты. Запретить запись, произвольный экспорт и обход шлюза данных.
+    - Check the exact query and parameters, authorized tables and operations, row and column rights, and limits. Block writes, arbitrary exports, and bypasses of the data gateway.
+  classes: [RM-AGT-04, RM-ACT-02, RM-ACT-01, RM-DPR-04, RM-AGT-08]
+  architectureSteps: [t_gw, d2, b_polbudget]
+  workflowNode: admit
+FLOW-ANALYTICS--EXECUTE:
+  kind: operation
+  name:
+    ru: Выполнить расчёт
+    en: Run the calculation
+  description:
+    - Исполнить разрешённый запрос у источника с правами инициатора. Если нужен сгенерированный код, запускать только в изолированной среде с допущенными входами, лимитами и запретом произвольного сетевого вывода.
+    - Run the authorized query at the source under the requester's scope. If generated code is required, execute only in an isolated environment with admitted inputs, limits, and no arbitrary network output.
+  classes: [RM-DPR-04, RM-ACT-02, RM-DAT-06, RM-ACT-03]
+  architectureSteps: [t_gw, s_runtime]
+  workflowNode: execute
+FLOW-ANALYTICS--VALIDATE:
+  kind: operation
+  name:
+    ru: Расчёт проверен?
+    en: Is the calculation verified?
+  description:
+    - Сверить с определением метрики и контрольной выборкой, отметить пропуски и качество данных. Проверить результат инструмента до передачи модели и скрыть недопустимые малые группы или поля по политике.
+    - Compare against the metric definition and a reference sample; note missing values and data quality. Check tool output before passing it to a model and suppress prohibited small groups or fields per policy.
+  classes: [RM-DAT-03, RM-DAT-05, RM-AIC-02]
+  architectureSteps: [d4, t_result, mt_ev]
+  workflowNode: validate
+FLOW-ANALYTICS--PUBLISH:
+  kind: operation
+  name:
+    ru: Вывод допустим к выдаче?
+    en: May the analysis be delivered?
+  description:
+    - Если модель формулирует вывод, применить входные и выходные проверки, затем сверить текст с рассчитанными числами. Проверить права на итог, ссылку и экспорт.
+    - If a model writes the summary, apply input and output checks, then reconcile the text with calculated numbers. Check permissions for the result, references, and export.
+  classes: [RM-AIC-01, RM-AIC-05, RM-MOD-12, RM-MOD-13, RM-MOD-06, RM-AIC-02, RM-TRS-04]
+  architectureSteps: [t_input, t_infer, t_result, b_poldisc]
+  workflowNode: publish

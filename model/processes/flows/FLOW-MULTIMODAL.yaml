@@ -1,0 +1,207 @@
+# Процесс на карте / Process on the map: FLOW-MULTIMODAL
+# workflow: узлы и переходы схемы; SVG схемы строит tools/build.py через Graphviz.
+# workflow: diagram nodes and edges; tools/build.py renders the SVG with Graphviz.
+name:
+  ru: Обработка документов и мультимодальных материалов
+  en: Document and Multimodal Processing
+group: INF
+owner: [Владелец обработки вложений, Media processing owner]
+start:
+  - Пользователь предоставил файл или поток в поддерживаемом формате и задал назначение обработки.
+  - A user provides a file or stream in a supported format and defines the processing purpose.
+result:
+  - Выданы проверенные извлечённые данные с указанием страниц, областей или времени; неуверенные случаи переданы на проверку.
+  - Checked extracted data with page, region, or time references are delivered; uncertain cases are referred for review.
+check:
+  - Неподдерживаемый или опасный файл не открывается в рабочем процессе модели. Низкая уверенность эскалируется, а проверенный результат связан с версией файла и страницей, областью или таймкодом.
+  - Unsupported or unsafe files are not opened in the model's work environment. Low confidence is escalated, and checked results link to the file version and page, region, or timestamp.
+maturity:
+  - Проектный маршрут · нужен профиль модальностей
+  - Proposed workflow · a modality profile is required
+calls: []
+order: 13
+protection:
+  - Каждый вызов модели проходит проверку идентичности и прав, защиту входа и выхода и аудит в разрешённом объёме. Вызовы инструментов допускаются отдельно; код исполняется в изолированной среде. Согласование и ограничения раскрытия задаются политикой.
+  - Every model call uses identity and authorization checks, input and output protections, and permitted audit retention. Tool calls are authorized separately; code runs in a sandbox. Approval and disclosure restrictions follow policy.
+parts:
+  - CORE-01
+  - FLOW-MULTIMODAL--INTAKE
+  - FLOW-MULTIMODAL--FILE
+  - FLOW-MULTIMODAL--ROUTE
+  - FLOW-MULTIMODAL--EXTRACT
+  - FLOW-MULTIMODAL--QUALITY
+  - FLOW-MULTIMODAL--DELIVER-CHECK
+tags: [Document and Multimodal Processing]
+option: placement
+paths:
+  local: process-flow-multimodal-local
+  external: process-flow-multimodal-external
+workflow:
+  summary:
+    - Пользователь предоставил файл или поток в поддерживаемом формате и задал назначение обработки. Выданы проверенные извлечённые данные с указанием страниц, областей или времени; неуверенные случаи переданы на проверку.
+    - A user provides a file or stream in a supported format and defines the processing purpose. Checked extracted data with page, region, or time references are delivered; uncertain cases are referred for review.
+  synthesis:
+    - Последовательность, условия переходов и сопоставление компонентов — проектный синтез AiNativeOps. Источники подтверждают отдельные практики в указанной области, а не всю схему.
+    - The sequence, conditions and component mapping are AiNativeOps design synthesis. Sources support individual practices within their stated scope, not the entire diagram.
+  basis:
+    - source: P20-MULTIMODAL
+      claim:
+        - Преобразование документов, изображений, аудио и видео в структурированные данные; классы AiNativeOps не привязаны к поставщику.
+        - Covers converting documents, images, audio, and video into structured data; AiNativeOps classes are not tied to a vendor.
+    - source: RMF
+      claim:
+        - Профиль рисков генеративного ИИ и действия по управлению риском.
+        - Covers the generative AI risk profile and risk management actions.
+    - source: ADK-A
+      claim:
+        - Версионируемые рабочие файлы с областью сессии или пользователя.
+        - Covers versioned working files scoped to a session or a user.
+    - source: LLM-C
+      claim:
+        - Отделение инструкций от данных, проверки ввода и выхода, многослойный контроль.
+        - Covers separating instructions from data, input and output guardrails, and layered controls.
+    - source: OPEN-G
+      claim:
+        - Различает начальные, конечные и инструментальные проверки. Границы SDK не подтверждают проверку каждого промежуточного вызова.
+        - Distinguishes input, output, and tool guardrails. The SDK boundaries do not confirm that every intermediate call is checked.
+  nodes:
+    - id: intake
+      label: [Принять материал и цель, Receive media and purpose]
+      detail:
+        - Проверить идентичность, полномочия и назначение. Зарегистрировать ID и версию файла или потока, не отправляя его в модель и не исполняя содержимое.
+        - Check identity, authority, and purpose. Register the ID and version of the file or stream without sending it to a model or executing its contents.
+      kind: step
+      components:
+        architecture: [t_iam, d1]
+        infrastructure: [business-apps, iam-sso, artifact-intake, landing-zone]
+        stack: [RM-APP-01, RM-SEC-01, RM-SEC-03]
+    - id: file
+      label: ['Файл и область обработки допустимы?', 'Are file and processing scope allowed?']
+      detail:
+        - В карантине определить фактический формат, размер, длительность и класс данных; проверить требования к декодированию и хранению. Запрещённый или подозрительный материал не переносить в рабочую среду.
+        - In quarantine, determine actual format, size, duration, and data class; check decoding and retention requirements. Do not move prohibited or suspicious media to the working environment.
+      kind: decision
+      components:
+        architecture: [d1, d2, s_scan]
+        infrastructure: [artifact-intake, landing-zone, data-discovery, pdp]
+        stack: [RM-SEC-03, RM-DPR-01, RM-ACT-01]
+    - id: route
+      label: ['Есть допущенный обработчик?', 'Is an approved processor available?']
+      detail:
+        - Выбрать разрешённый парсер, OCR, распознавание речи или нативный мультимодальный маршрут. Проверить формат, версию, качество и ограничения размещения. Без допущенной возможности передать на ручную проверку.
+        - Select an approved parser, OCR, speech recognition, or native multimodal route. Check format, version, quality, and placement constraints. Without an admitted capability, refer for manual review.
+      kind: decision
+      components:
+        architecture: [d_extract, t_infer, b_polext]
+        infrastructure: [multimodal-processing, model-registry, pdp]
+        stack: [RM-DAT-10, RM-MOD-05, RM-ACT-01]
+    - id: extract
+      label: [Извлечь данные в изоляции, Extract data in isolation]
+      detail:
+        - Запустить обработчик только после допуска с ограничениями файлов, сети и ресурсов. Сохранить привязку к странице, области или времени. Для модельного OCR, ASR или vision применить входной контроль модальности, шлюз и выходной контроль.
+        - Run the admitted processor with file, network, and resource limits. Preserve page, region, or time references. For model-based OCR, ASR, or vision, apply modality-aware input checks, gateway routing, and output checks.
+      kind: step
+      components:
+        architecture: [d_extract, t_gw, t_input, t_infer, t_result]
+        infrastructure:
+          - multimodal-processing
+          - pep
+          - job-sandbox
+          - input-guardrails
+          - llm-gateway
+          - output-guardrails
+        stack: [RM-DAT-10, RM-ACT-02, RM-ACT-03, RM-AIC-01, RM-MOD-06, RM-AIC-02]
+    - id: quality
+      label: ['Извлечение пригодно?', 'Is the extraction usable?']
+      detail:
+        - Проверить полноту, привязки, чувствительные поля и качество по установленным порогам и контрольным образцам. Считать команды из вложения недоверенными данными; сомнительные значения не дополнять догадкой.
+        - Check completeness, locations, sensitive fields, and quality against defined thresholds and reference samples. Treat embedded instructions as untrusted data; do not guess uncertain values.
+      kind: decision
+      components:
+        architecture: [d4, t_result, b_poldisc]
+        infrastructure: [multimodal-processing, rule-based-checks, output-guardrails, data-discovery]
+        stack: [RM-DAT-10, RM-DAT-05, RM-AIC-02, RM-DPR-01]
+    - id: deliver-check
+      label: ['Результат разрешён к выдаче?', 'May the result be delivered?']
+      detail:
+        - Если требуется модельное резюме, проверить его вход и выход отдельно и сверить с извлечением. Перед выдачей проверить права получателя, представление и метаданные файла.
+        - If a model-generated summary is needed, check its input and output separately and reconcile it against the extraction. Check recipient rights, representation, and file metadata before delivery.
+      kind: decision
+      components:
+        architecture: [t_input, t_infer, t_result, b_poldisc]
+        infrastructure: [input-guardrails, llm-gateway, output-guardrails, audit-log]
+        stack: [RM-AIC-01, RM-MOD-06, RM-AIC-02, RM-TRS-04]
+    - id: result
+      label: [Выдать результат с привязками, Deliver result with locations]
+      detail:
+        - Вернуть только проверенные поля или фрагменты с указанием версии материала и места. Записать маршрут и решения; хранить исходник и производные по утверждённым срокам.
+        - Return only checked fields or excerpts with media version and location. Record route and decisions; retain source and derivatives under approved periods.
+      kind: outcome
+      components:
+        architecture: [t_result, t_audit]
+        infrastructure: [business-apps, audit-log]
+        stack: [RM-APP-01, RM-TRS-04]
+    - id: quarantine
+      label: [Изолировать или отказать, Quarantine or deny]
+      detail:
+        - Остановить исполнение или выдачу и зафиксировать основание. Подозрительный материал остаётся в карантине по политике, а запрещённый результат не отправляется потребителю.
+        - Stop execution or delivery and record the reason. Keep suspicious media in quarantine under policy and withhold prohibited results from the consumer.
+      kind: outcome
+      components:
+        architecture: [d1, t_audit]
+        infrastructure: [landing-zone, artifact-intake, audit-log]
+        stack: [RM-SEC-03, RM-TRS-04]
+    - id: review
+      label: [Передать на ручную проверку, Refer for manual review]
+      detail:
+        - Указать отсутствующую возможность, низкую уверенность или технический сбой. Передать эксперту только допущенные материалы без автоматического перехода к внешней модели.
+        - Identify the missing capability, low confidence, or technical failure. Forward only admitted material to the reviewer without automatic fallback to an external model.
+      kind: outcome
+      components:
+        architecture: [b_ownproc, mt_ev, t_audit]
+        infrastructure: [business-apps, audit-log]
+        stack: [RM-APP-03, RM-TRS-04]
+  edges:
+    - from: intake
+      to: file
+      label: [Материал зарегистрирован, Media registered]
+    - from: file
+      to: route
+      label: [Формат и данные допустимы, Format and data allowed]
+    - from: file
+      to: quarantine
+      label: [Опасный или запрещённый файл, Unsafe or prohibited file]
+    - from: file
+      to: review
+      label: [Формат неизвестен или не поддерживается, Unknown or unsupported format]
+    - from: route
+      to: extract
+      label: [Обработчик допущен, Processor admitted]
+    - from: route
+      to: review
+      label: [Нет подходящего допущенного обработчика, No suitable admitted processor]
+    - from: extract
+      to: quality
+      label: [Извлечение завершено, Extraction completed]
+    - from: extract
+      to: quarantine
+      label: [Проверка обнаружила запрет, Control found a prohibition]
+    - from: extract
+      to: review
+      label: [Сбой или нет проверенного результата, Failure or no checked result]
+    - from: quality
+      to: deliver-check
+      label: [Качество подтверждено, Quality confirmed]
+    - from: quality
+      to: review
+      label: [Неуверенное или неполное извлечение, Uncertain or incomplete extraction]
+    - from: deliver-check
+      to: result
+      label: [Выдача разрешена, Delivery allowed]
+    - from: deliver-check
+      to: quarantine
+      label: [Выдача запрещена, Delivery prohibited]
+    - from: deliver-check
+      to: review
+      label: [Резюме не подтверждено, Summary unsupported]
+  main: [intake, file, route, extract, quality, deliver-check, result]

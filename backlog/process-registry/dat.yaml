@@ -1,0 +1,134 @@
+# Реестр процессов · Данные и признаки / Process registry · Data and features
+DAT-01:
+  name:
+    ru: Приём и квалификация источника данных
+    en: Data source intake and qualification
+  start:
+    - Появился новый источник, договор или версия набора данных.
+    - A new source, agreement or dataset version appears.
+  result:
+    - Решение о приёме, карантине или отказе с владельцем и назначением.
+    - A decision to accept, quarantine or reject, with an owner and a purpose.
+  check:
+    - Есть сведения о происхождении, допустимых применениях и составе; недопущенные данные остаются изолированными.
+    - Provenance, permitted uses and content are documented; data that is not admitted stays isolated.
+  gates: G1
+  classes: [RM-DAT-01, RM-DAT-02, RM-DPR-01, RM-SEC-03, RM-TRS-05]
+DAT-02:
+  name:
+    ru: Очистка и подготовка корпуса
+    en: Data corpus preparation
+  start:
+    - Есть допущенные исходные данные и требования к корпусу.
+    - Admitted source data and corpus requirements are available.
+  result:
+    - Воспроизводимая версия очищенного и преобразованного корпуса.
+    - A reproducible version of the cleaned and transformed corpus.
+  check:
+    - Проверить схему, дубликаты, пропуски, фильтры и происхождение результатов преобразований.
+    - Check the schema, duplicates, missing values, filters and the provenance of transformation outputs.
+  gates: G2
+  classes: [RM-DEV-03, RM-DAT-01, RM-DAT-04, RM-TRS-05]
+DAT-03:
+  name:
+    ru: Разметка и проверка согласованности
+    en: Data labeling and adjudication
+  start:
+    - Требуются метки, оценки или эталонные ответы.
+    - Labels, ratings or reference answers are needed.
+  result:
+    - Версия разметки с критериями, ответственными и спорными случаями.
+    - A labeling version with criteria, responsible people and disputed cases.
+  check:
+    - Неоднозначные метки проходят сверку; автоматическая разметка оценивается на независимой выборке.
+    - Ambiguous labels go through adjudication; automatic labeling is evaluated on an independent sample.
+  gates: G2 И*
+  classes: [RM-DAT-04, RM-DEV-03, RM-DAT-05, RM-DEV-07]
+DAT-04:
+  name:
+    ru: Формирование выборок
+    en: Dataset partitioning
+  start:
+    - Допущенный корпус нужен для обучения, настройки и контроля.
+    - An admitted corpus is needed for training, tuning and testing.
+  result: [Манифест версий раздельных выборок., A manifest of versions of the separate splits.]
+  check:
+    - Проверяются пересечения, временные границы и независимость контрольного набора.
+    - Overlaps, time boundaries and the independence of the test set are checked.
+  gates: G2
+  classes: [RM-DAT-04, RM-DAT-05, RM-DEV-03]
+DAT-05:
+  name:
+    ru: Генерация синтетических данных
+    en: Synthetic data generation
+  start:
+    - Нужны дополнительные примеры по утверждённому заданию.
+    - Additional examples are needed under an approved specification.
+  result:
+    - Версия синтетического набора с источником и протоколом оценки.
+    - A synthetic dataset version with its source and evaluation protocol.
+  check:
+    - Проверить качество, допустимость исходных данных и сохранение приватности по заявленной модели риска.
+    - Check quality, the permissibility of source data and privacy preservation under the stated risk model.
+  gates: G2 И*
+  classes: [RM-DAT-04, RM-DEV-03, RM-DAT-05, RM-DEV-07, RM-TRS-05]
+DAT-06:
+  name:
+    ru: Подготовка защищённого представления данных
+    en: Protected data preparation
+  start:
+    - Для работы нужны данные с ограничениями раскрытия.
+    - The work requires data with disclosure restrictions.
+  result:
+    - Допущенная выборка или контекст с разрешённым представлением значений.
+    - An admitted sample or context with a permitted representation of values.
+  check:
+    - Проверить доступ к исходным данным, назначение, полезность преобразования и правила восстановления значений.
+    - Check access to the source data, the purpose, the usefulness of the transformation and the rules for restoring values.
+  gates: G2
+  classes: [RM-DPR-01, RM-DPR-02, RM-DPR-03, RM-DPR-04, RM-TRS-02]
+DAT-07:
+  name:
+    ru: Подготовка и выдача признаков
+    en: Feature preparation and serving
+  start:
+    - Предиктивной модели нужны воспроизводимые признаки.
+    - A predictive model needs reproducible features.
+  result:
+    - Версия признаков, правила вычисления и способ получения в обучении и применении.
+    - A feature version, computation rules and the retrieval method for training and inference.
+  check:
+    - Сопоставить выдачу и обучение, проверить допустимость признака на момент события.
+    - Compare serving with training, and check that each feature is valid as of the event time.
+  gates: G2
+  classes: [RM-DAT-02, RM-DAT-04, RM-DAT-09, RM-DEV-03]
+DAT-08:
+  name:
+    ru: Выпуск версии набора данных
+    en: Versioned dataset publication
+  start:
+    - Владелец подготовил набор к предоставлению другим задачам.
+    - The owner has prepared a dataset for use by other tasks.
+  result:
+    - Опубликованная версия с контрактом, происхождением и правилами использования.
+    - A published version with a contract, provenance and terms of use.
+  check:
+    - Набор однозначно восстанавливается по манифесту и доступен только согласованным получателям.
+    - The dataset is restored unambiguously from its manifest and is available only to approved recipients.
+  gates: G2
+  classes: [RM-DAT-02, RM-DAT-04, RM-DEV-08, RM-TRS-05]
+DAT-09:
+  name:
+    ru: Допуск обратной связи в обучение
+    en: Training feedback qualification
+  start:
+    - Из эксплуатации поступили исправления, оценки и примеры.
+    - Corrections, ratings and examples arrive from operation.
+  result:
+    - Принятый набор обратной связи с происхождением и версией.
+    - An accepted feedback dataset with provenance and a version.
+  check:
+    - Неразобранный отзыв или запрещённый источник не попадает в обучающий набор.
+    - Unreviewed feedback or a prohibited source does not enter the training dataset.
+  gates: G1 G2 G8
+  classes: [RM-DAT-01, RM-DAT-04, RM-DEV-03, RM-DEV-07, RM-OPS-05]
