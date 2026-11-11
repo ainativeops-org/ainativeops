@@ -12,7 +12,7 @@
    ```bash
    gh auth login
    ```
-3. Создайте организацию `ainativeops` на странице https://github.com/account/organizations/new, тариф Free. Отдельная организация держит проект независимым от личного аккаунта и от компании. Если имя занято, выберите другое и подставляйте его вместо `ainativeops` во всех командах ниже.
+3. Создайте организацию `ainativeops-org` (имя `ainativeops` на GitHub занято) на странице https://github.com/account/organizations/new, тариф Free. Отдельная организация держит проект независимым от личного аккаунта и от компании. Если имя занято, выберите другое и подставляйте его вместо `ainativeops-org` во всех командах ниже.
 
 ## 2. Распаковка и проверка
 
@@ -46,14 +46,14 @@
    Коммиты подписаны строкой DCO, которую требует CONTRIBUTING.md. Свои коммиты делайте с ключом `-s`.
 2. Создайте публичный репозиторий в организации и отправьте `main` одной командой, затем теги:
    ```bash
-   gh repo create ainativeops/ainativeops --public --source=. --remote=origin --push \
+   gh repo create ainativeops-org/ainativeops --public --source=. --remote=origin --push \
      --description "Open reference model for AI-native operations. Community Interest Project." \
      --homepage "https://ainativeops.org"
    git push origin --tags
    ```
    Если репозиторий уже создан и в нём лежит alpha 0.1, подключите его и отправьте 0.2 поверх. Вторая команда проверяет, что история на GitHub — начало локальной истории; при ошибке остановитесь и сравните `git log origin/main` с локальным `git log`:
    ```bash
-   git remote add origin https://github.com/ainativeops/ainativeops.git
+   git remote add origin https://github.com/ainativeops-org/ainativeops.git
    git fetch origin
    git merge-base --is-ancestor origin/main main && echo "можно отправлять"
    git push origin main
@@ -61,22 +61,22 @@
    ```
 3. Добавьте темы для поиска по GitHub:
    ```bash
-   gh repo edit ainativeops/ainativeops --add-topic reference-model,ai-agents,mlops,llmops,ai-safety,archimate
+   gh repo edit ainativeops-org/ainativeops --add-topic reference-model,ai-agents,mlops,llmops,ai-safety,archimate
    ```
 
 ## 4. Публикация карты через GitHub Pages
 
-1. Откройте https://github.com/ainativeops/ainativeops/settings/pages. В поле **Source** выберите **GitHub Actions**.
+1. Откройте https://github.com/ainativeops-org/ainativeops/settings/pages. В поле **Source** выберите **GitHub Actions**.
 2. Запустите публикацию. После первого пуша она могла упасть, потому что Pages ещё не был включён:
    ```bash
-   gh workflow run pages.yml --repo ainativeops/ainativeops
-   gh run watch --repo ainativeops/ainativeops
+   gh workflow run pages.yml --repo ainativeops-org/ainativeops
+   gh run watch --repo ainativeops-org/ainativeops
    ```
-3. Когда задание `deploy` завершится, карта откроется по адресу https://ainativeops.github.io/ainativeops/. Проверьте три вида, переключатель языка и кнопку «Предложить правку» в панели элемента. Кнопка должна открыть форму issue в этом репозитории.
+3. Когда задание `deploy` завершится, карта откроется по адресу https://ainativeops-org.github.io/ainativeops/. Проверьте три вида, переключатель языка и кнопку «Предложить правку» в панели элемента. Кнопка должна открыть форму issue в этом репозитории.
 
 ## 5. Домен ainativeops.org
 
-1. **Подтвердите домен для организации.** Откройте https://github.com/organizations/ainativeops/settings/pages, нажмите **Add a domain** и введите `ainativeops.org`. GitHub покажет TXT-запись вида `_github-pages-challenge-ainativeops.ainativeops.org`. Создайте её у регистратора и нажмите **Verify**. Подтверждение запрещает другим аккаунтам привязать ваш домен к своим страницам.
+1. **Подтвердите домен для организации.** Откройте https://github.com/organizations/ainativeops-org/settings/pages, нажмите **Add a domain** и введите `ainativeops.org`. GitHub покажет TXT-запись вида `_github-pages-challenge-ainativeops-org.ainativeops.org`. Создайте её у регистратора и нажмите **Verify**. Подтверждение запрещает другим аккаунтам привязать ваш домен к своим страницам.
 2. **Создайте записи DNS у регистратора.** Перед вводом сверьте адреса с документацией GitHub: https://docs.github.com/pages/configuring-a-custom-domain-for-your-github-pages-site/managing-a-custom-domain-for-your-github-pages-site
 
    | Имя | Тип | Значение |
@@ -89,10 +89,10 @@
    | `@` | AAAA | `2606:50c0:8001::153` |
    | `@` | AAAA | `2606:50c0:8002::153` |
    | `@` | AAAA | `2606:50c0:8003::153` |
-   | `www` | CNAME | `ainativeops.github.io` |
+   | `www` | CNAME | `ainativeops-org.github.io` |
 
    Удалите у регистратора записи-заглушки для `@` и `www`, если они есть. Иначе GitHub не выпустит сертификат.
-3. **Привяжите домен к репозиторию.** В https://github.com/ainativeops/ainativeops/settings/pages впишите `ainativeops.org` в поле **Custom domain** и нажмите **Save**. При публикации через Actions файл CNAME в репозитории не нужен.
+3. **Привяжите домен к репозиторию.** В https://github.com/ainativeops-org/ainativeops/settings/pages впишите `ainativeops.org` в поле **Custom domain** и нажмите **Save**. При публикации через Actions файл CNAME в репозитории не нужен.
 4. **Дождитесь проверки DNS.** Обычно она занимает от нескольких минут до часа. Проверить записи можно так:
    ```bash
    dig +short ainativeops.org
@@ -104,17 +104,17 @@
 
 1. Включите Discussions для RFC:
    ```bash
-   gh repo edit ainativeops/ainativeops --enable-discussions
+   gh repo edit ainativeops-org/ainativeops --enable-discussions
    ```
-   В https://github.com/ainativeops/ainativeops/discussions/categories создайте категорию **RFC** с форматом Announcement или Open-ended discussion.
+   В https://github.com/ainativeops-org/ainativeops/discussions/categories создайте категорию **RFC** с форматом Announcement или Open-ended discussion.
 2. Создайте метку, которую ставит форма «Предложить правку»:
    ```bash
-   gh label create proposal --color FBCA04 --description "Предложение изменить модель" --repo ainativeops/ainativeops
+   gh label create proposal --color FBCA04 --description "Предложение изменить модель" --repo ainativeops-org/ainativeops
    ```
 
 ## 7. Защита ветки main
 
-Правила не дают слить изменение без проверок и рецензии. Откройте https://github.com/ainativeops/ainativeops/settings/rules, создайте **New branch ruleset** и задайте:
+Правила не дают слить изменение без проверок и рецензии. Откройте https://github.com/ainativeops-org/ainativeops/settings/rules, создайте **New branch ruleset** и задайте:
 
 1. Enforcement status: **Active**. Target branches: **Default branch**.
 2. **Require a pull request before merging**, Required approvals: 1, отметьте **Require review from Code Owners**.
@@ -129,7 +129,7 @@
 
 ```bash
 git push origin v0.2.0-alpha
-gh release create v0.2.0-alpha --repo ainativeops/ainativeops --prerelease \
+gh release create v0.2.0-alpha --repo ainativeops-org/ainativeops --prerelease \
   --title "AiNativeOps alpha 0.2" --notes-file docs/releases/v0.2.0-alpha.md
 ```
 
@@ -159,7 +159,7 @@ gh release create v0.2.0-alpha --repo ainativeops/ainativeops --prerelease \
 | Симптом | Причина и решение |
 |---|---|
 | Задание `deploy` падает с ошибкой про environment или Pages | Pages не включён или источник не GitHub Actions. Выполните шаг 4.1 и перезапустите `gh workflow run pages.yml`. |
-| `gh repo create` отвечает, что нет прав в организации | Вы не владелец организации или имя репозитория занято. Проверьте https://github.com/orgs/ainativeops/people. |
+| `gh repo create` отвечает, что нет прав в организации | Вы не владелец организации или имя репозитория занято. Проверьте https://github.com/orgs/ainativeops-org/people. |
 | Домен не проходит проверку DNS | Остались старые A-записи регистратора или записи ещё не разошлись. Сверьте `dig +short ainativeops.org` с таблицей шага 5.2. |
 | Нет галочки Enforce HTTPS | Сертификат ещё выпускается. Подождите до часа. Если не помогло, удалите домен в настройках Pages, сохраните и введите снова. |
 | Кнопка «Предложить правку» не видна | Карта собрана локально без адреса репозитория. На GitHub Pages адрес подставляет workflow. |
